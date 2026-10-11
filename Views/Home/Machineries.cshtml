@@ -1,0 +1,87 @@
+@model List<ZamZamClient.Models.Machinery>
+@{
+    ViewData["Title"] = "Our Machineries - World-Class Production Infrastructure";
+    var currentCat = ViewBag.CurrentCategory as string ?? "all";
+}
+
+<!-- Page Header -->
+<section class="page-header-banner">
+    <div class="container text-center">
+        <span class="badge bg-teal text-white px-3 py-2 text-uppercase mb-2">Advanced Industrial Equipment</span>
+        <h1 class="display-5 fw-bold font-heading mb-2 text-white">Our Production Machineries</h1>
+        <p class="lead text-slate-300 max-w-2xl mx-auto mb-0">
+            Equipped with world-class Heidelberg offset presses, rotary label lines, ultrasonic cutters, automatic screen printers, and high-tonnage die cutting machines.
+        </p>
+    </div>
+</section>
+
+<section class="section-padding bg-light">
+    <div class="container">
+        <!-- Category Filter Pills -->
+        <div class="catalog-filter-bar mb-5">
+            <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "all" ? "active" : "")" data-filter="all">
+                All Machineries (17+)
+            </button>
+            <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "offset" ? "active" : "")" data-filter="offset">
+                <i class="bi bi-printer"></i> Offset Printing & Finishing
+            </button>
+            <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "label" ? "active" : "")" data-filter="label">
+                <i class="bi bi-tags"></i> Label Weaving & Printing
+            </button>
+            <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "others" ? "active" : "")" data-filter="others">
+                <i class="bi bi-layers"></i> Embossing & Specialized
+            </button>
+        </div>
+
+        <!-- Machineries Grid -->
+        <div class="row g-4" id="machineryGrid">
+            @foreach (var m in Model)
+            {
+                <div class="col-lg-4 col-md-6 machinery-item-col" data-category="@m.FilterCategory">
+                    <div class="machinery-card">
+                        <div class="machinery-img-wrapper">
+                            <span class="machinery-badge">@m.Category</span>
+                            <img src="@m.ImageUrl" alt="@m.Title" class="machinery-img" onerror="this.src='/images/machineries/gto.jpg';" />
+                        </div>
+                        <div class="machinery-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h3 class="machinery-title mb-0">@m.Title</h3>
+                                <span class="badge bg-light text-dark border">#@(m.Id.ToString("D2"))</span>
+                            </div>
+                            <p class="machinery-desc">@m.KeyCapabilities</p>
+                            
+                            <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
+                                <span class="small text-teal fw-bold">
+                                    <i class="bi bi-check-circle-fill"></i> Precision Unit
+                                </span>
+                                <button type="button" class="btn btn-sm btn-modern-primary" onclick="openQuoteModal('', '@m.Title Service')">
+                                    Inquire Capacity
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Machine Capabilities Highlight Banner -->
+<section class="container my-5">
+    <div class="card border-0 shadow-sm rounded-4 p-5 bg-white">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <span class="section-tagline"><i class="bi bi-patch-check"></i> HIGH PRECISION TOLERANCES</span>
+                <h3 class="fw-bold font-heading mb-2">German & Specialized High-Speed Lines</h3>
+                <p class="text-secondary mb-0">
+                    Our Heidelberg GTO and MO offset setups provide microscopic dot reproduction for premium export hang tags. Coupled with ultrasonic cold-cutting and rotary label presses, we guarantee fray-free edges, skin-safe softness, and colorfast wash durability across high-volume production schedules.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a asp-controller="Home" asp-action="Contact" class="btn btn-modern-dark btn-lg">
+                    Schedule a Factory Tour <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

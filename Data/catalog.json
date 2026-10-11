@@ -1,0 +1,645 @@
+﻿{
+    "TotalProducts":  74,
+    "Products":  [
+                     {
+                         "Id":  1,
+                         "FilterCategory":  "label",
+                         "ImageUrl":  "assets/images/products/WLabel.jpg",
+                         "Category":  "Label",
+                         "Title":  "Woven Label"
+                     },
+                     {
+                         "Id":  2,
+                         "FilterCategory":  "label",
+                         "ImageUrl":  "assets/images/products/WLabel_1.jpg",
+                         "Category":  "Label",
+                         "Title":  "Woven Label"
+                     },
+                     {
+                         "Id":  3,
+                         "FilterCategory":  "label",
+                         "ImageUrl":  "assets/images/products/WLabel_2.jpg",
+                         "Category":  "Label",
+                         "Title":  "Woven Label"
+                     },
+                     {
+                         "Id":  4,
+                         "FilterCategory":  "label",
+                         "ImageUrl":  "assets/images/products/WLabel_3.jpg",
+                         "Category":  "Label",
+                         "Title":  "Woven Label"
+                     },
+                     {
+                         "Id":  5,
+                         "FilterCategory":  "label",
+                         "ImageUrl":  "assets/images/products/CLabel.jpg",
+                         "Category":  "Label",
+                         "Title":  "Care Label"
+                     },
+                     {
+                         "Id":  6,
+                         "FilterCategory":  "label",
+                         "ImageUrl":  "assets/images/products/CLabel_1.jpg",
+                         "Category":  "Label",
+                         "Title":  "Care Label"
+                     },
+                     {
+                         "Id":  7,
+                         "FilterCategory":  "label",
+                         "ImageUrl":  "assets/images/products/CLabel_2.jpg",
+                         "Category":  "Label",
+                         "Title":  "Care Label"
+                     },
+                     {
+                         "Id":  8,
+                         "FilterCategory":  "label",
+                         "ImageUrl":  "assets/images/products/CLabel_3.jpg",
+                         "Category":  "Label",
+                         "Title":  "Care Label"
+                     },
+                     {
+                         "Id":  9,
+                         "FilterCategory":  "emboss",
+                         "ImageUrl":  "assets/images/products/Emboss.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Emboss Paper"
+                     },
+                     {
+                         "Id":  10,
+                         "FilterCategory":  "emboss",
+                         "ImageUrl":  "assets/images/products/Emboss_1.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Emboss Paper"
+                     },
+                     {
+                         "Id":  11,
+                         "FilterCategory":  "emboss",
+                         "ImageUrl":  "assets/images/products/Emboss_2.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Emboss Paper"
+                     },
+                     {
+                         "Id":  12,
+                         "FilterCategory":  "emboss",
+                         "ImageUrl":  "assets/images/products/Emboss_3.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Emboss Paper"
+                     },
+                     {
+                         "Id":  13,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  14,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_1.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  15,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_2.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  16,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_3.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  17,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_4.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  18,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_5.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  19,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_6.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  20,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_7.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  21,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_8.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  22,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_9.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  23,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_10.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  24,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_11.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  25,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_12.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  26,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_13.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  27,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_14.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  28,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_15.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  29,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_16.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  30,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_17.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  31,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_18.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  32,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_19.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  33,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_20.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  34,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_21.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  35,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_22.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  36,
+                         "FilterCategory":  "button",
+                         "ImageUrl":  "assets/images/products/Buttons_23.jpg",
+                         "Category":  "Shirt",
+                         "Title":  "Buttons"
+                     },
+                     {
+                         "Id":  37,
+                         "FilterCategory":  "thread",
+                         "ImageUrl":  "assets/images/products/Cotton.jpg",
+                         "Category":  "Thread",
+                         "Title":  "Cotton"
+                     },
+                     {
+                         "Id":  38,
+                         "FilterCategory":  "thread",
+                         "ImageUrl":  "assets/images/products/Cotton_1.jpg",
+                         "Category":  "Thread",
+                         "Title":  "Cotton"
+                     },
+                     {
+                         "Id":  39,
+                         "FilterCategory":  "thread",
+                         "ImageUrl":  "assets/images/products/Cotton_2.jpg",
+                         "Category":  "Thread",
+                         "Title":  "Cotton"
+                     },
+                     {
+                         "Id":  40,
+                         "FilterCategory":  "thread",
+                         "ImageUrl":  "assets/images/products/Cotton_3.jpg",
+                         "Category":  "Thread",
+                         "Title":  "Cotton"
+                     },
+                     {
+                         "Id":  41,
+                         "FilterCategory":  "elastic",
+                         "ImageUrl":  "assets/images/products/Elastic.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Elastic"
+                     },
+                     {
+                         "Id":  42,
+                         "FilterCategory":  "elastic",
+                         "ImageUrl":  "assets/images/products/Elastic_1.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Elastic"
+                     },
+                     {
+                         "Id":  43,
+                         "FilterCategory":  "elastic",
+                         "ImageUrl":  "assets/images/products/Elastic_2.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Elastic"
+                     },
+                     {
+                         "Id":  44,
+                         "FilterCategory":  "elastic",
+                         "ImageUrl":  "assets/images/products/Elastic_3.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Elastic"
+                     },
+                     {
+                         "Id":  45,
+                         "FilterCategory":  "ribbon",
+                         "ImageUrl":  "assets/images/products/Ribbon.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Gaments Ribbon"
+                     },
+                     {
+                         "Id":  46,
+                         "FilterCategory":  "ribbon",
+                         "ImageUrl":  "assets/images/products/Ribbon_1.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Gaments Ribbon"
+                     },
+                     {
+                         "Id":  47,
+                         "FilterCategory":  "ribbon",
+                         "ImageUrl":  "assets/images/products/Ribbon_2.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Gaments Ribbon"
+                     },
+                     {
+                         "Id":  48,
+                         "FilterCategory":  "ribbon",
+                         "ImageUrl":  "assets/images/products/Ribbon_3.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Gaments Ribbon"
+                     },
+                     {
+                         "Id":  49,
+                         "FilterCategory":  "hangtag",
+                         "ImageUrl":  "assets/images/products/Hangtag.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Hang Tag"
+                     },
+                     {
+                         "Id":  50,
+                         "FilterCategory":  "hangtag",
+                         "ImageUrl":  "assets/images/products/Hangtag_1.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Hang Tag"
+                     },
+                     {
+                         "Id":  51,
+                         "FilterCategory":  "hangtag",
+                         "ImageUrl":  "assets/images/products/Hangtag_2.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Hang Tag"
+                     },
+                     {
+                         "Id":  52,
+                         "FilterCategory":  "hangtag",
+                         "ImageUrl":  "assets/images/products/Hangtag_3.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Hang Tag"
+                     },
+                     {
+                         "Id":  53,
+                         "FilterCategory":  "hangtag",
+                         "ImageUrl":  "assets/images/products/Hangtag_4.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Hang Tag"
+                     },
+                     {
+                         "Id":  54,
+                         "FilterCategory":  "hangtag",
+                         "ImageUrl":  "assets/images/products/Hangtag_5.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Hang Tag"
+                     },
+                     {
+                         "Id":  55,
+                         "FilterCategory":  "hangtag",
+                         "ImageUrl":  "assets/images/products/Hangtag_6.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Hang Tag"
+                     },
+                     {
+                         "Id":  56,
+                         "FilterCategory":  "hangtag",
+                         "ImageUrl":  "assets/images/products/Hangtag_7.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Hang Tag"
+                     },
+                     {
+                         "Id":  57,
+                         "FilterCategory":  "tape",
+                         "ImageUrl":  "assets/images/products/GumTape_1.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Gum Tape"
+                     },
+                     {
+                         "Id":  58,
+                         "FilterCategory":  "tape",
+                         "ImageUrl":  "assets/images/products/Tape.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Both Gum Tape"
+                     },
+                     {
+                         "Id":  59,
+                         "FilterCategory":  "tape",
+                         "ImageUrl":  "assets/images/products/Lace-Tape.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Lace Tape"
+                     },
+                     {
+                         "Id":  60,
+                         "FilterCategory":  "tape",
+                         "ImageUrl":  "assets/images/products/Velcro-Tape.jpg",
+                         "Category":  "Trims",
+                         "Title":  "Velcro Tape"
+                     },
+                     {
+                         "Id":  61,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  62,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_1.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  63,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_2.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  64,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_3.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  65,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_4.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  66,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_5.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  67,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_6.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  68,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_7.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  69,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_8.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  70,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_9.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  71,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_10.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  72,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_11.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  73,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_12.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     },
+                     {
+                         "Id":  74,
+                         "FilterCategory":  "zipper",
+                         "ImageUrl":  "assets/images/products/Zippers_13.jpg",
+                         "Category":  "Accessories",
+                         "Title":  "Zipper"
+                     }
+                 ],
+    "TotalMachineries":  17,
+    "Machineries":  [
+                        {
+                            "Id":  1,
+                            "FilterCategory":  "offset",
+                            "ImageUrl":  "assets/images/machineries/gto.jpg",
+                            "Category":  "Offset",
+                            "Title":  "GTO"
+                        },
+                        {
+                            "Id":  2,
+                            "FilterCategory":  "offset",
+                            "ImageUrl":  "assets/images/machineries/mo.jpg",
+                            "Category":  "Offset",
+                            "Title":  "MO"
+                        },
+                        {
+                            "Id":  3,
+                            "FilterCategory":  "offset",
+                            "ImageUrl":  "assets/images/machineries/dmai.jpg",
+                            "Category":  "Offset",
+                            "Title":  "DMAI"
+                        },
+                        {
+                            "Id":  4,
+                            "FilterCategory":  "offset",
+                            "ImageUrl":  "assets/images/machineries/polar-cutting.jpg",
+                            "Category":  "Offset",
+                            "Title":  "Polar Cutting"
+                        },
+                        {
+                            "Id":  5,
+                            "FilterCategory":  "offset",
+                            "ImageUrl":  "assets/images/machineries/die-cutting.jpg",
+                            "Category":  "Offset",
+                            "Title":  "Die Cutting"
+                        },
+                        {
+                            "Id":  6,
+                            "FilterCategory":  "offset",
+                            "ImageUrl":  "assets/images/machineries/foil-offset.jpg",
+                            "Category":  "Offset",
+                            "Title":  "Foil"
+                        },
+                        {
+                            "Id":  7,
+                            "FilterCategory":  "offset",
+                            "ImageUrl":  "assets/images/machineries/spot.jpg",
+                            "Category":  "Offset",
+                            "Title":  "Spot"
+                        },
+                        {
+                            "Id":  8,
+                            "FilterCategory":  "label",
+                            "ImageUrl":  "assets/images/machineries/autoscreen.jpg",
+                            "Category":  "Label",
+                            "Title":  "Auto Screen"
+                        },
+                        {
+                            "Id":  9,
+                            "FilterCategory":  "label",
+                            "ImageUrl":  "assets/images/machineries/screenprint.jpg",
+                            "Category":  "Label",
+                            "Title":  "Screen Print"
+                        },
+                        {
+                            "Id":  10,
+                            "FilterCategory":  "label",
+                            "ImageUrl":  "assets/images/machineries/rotarylabel.jpg",
+                            "Category":  "Label",
+                            "Title":  "Rotary"
+                        },
+                        {
+                            "Id":  11,
+                            "FilterCategory":  "label",
+                            "ImageUrl":  "assets/images/machineries/cutfold.jpg",
+                            "Category":  "Label",
+                            "Title":  "Cut Fold"
+                        },
+                        {
+                            "Id":  12,
+                            "FilterCategory":  "label",
+                            "ImageUrl":  "assets/images/machineries/flexolabel.jpg",
+                            "Category":  "Label",
+                            "Title":  "Flexo"
+                        },
+                        {
+                            "Id":  13,
+                            "FilterCategory":  "label",
+                            "ImageUrl":  "assets/images/machineries/ultrasonic.jpg",
+                            "Category":  "Label",
+                            "Title":  "Ultra Sonic"
+                        },
+                        {
+                            "Id":  14,
+                            "FilterCategory":  "others",
+                            "ImageUrl":  "assets/images/machineries/emboss.jpg",
+                            "Category":  "",
+                            "Title":  "Paper Emboss"
+                        },
+                        {
+                            "Id":  15,
+                            "FilterCategory":  "others",
+                            "ImageUrl":  "assets/images/machineries/heatlamination.jpg",
+                            "Category":  "Heat Lamination",
+                            "Title":  "Offset"
+                        },
+                        {
+                            "Id":  16,
+                            "FilterCategory":  "others",
+                            "ImageUrl":  "assets/images/projects/Buttons.jpg",
+                            "Category":  "GTO",
+                            "Title":  "Offset"
+                        },
+                        {
+                            "Id":  17,
+                            "FilterCategory":  "others",
+                            "ImageUrl":  "assets/images/projects/Buttons.jpg",
+                            "Category":  "GTO",
+                            "Title":  "Offset"
+                        }
+                    ]
+}

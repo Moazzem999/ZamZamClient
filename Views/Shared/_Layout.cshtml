@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ZamZam Trims (BD) Limited | Leading Apparel Accessories & Trims Manufacturer</title>
+    <meta name="description" content="ZamZam Trims (BD) Limited - Premier manufacturer, importer & supplier of international standard apparel accessories, trims, woven labels, hang tags, buttons, zippers, and digital printing solutions in Bangladesh." />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Custom Modern Stylesheet -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- Top Announcement Bar -->
+    <div class="top-announcement-bar d-none d-md-block">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <span class="badge-status me-3">
+                    <span class="status-dot"></span> Open for Production
+                </span>
+                <span><i class="bi bi-clock me-1 text-teal"></i> Sat - Thu : 9:30 AM – 6:00 PM</span>
+                <span class="top-bar-divider"></span>
+                <span><i class="bi bi-geo-alt me-1 text-teal"></i> Uttara & Motijheel, Dhaka, Bangladesh</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <a href="tel:+8801874633431"><i class="bi bi-telephone-fill me-1 text-teal"></i> +88 01874633431</a>
+                <span class="top-bar-divider"></span>
+                <a href="mailto:info@zztbl.com"><i class="bi bi-envelope-fill me-1 text-teal"></i> info@zztbl.com</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Sticky Navbar -->
+    <header>
+        <nav class="navbar navbar-expand-lg site-navbar py-2">
+            <div class="container">
+                <a class="navbar-brand-wrapper" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.png" alt="ZamZam Trims (BD) Limited" class="navbar-brand-logo" onerror="this.onerror=null; this.src='/assets/images/logo.png';" />
+                </a>
+
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarContent" aria-controls="mainNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="bi bi-list fs-2 text-dark"></i>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNavbarContent">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")" asp-controller="Home" asp-action="Index">
+                                Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "About" ? "active" : "")" asp-controller="Home" asp-action="About">
+                                About Us
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Services" ? "active" : "")" asp-controller="Home" asp-action="Services">
+                                Services
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Products" ? "active" : "")" asp-controller="Home" asp-action="Products">
+                                Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Machineries" ? "active" : "")" asp-controller="Home" asp-action="Machineries">
+                                Machineries
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Contact" ? "active" : "")" asp-controller="Home" asp-action="Contact">
+                                Contact
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                        <a href="tel:+8801874633431" class="btn btn-modern-outline d-none d-xl-inline-flex">
+                            <i class="bi bi-telephone"></i> Call Us
+                        </a>
+                        <button type="button" class="btn btn-modern-primary" onclick="openQuoteModal('', '')">
+                            <i class="bi bi-file-earmark-text"></i> Request Quote
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Global Toast Alert Container -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="container mt-3">
+            <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                <div>@TempData["SuccessMessage"]</div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="container mt-3">
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                <div>@TempData["ErrorMessage"]</div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    <!-- Main Body Content -->
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <!-- Global Quick Quote Modal -->
+    <div class="modal fade" id="quickQuoteModal" tabindex="-1" aria-labelledby="quickQuoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header bg-dark text-white p-4">
+                    <div>
+                        <h4 class="modal-title font-heading fw-bold mb-1" id="quickQuoteModalLabel">
+                            <i class="bi bi-lightning-charge text-teal me-2"></i>Request an Instant Quotation
+                        </h4>
+                        <p class="text-secondary small mb-0">Fill in your requirements and our estimation department will provide pricing within 2-4 hours.</p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-controller="Home" asp-action="SubmitQuote" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body p-4 bg-light">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="FullName" class="form-control rounded-3" placeholder="e.g. John Doe" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" name="Email" class="form-control rounded-3" placeholder="name@company.com" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Phone / WhatsApp Number <span class="text-danger">*</span></label>
+                                <input type="text" name="Phone" class="form-control rounded-3" placeholder="+880 18XXXXXXXX" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Company / Garments Name</label>
+                                <input type="text" name="CompanyName" class="form-control rounded-3" placeholder="Garments Ltd / Buying House" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Service / Category <span class="text-danger">*</span></label>
+                                <select name="ServiceType" id="modalServiceType" class="form-select rounded-3" required>
+                                    <option value="Trims & Accessories">Trims & Accessories Manufacturing</option>
+                                    <option value="Woven & Care Labels">Woven & Care Labels</option>
+                                    <option value="Hang Tags & Packaging">Hang Tags & Packaging</option>
+                                    <option value="Buttons & Zippers">Buttons & Zippers</option>
+                                    <option value="Digital Printing">Digital Printing</option>
+                                    <option value="Paper Embossing">Paper Embossing</option>
+                                    <option value="Heat Press & Lamination">Heat Press & Lamination</option>
+                                    <option value="Direct Selling (Ready Stock)">Direct Selling (Ready Stock)</option>
+                                    <option value="Global Sourcing">Global Sourcing</option>
+                                    <option value="Other">Other Specific Inquiries</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Estimated Quantity (Units / Gross / Yards)</label>
+                                <input type="text" name="Quantity" class="form-control rounded-3" placeholder="e.g. 5,000 pcs or 50,000 yards" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold">Product Item Name / Reference</label>
+                                <input type="text" name="ProductName" id="modalProductName" class="form-control rounded-3" placeholder="e.g. Damask Woven Label / Horn Button / Brass Zipper" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold">Detailed Specifications & Delivery Schedule</label>
+                                <textarea name="Message" rows="3" class="form-control rounded-3" placeholder="Please provide dimensions, colors, base material, pantone codes, target delivery dates, or export requirements..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-white p-3 border-top d-flex justify-content-between">
+                        <span class="small text-muted"><i class="bi bi-shield-lock me-1"></i> Your information is kept strictly confidential.</span>
+                        <div>
+                            <button type="button" class="btn btn-light rounded-3 px-3 me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-modern-primary rounded-3 px-4">
+                                <i class="bi bi-send-fill me-1"></i> Submit Quotation Request
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Product Quick View Modal -->
+    <div class="modal fade" id="productQuickViewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header border-bottom p-3">
+                    <span class="badge bg-dark rounded-pill px-3 py-2 text-uppercase" id="quickViewCategory">Category</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4 align-items-center">
+                        <div class="col-md-6 text-center">
+                            <div class="rounded-4 overflow-hidden bg-light p-2 shadow-sm">
+                                <img src="" id="quickViewImage" alt="Product Preview" class="img-fluid rounded-3" style="max-height: 340px; object-fit: contain; width: 100%;" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="font-heading fw-bold text-dark mb-2" id="quickViewTitle">Product Name</h3>
+                            <p class="text-secondary mb-3" id="quickViewDesc">Description here</p>
+                            
+                            <div class="p-3 bg-light rounded-3 mb-4">
+                                <h6 class="fw-bold small text-uppercase text-teal mb-2"><i class="bi bi-cpu me-1"></i> Technical Specs</h6>
+                                <p class="small text-muted mb-0" id="quickViewSpecs">Specifications</p>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-modern-primary flex-grow-1" id="quickViewQuoteBtn">
+                                    <i class="bi bi-file-earmark-text"></i> Inquire / Quote This Item
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button type="button" id="backToTopBtn" aria-label="Back to top">
+        <i class="bi bi-chevron-up fs-5"></i>
+    </button>
+
+    <!-- Ultra-Modern Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Company Info -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="mb-3">
+                        <div class="d-inline-block bg-white px-3 py-2 rounded-3 shadow-sm">
+                            <img src="~/images/logo.png" alt="ZamZam Trims (BD) Limited" style="height: 38px; width: auto;" onerror="this.onerror=null; this.src='/assets/images/logo.png';" />
+                        </div>
+                    </div>
+                    <p class="text-slate-400 small mb-4">
+                        An apparel accessories and trims products manufacturer, importer and supplier company in Bangladesh. Operating state-of-the-art mechanized production facilities with a dedicated workforce of 250+ delivering export-standard excellence since 2019.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="https://facebook.com" target="_blank" class="btn btn-sm btn-outline-light rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-facebook"></i></a>
+                        <a href="https://linkedin.com" target="_blank" class="btn btn-sm btn-outline-light rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://whatsapp.com" target="_blank" class="btn btn-sm btn-outline-light rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-whatsapp"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Navigation -->
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-heading">Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a asp-controller="Home" asp-action="Index"><i class="bi bi-chevron-right text-teal"></i> Home</a></li>
+                        <li><a asp-controller="Home" asp-action="About"><i class="bi bi-chevron-right text-teal"></i> About Us</a></li>
+                        <li><a asp-controller="Home" asp-action="Services"><i class="bi bi-chevron-right text-teal"></i> Our Services</a></li>
+                        <li><a asp-controller="Home" asp-action="Products"><i class="bi bi-chevron-right text-teal"></i> All Products</a></li>
+                        <li><a asp-controller="Home" asp-action="Machineries"><i class="bi bi-chevron-right text-teal"></i> Machineries</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact"><i class="bi bi-chevron-right text-teal"></i> Contact Us</a></li>
+                        <li><a asp-controller="Home" asp-action="RequestQuote"><i class="bi bi-chevron-right text-teal"></i> Request a Quote</a></li>
+                    </ul>
+                </div>
+
+                <!-- Production & Services -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-heading">Key Capabilities</h5>
+                    <ul class="footer-links">
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="manufacturing"><i class="bi bi-chevron-right text-teal"></i> Garment Trims Manufacturing</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="digital-printing"><i class="bi bi-chevron-right text-teal"></i> Advanced Digital Printing</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="apparel-labeling"><i class="bi bi-chevron-right text-teal"></i> Apparel Labeling Solutions</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="paper-embossing"><i class="bi bi-chevron-right text-teal"></i> 3D Paper Embossing</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="heat-pressing"><i class="bi bi-chevron-right text-teal"></i> Heat Press & Transfer</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="direct-selling"><i class="bi bi-chevron-right text-teal"></i> Direct Selling & Ready Stock</a></li>
+                        <li><a asp-controller="Home" asp-action="Machineries"><i class="bi bi-chevron-right text-teal"></i> Heidelberg Offset & Rotary</a></li>
+                    </ul>
+                </div>
+
+                <!-- Locations & Contact -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-heading">Factory & Offices</h5>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-geo-alt-fill footer-contact-icon"></i>
+                        <div>
+                            <strong class="text-white d-block">Factory & Corporate Office:</strong>
+                            House # 21, 21/1, 21/2, Road # 01, Dhour, Turag, Dhaka-Word # 54, Uttara, Dhaka-1230, Bangladesh.
+                        </div>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-building footer-contact-icon"></i>
+                        <div>
+                            <strong class="text-white d-block">Registered Sales Office:</strong>
+                            10 / 10, Arambagh, Motijheel, Dhaka - 1000, Bangladesh.
+                        </div>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-telephone-fill footer-contact-icon"></i>
+                        <div>
+                            <strong class="text-white d-block">Direct Line & WhatsApp:</strong>
+                            <a href="tel:+8801874633431" class="text-white text-decoration-none">+88 01874633431</a>
+                        </div>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-envelope-fill footer-contact-icon"></i>
+                        <div>
+                            <strong class="text-white d-block">Email Address:</strong>
+                            <a href="mailto:info@zztbl.com" class="text-white text-decoration-none">info@zztbl.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom Strip -->
+            <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    &copy; @DateTime.Now.Year <strong>ZamZam Trims (BD) Limited</strong>. All Rights Reserved.
+                </div>
+                <div class="d-flex gap-3 small">
+                    <span class="text-slate-400">Export Standard Quality</span>
+                    <span>•</span>
+                    <span class="text-slate-400">OEKO-TEX Compliant</span>
+                    <span>•</span>
+                    <span class="text-slate-400">24/7 Production Support</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

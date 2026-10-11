@@ -1,0 +1,149 @@
+@model ZamZamClient.Models.ContactMessageViewModel
+@{
+    ViewData["Title"] = "Contact Us - Factory & Corporate Offices";
+}
+
+<!-- Page Header -->
+<section class="page-header-banner">
+    <div class="container text-center">
+        <span class="badge bg-teal text-white px-3 py-2 text-uppercase mb-2">Get Connected With Us</span>
+        <h1 class="display-5 fw-bold font-heading mb-2 text-white">Contact ZamZam Trims (BD) Limited</h1>
+        <p class="lead text-slate-300 max-w-2xl mx-auto mb-0">
+            For inquiries, customized sampling, quotation requests, or factory visits, reach out to our team via phone, email, or our contact form.
+        </p>
+    </div>
+</section>
+
+<section class="section-padding bg-light">
+    <div class="container">
+        <!-- Dual Location Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-6">
+                <div class="contact-card-box">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="service-icon-box mb-0">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <div>
+                            <span class="badge bg-teal text-white mb-1">Production Hub</span>
+                            <h4 class="fw-bold font-heading mb-0">Factory & Corporate Office</h4>
+                        </div>
+                    </div>
+                    <p class="text-secondary mb-3">
+                        House # 21, 21/1, 21/2, Road # 01, Dhour, Turag, Dhaka-Word # 54, Uttara, Dhaka-1230, Bangladesh.
+                    </p>
+                    <div class="d-flex flex-column gap-2 border-top pt-3">
+                        <div class="small text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-telephone text-teal"></i> <a href="tel:+8801874633431" class="text-dark fw-bold text-decoration-none">+88 01874633431</a>
+                        </div>
+                        <div class="small text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-envelope text-teal"></i> <a href="mailto:info@zztbl.com" class="text-dark fw-bold text-decoration-none">info@zztbl.com</a>
+                        </div>
+                        <div class="small text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-clock text-teal"></i> Saturday - Thursday: 9:30 AM to 6:00 PM
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="contact-card-box">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="service-icon-box mb-0" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: var(--brand-blue);">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div>
+                            <span class="badge bg-primary text-white mb-1">Commercial Center</span>
+                            <h4 class="fw-bold font-heading mb-0">Registered / Sales Office</h4>
+                        </div>
+                    </div>
+                    <p class="text-secondary mb-3">
+                        10 / 10, Arambagh, Motijheel, Dhaka - 1000, Bangladesh.
+                    </p>
+                    <div class="d-flex flex-column gap-2 border-top pt-3">
+                        <div class="small text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-telephone text-teal"></i> <a href="tel:+8801874633431" class="text-dark fw-bold text-decoration-none">+88 01874633431</a>
+                        </div>
+                        <div class="small text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-envelope text-teal"></i> <a href="mailto:info@zztbl.com" class="text-dark fw-bold text-decoration-none">info@zztbl.com</a>
+                        </div>
+                        <div class="small text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-clock text-teal"></i> Saturday - Thursday: 9:30 AM to 6:00 PM
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form & Interactive Map -->
+        <div class="row g-5 align-items-stretch">
+            <!-- Form -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white h-100">
+                    <span class="section-tagline"><i class="bi bi-chat-dots-fill"></i> DROP US A LINE</span>
+                    <h3 class="fw-bold font-heading mb-2">Send Us an Inquiry</h3>
+                    <p class="text-secondary small mb-4">
+                        Please fill out the form below. Our customer care and technical merchandising team will respond promptly.
+                    </p>
+
+                    <form asp-controller="Home" asp-action="SubmitContact" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="FirstName" class="form-label small fw-bold">First Name <span class="text-danger">*</span></label>
+                                <input asp-for="FirstName" class="form-control rounded-3" placeholder="John" required />
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LastName" class="form-label small fw-bold">Last Name <span class="text-danger">*</span></label>
+                                <input asp-for="LastName" class="form-control rounded-3" placeholder="Doe" required />
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label small fw-bold">Email Address <span class="text-danger">*</span></label>
+                                <input asp-for="Email" type="email" class="form-control rounded-3" placeholder="john@company.com" required />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Phone" class="form-label small fw-bold">Phone Number <span class="text-danger">*</span></label>
+                                <input asp-for="Phone" class="form-control rounded-3" placeholder="+88 018XXXXXXXX" required />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Subject" class="form-label small fw-bold">Subject / Product Inquiry</label>
+                                <input asp-for="Subject" class="form-control rounded-3" placeholder="e.g. Bulk Woven Label Order / Sample Request" />
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Message" class="form-label small fw-bold">Message <span class="text-danger">*</span></label>
+                                <textarea asp-for="Message" rows="5" class="form-control rounded-3" placeholder="Write your requirements or questions here..." required></textarea>
+                                <span asp-validation-for="Message" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-modern-primary btn-lg w-100">
+                                    <i class="bi bi-send-fill me-2"></i> Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Map / Location Information -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 bg-white">
+                    <div class="p-4 bg-dark text-white">
+                        <h4 class="font-heading fw-bold mb-1"><i class="bi bi-geo-alt text-teal me-2"></i>Factory Location Map</h4>
+                        <p class="text-slate-300 small mb-0">Turag, Uttara Sector-Ward # 54, Dhaka-1230</p>
+                    </div>
+                    <div class="ratio ratio-4x3 h-100" style="min-height: 380px;">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14594.385799986328!2d90.3644485!3d23.8684784!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c478a571f54f%3A0x67dbef912f275e7a!2sTurag%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1710000000000!5m2!1sen!2sbd" 
+                                style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                    <div class="p-3 bg-light border-top text-center">
+                        <span class="small text-muted"><i class="bi bi-car-front-fill me-1 text-teal"></i> Convenient access from Dhaka International Airport & Export Cargo terminals.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

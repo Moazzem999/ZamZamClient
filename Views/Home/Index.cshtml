@@ -1,0 +1,369 @@
+@model ZamZamClient.Models.HomeViewModel
+@{
+    ViewData["Title"] = "Home - Premier Apparel Accessories & Trims Manufacturer";
+}
+
+<!-- Hero Section -->
+<section class="hero-wrapper position-relative">
+    <div class="container position-relative z-1">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="hero-badge">
+                    <i class="bi bi-award-fill"></i> LEADING APPAREL ACCESSORIES MANUFACTURER IN BANGLADESH
+                </div>
+                <h1 class="hero-title">
+                    Precision Engineered <span>Apparel Trims</span> & Packaging Solutions.
+                </h1>
+                <p class="hero-subtitle">
+                    ZamZam Trims (BD) Limited is an apparel accessories and trims products manufacturer, importer, and supplier company in Bangladesh. We operate modern mechanized production floors providing world-class labels, tags, buttons, zippers, digital printing, and paper embossing.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <button type="button" class="btn btn-modern-primary btn-lg" onclick="openQuoteModal('', 'Trims & Accessories')">
+                        <i class="bi bi-calculator"></i> Request Instant Quote
+                    </button>
+                    <a asp-controller="Home" asp-action="Products" class="btn btn-outline-light btn-lg rounded-3 px-4">
+                        <i class="bi bi-grid-3x3-gap"></i> Explore Products
+                    </a>
+                </div>
+
+                <!-- Animated Key Stats -->
+                <div class="hero-stats-strip">
+                    <div class="hero-stat-item">
+                        <h3><span class="counter-val" data-target="250">0</span>+</h3>
+                        <p>Skilled Workforce</p>
+                    </div>
+                    <div class="hero-stat-item">
+                        <h3><span class="counter-val" data-target="100">0</span>+</h3>
+                        <p>Product Types</p>
+                    </div>
+                    <div class="hero-stat-item">
+                        <h3><span class="counter-val" data-target="17">0</span>+</h3>
+                        <p>Modern Machines</p>
+                    </div>
+                    <div class="hero-stat-item">
+                        <h3>2019</h3>
+                        <p>Established</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="hero-visual-card">
+                    <img src="~/images/slider/slide-1.jpg" alt="ZamZam Trims Manufacturing" class="hero-main-img" onerror="this.src='/images/machineries/gto.jpg';" />
+                    
+                    <div class="hero-floating-card hero-floating-card-1">
+                        <div class="p-2 rounded-3 bg-teal text-white bg-opacity-75" style="background-color: var(--brand-accent);">
+                            <i class="bi bi-check-circle-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold small">Export Standard Quality</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">OEKO-TEX & RMG Compliant</div>
+                        </div>
+                    </div>
+
+                    <div class="hero-floating-card hero-floating-card-2">
+                        <div class="p-2 rounded-3 text-white" style="background-color: var(--brand-blue);">
+                            <i class="bi bi-truck fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold small">Fast Factory Delivery</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">Direct Ship & Drop-ship</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Welcome / Introduction Section -->
+<section class="section-padding bg-white">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="position-relative">
+                    <img src="~/images/about-s3-pic.jpg" alt="About ZamZam Trims" class="img-fluid rounded-4 shadow-lg w-100" style="max-height: 440px; object-fit: cover;" onerror="this.src='/images/machineries/cutfold.jpg';" />
+                    <div class="position-absolute bottom-0 end-0 bg-dark text-white p-4 rounded-4 m-3 shadow-lg" style="max-width: 280px; backdrop-filter: blur(8px); background: rgba(10, 25, 47, 0.92) !important;">
+                        <h5 class="fw-bold text-teal mb-1">Our Core Commitment</h5>
+                        <p class="small text-slate-300 mb-0">Providing solid, sustainable, and reliable accessories to meet clients' maximum satisfaction level.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <span class="section-tagline"><i class="bi bi-shield-check"></i> WELCOME TO ZAMZAM TRIMS (BD) LIMITED</span>
+                <h2 class="section-title">Reliable, Innovative & High-Precision Garment Solutions</h2>
+                <p class="text-secondary mb-3">
+                    Since 2019, ZamZam Trims (BD) Limited has built a firm reputation for manufacturing, importing, and supplying high-quality precision-fabricated accessories and trims for use across a variety of apparel and RMG industries in Bangladesh.
+                </p>
+                <p class="text-secondary mb-4">
+                    With an experienced workforce over 250 and advanced mechanized production facilities including Heidelberg offset presses, rotary label lines, ultrasonic cutters, and digital presses, our unit continuously delivers at the exacting standards required by global fashion buyers.
+                </p>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light border">
+                            <i class="bi bi-patch-check-fill fs-3 text-teal"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0">International Standards</h6>
+                                <span class="small text-muted">Precision tolerances</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light border">
+                            <i class="bi bi-clock-history fs-3 text-teal"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0">24/7 Production Care</h6>
+                                <span class="small text-muted">Dedicated merchandisers</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <a asp-controller="Home" asp-action="About" class="btn btn-modern-dark">
+                        Learn More About Us <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <a asp-controller="Home" asp-action="Contact" class="btn btn-modern-outline">
+                        Visit Our Factory
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section (11 Core Capabilities) -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tagline"><i class="bi bi-gear-fill"></i> WHAT WE ARE SERVING</span>
+            <h2 class="section-title">Full-Spectrum Apparel Accessories & Technical Solutions</h2>
+            <p class="section-description mx-auto">
+                Our modern setup for apparel accessories & trims, digital printing, emboss printing, heat press, and lamination offers clients superior quality, durability, and competitive factory pricing.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var s in Model.Services.Take(6))
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card">
+                        <img src="@s.ImageUrl" alt="@s.Title" class="service-card-img" onerror="this.src='/images/services/ManufacturingService.jpg';" />
+                        <div class="service-icon-box">
+                            <i class="bi @s.IconClass"></i>
+                        </div>
+                        <h4 class="service-title">@s.Title</h4>
+                        <p class="service-desc">@s.ShortDescription</p>
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                            <a asp-controller="Home" asp-action="Services" asp-route-slug="@s.Slug" class="text-teal text-decoration-none fw-bold small">
+                                Read Details <i class="bi bi-arrow-right"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="openQuoteModal('', '@s.Title')">
+                                Quote
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-center mt-5">
+            <a asp-controller="Home" asp-action="Services" class="btn btn-modern-dark btn-lg">
+                View All Services & Solutions <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section with Interactive Filtering -->
+<section class="section-padding bg-white">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+            <div>
+                <span class="section-tagline"><i class="bi bi-box-seam-fill"></i> OUR PRODUCT LINE</span>
+                <h2 class="section-title mb-0">Featured Apparel Accessories & Trims</h2>
+            </div>
+            <a asp-controller="Home" asp-action="Products" class="btn btn-modern-outline mt-3 mt-md-0">
+                View Complete Catalog <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var p in Model.FeaturedProducts.Take(8))
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card">
+                        <div class="product-img-wrapper">
+                            <span class="product-category-badge">@p.Category</span>
+                            <img src="@p.ImageUrl" alt="@p.Title" class="product-img" onerror="this.src='/images/products/Buttons.jpg';" />
+                        </div>
+                        <div class="product-body">
+                            <h5 class="product-title">@p.Title</h5>
+                            <p class="product-desc">@p.Description</p>
+                            <div class="product-actions">
+                                <button type="button" class="btn btn-sm btn-modern-primary flex-grow-1" onclick="openQuoteModal('@p.Title', '@p.Category')">
+                                    <i class="bi bi-file-earmark-text"></i> Quote
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-dark" onclick="openProductQuickView('@p.Title', '@p.Category', '@p.ImageUrl', '@p.Description', '@p.Specifications')" title="Quick View">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Interactive Work Process Section (Planning, Processing, Shipping) -->
+<section class="section-padding process-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tagline"><i class="bi bi-diagram-3-fill"></i> HOW WE WORK</span>
+            <h2 class="section-title">Our Rigorous 3-Step Production & Delivery Process</h2>
+            <p class="section-description mx-auto">
+                From initial tech-pack spec analysis to final factory doorstep drop-off, our transparent methodology guarantees quality assurance, compliance, and punctuality.
+            </p>
+        </div>
+
+        <div class="process-nav-pills">
+            @for (int i = 0; i < Model.ProcessSteps.Count; i++)
+            {
+                var step = Model.ProcessSteps[i];
+                <button type="button" class="process-pill @(i == 0 ? "active" : "")" data-step="@step.StepNumber">
+                    <span class="step-circle">0@(step.StepNumber)</span>
+                    <span>@step.Title</span>
+                </button>
+            }
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                @for (int i = 0; i < Model.ProcessSteps.Count; i++)
+                {
+                    var step = Model.ProcessSteps[i];
+                    <div class="process-pane @(i != 0 ? "d-none" : "")" data-step="@step.StepNumber">
+                        <div class="process-content-card">
+                            <div class="row align-items-center g-4">
+                                <div class="col-md-6">
+                                    <span class="badge bg-teal text-white mb-2 px-3 py-2">PHASE 0@(step.StepNumber)</span>
+                                    <h3 class="fw-bold font-heading mb-2">@step.Subtitle</h3>
+                                    <p class="text-secondary mb-4">@step.Description</p>
+                                    
+                                    <div class="checkpoints-list">
+                                        @foreach (var cp in step.Checkpoints)
+                                        {
+                                            <div class="process-checkpoint-item">
+                                                <div class="process-checkpoint-icon">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </div>
+                                                <div class="small fw-semibold text-dark">@cp</div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <img src="@step.ImageUrl" alt="@step.Title" class="img-fluid rounded-4 shadow w-100" style="max-height: 380px; object-fit: cover;" onerror="this.src='/images/Planning.jpg';" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Machineries Infrastructure Strip -->
+<section class="section-padding bg-white">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-5">
+            <div>
+                <span class="section-tagline"><i class="bi bi-cpu-fill"></i> WORLD CLASS INFRASTRUCTURE</span>
+                <h2 class="section-title mb-0">Modern Mechanized Machinery Lineup</h2>
+            </div>
+            <a asp-controller="Home" asp-action="Machineries" class="btn btn-modern-outline mt-3 mt-md-0">
+                Explore All Machineries (17+) <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var m in Model.FeaturedMachineries)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="machinery-card">
+                        <div class="machinery-img-wrapper">
+                            <span class="machinery-badge">@m.Category</span>
+                            <img src="@m.ImageUrl" alt="@m.Title" class="machinery-img" onerror="this.src='/images/machineries/gto.jpg';" />
+                        </div>
+                        <div class="machinery-body">
+                            <h4 class="machinery-title">@m.Title</h4>
+                            <p class="machinery-desc">@m.KeyCapabilities</p>
+                            <div class="pt-3 border-top mt-auto">
+                                <span class="small text-teal fw-bold"><i class="bi bi-patch-check"></i> High Precision Unit</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Executive Leadership Team -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tagline"><i class="bi bi-people-fill"></i> EXPERIENCED MANAGEMENT</span>
+            <h2 class="section-title">Leadership Guiding Our Excellence</h2>
+            <p class="section-description mx-auto">
+                Engaged in the apparel trims industry with years of specialized leadership, managing operations with customer-centric focus and sustainable vision.
+            </p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            @foreach (var member in Model.TeamMembers)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="team-card">
+                        <div class="team-img-wrapper">
+                            <img src="@member.ImageUrl" alt="@member.Name" class="team-img" onerror="this.src='/images/team/Mahadi.jpg';" />
+                        </div>
+                        <div class="team-body">
+                            <h4 class="team-name">@member.Name</h4>
+                            <div class="team-role">@member.Role</div>
+                            <p class="team-bio mb-0">@member.Bio</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Direct Quotation CTA Banner -->
+<section class="container my-5">
+    <div class="quote-banner">
+        <div class="row align-items-center g-4 position-relative z-1">
+            <div class="col-lg-8">
+                <span class="badge bg-teal text-white mb-2 px-3 py-2 fw-bold text-uppercase">Direct Manufacturer Pricing</span>
+                <h2 class="fw-bold text-white display-6 mb-3">Ready to Discuss Your Apparel Trim Requirements?</h2>
+                <p class="text-slate-300 fs-5 mb-0">
+                    Contact our merchandising and engineering experts today. We provide free swatches, customized sampling, and competitive bulk pricing within 24 hours.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="d-flex flex-column gap-2">
+                    <button type="button" class="btn btn-modern-primary btn-lg" onclick="openQuoteModal('', '')">
+                        <i class="bi bi-file-earmark-text"></i> Request A Free Quote
+                    </button>
+                    <a href="tel:+8801874633431" class="btn btn-outline-light btn-lg rounded-3">
+                        <i class="bi bi-telephone-fill"></i> +88 01874633431
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

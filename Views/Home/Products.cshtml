@@ -1,0 +1,108 @@
+@model List<ZamZamClient.Models.Product>
+@{
+    ViewData["Title"] = "Products Catalog - Apparel Accessories & Trims";
+    var currentCat = ViewBag.CurrentCategory as string ?? "all";
+    var currentSearch = ViewBag.CurrentSearch as string ?? "";
+    var totalCount = Model.Count;
+}
+
+<!-- Page Header -->
+<section class="page-header-banner">
+    <div class="container text-center">
+        <span class="badge bg-teal text-white px-3 py-2 text-uppercase mb-2">Cataloge Varieties</span>
+        <h1 class="display-5 fw-bold font-heading mb-2 text-white">Apparel Accessories & Trims Catalog</h1>
+        <p class="lead text-slate-300 max-w-2xl mx-auto mb-0">
+            Browse our comprehensive range of woven labels, buttons, hang tags, zippers, elastics, ribbons, threads, and packaging trims manufactured to global export standards.
+        </p>
+    </div>
+</section>
+
+<section class="section-padding bg-light">
+    <div class="container">
+        <!-- Search and Filter Bar -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+            <div class="row g-3 align-items-center">
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="productSearchInput" class="form-control bg-light border-start-0 py-2" placeholder="Search products by title, type, material (e.g. Woven Label, Button, Zipper, Elastic)..." value="@currentSearch" />
+                    </div>
+                </div>
+                <div class="col-lg-6 text-lg-end">
+                    <span class="text-muted small">Showing <strong id="visibleProductsCount" class="text-teal">@totalCount</strong> of @totalCount products</span>
+                </div>
+            </div>
+
+            <hr class="my-3 text-muted opacity-25" />
+
+            <!-- Category Pills -->
+            <div class="catalog-filter-bar mb-0">
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "all" ? "active" : "")" data-filter="all">
+                    All Products
+                </button>
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "label" ? "active" : "")" data-filter="label">
+                    <i class="bi bi-tag"></i> Labels (Woven & Care)
+                </button>
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "button" ? "active" : "")" data-filter="button">
+                    <i class="bi bi-circle"></i> Buttons (23 Varieties)
+                </button>
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "emboss" ? "active" : "")" data-filter="emboss">
+                    <i class="bi bi-layers"></i> Emboss Paper
+                </button>
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "thread" ? "active" : "")" data-filter="thread">
+                    <i class="bi bi-thread"></i> Cotton Threads
+                </button>
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "elastic" ? "active" : "")" data-filter="elastic">
+                    <i class="bi bi-arrows-expand"></i> Elastics
+                </button>
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "ribbon" ? "active" : "")" data-filter="ribbon">
+                    <i class="bi bi-bookmark"></i> Ribbons
+                </button>
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "hangtag" ? "active" : "")" data-filter="hangtag">
+                    <i class="bi bi-ticket-perforated"></i> Hang Tags
+                </button>
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "tape" ? "active" : "")" data-filter="tape">
+                    <i class="bi bi-box"></i> Gum & Lace Tapes
+                </button>
+                <button type="button" class="filter-btn product-filter-btn @(currentCat == "zipper" ? "active" : "")" data-filter="zipper">
+                    <i class="bi bi-link-45deg"></i> Zippers & Pullers
+                </button>
+            </div>
+        </div>
+
+        <!-- No Results Alert -->
+        <div id="noProductsAlert" class="alert alert-warning text-center p-5 rounded-4 shadow-sm border-0" style="display: none;">
+            <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+            <h4 class="fw-bold">No Products Match Your Criteria</h4>
+            <p class="text-muted mb-0">Try clearing your search term or switching to another category.</p>
+        </div>
+
+        <!-- Products Grid (All Products) -->
+        <div class="row g-4" id="productsGrid">
+            @foreach (var p in Model)
+            {
+                <div class="col-xl-3 col-lg-4 col-md-6 product-item-col" data-category="@p.FilterCategory" data-title="@p.Title" data-desc="@p.Description">
+                    <div class="product-card">
+                        <div class="product-img-wrapper">
+                            <span class="product-category-badge">@p.Category</span>
+                            <img src="@p.ImageUrl" alt="@p.Title" class="product-img" onerror="this.src='/images/products/Buttons.jpg';" />
+                        </div>
+                        <div class="product-body">
+                            <h5 class="product-title">@p.Title</h5>
+                            <p class="product-desc">@p.Description</p>
+                            
+                            <div class="product-actions">
+                                <button type="button" class="btn btn-sm btn-modern-primary flex-grow-1" onclick="openQuoteModal('@p.Title', '@p.Category')">
+                                    <i class="bi bi-calculator"></i> Quote
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-dark" onclick="openProductQuickView('@p.Title', '@p.Category', '@p.ImageUrl', '@p.Description', '@p.Specifications')" title="View details & specs">
+                                    <i class="bi bi-eye"></i> Specs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

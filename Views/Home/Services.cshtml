@@ -1,0 +1,114 @@
+@model List<ZamZamClient.Models.ServiceItem>
+@{
+    ViewData["Title"] = "Our Services & Technical Solutions";
+    var selected = ViewBag.SelectedService as ZamZamClient.Models.ServiceItem;
+}
+
+<!-- Page Header -->
+<section class="page-header-banner">
+    <div class="container text-center">
+        <span class="badge bg-teal text-white px-3 py-2 text-uppercase mb-2">11 Core Manufacturing & Sourcing Capabilities</span>
+        <h1 class="display-5 fw-bold font-heading mb-2 text-white">Our Services & Solutions</h1>
+        <p class="lead text-slate-300 max-w-2xl mx-auto mb-0">
+            Advanced setups for apparel accessories & trims, digital print, emboss print, heat press, lamination, and international sourcing with top quality and competitive pricing.
+        </p>
+    </div>
+</section>
+
+<!-- Services Grid -->
+<section class="section-padding bg-light">
+    <div class="container">
+        @if (selected != null)
+        {
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 border-start border-4 border-teal bg-white">
+                <div class="row align-items-center g-4">
+                    <div class="col-md-5">
+                        <img src="@selected.ImageUrl" alt="@selected.Title" class="img-fluid rounded-4 shadow w-100" style="max-height: 280px; object-fit: cover;" onerror="this.src='/images/services/ManufacturingService.jpg';" />
+                    </div>
+                    <div class="col-md-7">
+                        <span class="badge bg-teal text-white mb-2">Selected Capability</span>
+                        <h2 class="fw-bold font-heading mb-2">@selected.Title</h2>
+                        <p class="text-secondary mb-3">@selected.FullDescription</p>
+                        
+                        <div class="row g-2 mb-4">
+                            @foreach (var h in selected.Highlights)
+                            {
+                                <div class="col-sm-6 small text-secondary">
+                                    <i class="bi bi-check-circle-fill text-teal me-1"></i> @h
+                                </div>
+                            }
+                        </div>
+
+                        <button type="button" class="btn btn-modern-primary" onclick="openQuoteModal('', '@selected.Title')">
+                            <i class="bi bi-calculator"></i> Request Quote for @selected.Title
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="row g-4">
+            @foreach (var s in Model)
+            {
+                <div class="col-lg-4 col-md-6" id="@s.Slug">
+                    <div class="service-card h-100">
+                        <div class="position-relative overflow-hidden rounded-3 mb-3">
+                            <img src="@s.ImageUrl" alt="@s.Title" class="service-card-img mb-0" onerror="this.src='/images/services/ManufacturingService.jpg';" />
+                            <div class="position-absolute top-0 start-0 m-2">
+                                <span class="badge bg-dark bg-opacity-75 text-white">#@(s.Id.ToString("D2"))</span>
+                            </div>
+                        </div>
+
+                        <div class="service-icon-box">
+                            <i class="bi @s.IconClass"></i>
+                        </div>
+
+                        <h3 class="service-title">@s.Title</h3>
+                        <p class="service-desc">@s.FullDescription</p>
+
+                        <div class="mb-4">
+                            <h6 class="small fw-bold text-uppercase text-teal mb-2">Highlights:</h6>
+                            <ul class="list-unstyled mb-0">
+                                @foreach (var hl in s.Highlights)
+                                {
+                                    <li class="d-flex align-items-start gap-2 small text-secondary mb-1">
+                                        <i class="bi bi-check-lg text-teal"></i>
+                                        <span>@hl</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+
+                        <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn btn-modern-primary btn-sm" onclick="openQuoteModal('', '@s.Title')">
+                                <i class="bi bi-calculator"></i> Request Quote
+                            </button>
+                            <a href="tel:+8801874633431" class="btn btn-outline-secondary btn-sm" title="Call directly">
+                                <i class="bi bi-telephone"></i> Inquire
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Direct Consultation Banner -->
+<section class="container my-5">
+    <div class="quote-banner">
+        <div class="row align-items-center g-4 position-relative z-1">
+            <div class="col-lg-8">
+                <h3 class="fw-bold text-white mb-2">Need a Customized Apparel Accessories Solution?</h3>
+                <p class="text-slate-300 mb-0">
+                    Our technical and design teams are ready to analyze your tech-packs, provide yarn strike-offs, and recommend cost-effective fabrication.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <button type="button" class="btn btn-modern-primary btn-lg" onclick="openQuoteModal('', 'Custom Solution')">
+                    <i class="bi bi-chat-dots-fill"></i> Speak With An Expert
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
