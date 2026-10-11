@@ -175,6 +175,25 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     letter-spacing: 0.04em;
 }
 
+/* Modal Header Theme (Electric Indigo Gradient) */
+.modal-header-theme {
+    background: linear-gradient(135deg, var(--brand-indigo) 0%, #6366f1 55%, var(--brand-indigo-dark) 100%) !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    position: relative;
+    overflow: hidden;
+}
+.modal-header-theme::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+}
+
 /* =========================================================
    MAIN NAVBAR (Clean Frosted Glass with Pill Navigation)
    ========================================================= */
