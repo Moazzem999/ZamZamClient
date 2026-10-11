@@ -136,8 +136,8 @@
         <div class="row g-4">
             @foreach (var step in processSteps)
             {
-                <div class="col-lg-4">
-                    <div class="card h-100 border rounded-4 p-4 shadow-sm position-relative overflow-hidden">
+                <div class="col-lg-4 reveal delay-@(step.StepNumber)">
+                    <div class="card card-sheen h-100 border rounded-4 p-4 shadow-sm position-relative overflow-hidden">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="badge bg-indigo rounded-pill px-3 py-2 fw-bold">PHASE 0@(step.StepNumber)</span>
                             <span class="fs-1 fw-bold text-muted opacity-25 font-heading">0@(step.StepNumber)</span>
@@ -168,7 +168,7 @@
 <!-- Executive Leadership Team -->
 <section class="section-padding bg-light">
     <div class="container">
-        <div class="text-center mb-5">
+        <div class="text-center mb-5 reveal">
             <span class="section-tagline"><i class="bi bi-people-fill"></i> OUR MANAGEMENT</span>
             <h2 class="section-title">Key Leaders Responsible for Operations</h2>
             <p class="section-description mx-auto">
@@ -177,10 +177,11 @@
         </div>
 
         <div class="row g-4 justify-content-center">
-            @foreach (var member in team)
+            @for (int i = 0; i < team.Count; i++)
             {
-                <div class="col-lg-4 col-md-6">
-                    <div class="team-card h-100">
+                var member = team[i];
+                <div class="col-lg-4 col-md-6 reveal delay-@(i + 1)">
+                    <div class="team-card card-sheen h-100">
                         <div class="team-img-wrapper">
                             <img src="@member.ImageUrl" alt="@member.Name" class="team-img" onerror="this.src='/images/team/Mahadi.jpg';" />
                         </div>

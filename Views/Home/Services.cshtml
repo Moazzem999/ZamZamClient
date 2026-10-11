@@ -50,8 +50,8 @@
         <div class="row g-4">
             @foreach (var s in Model)
             {
-                <div class="col-lg-4 col-md-6" id="@s.Slug">
-                    <div class="service-card h-100">
+                <div class="col-lg-4 col-md-6 reveal" id="@s.Slug">
+                    <div class="service-card card-sheen h-100">
                         <div class="position-relative overflow-hidden rounded-3 mb-3">
                             <img src="@s.ImageUrl" alt="@s.Title" class="service-card-img mb-0" onerror="this.src='/images/services/ManufacturingService.jpg';" />
                             <div class="position-absolute top-0 start-0 m-2">

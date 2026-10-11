@@ -37,8 +37,8 @@
         <div class="row g-4" id="machineryGrid">
             @foreach (var m in Model)
             {
-                <div class="col-lg-4 col-md-6 machinery-item-col" data-category="@m.FilterCategory">
-                    <div class="machinery-card">
+                <div class="col-lg-4 col-md-6 machinery-item-col reveal" data-category="@m.FilterCategory">
+                    <div class="machinery-card card-sheen">
                         <div class="machinery-img-wrapper">
                             <span class="machinery-badge">@m.Category</span>
                             <img src="@m.ImageUrl" alt="@m.Title" class="machinery-img" onerror="this.src='/images/machineries/gto.jpg';" />

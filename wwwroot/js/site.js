@@ -1,23 +1,49 @@
-// ZamZam Trims (BD) Limited - Modern Interactive Scripts
+// ZamZam Trims (BD) Limited - Advanced Interactive & Animation Controller
 
 document.addEventListener('DOMContentLoaded', function () {
-    // 1. Sticky Navbar shadow on scroll
+    // -------------------------------------------------------------
+    // 1. Sticky Navbar & Circular SVG Scroll Progress Back-To-Top
+    // -------------------------------------------------------------
     const navbar = document.querySelector('.site-navbar');
     const backToTopBtn = document.getElementById('backToTopBtn');
+    const progressRingBar = document.getElementById('progressRingBar');
 
-    window.addEventListener('scroll', function () {
-        if (window.scrollY > 40) {
+    let circumference = 0;
+    if (progressRingBar) {
+        const radius = progressRingBar.r.baseVal.value;
+        circumference = 2 * Math.PI * radius;
+        progressRingBar.style.strokeDasharray = `${circumference} ${circumference}`;
+        progressRingBar.style.strokeDashoffset = circumference;
+    }
+
+    function handleScroll() {
+        const scrollY = window.scrollY || window.pageYOffset;
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+        // Sticky Navbar subtle frosted shadow
+        if (scrollY > 30) {
             navbar?.classList.add('scrolled');
         } else {
             navbar?.classList.remove('scrolled');
         }
 
-        if (window.scrollY > 300) {
-            if (backToTopBtn) backToTopBtn.style.display = 'flex';
-        } else {
-            if (backToTopBtn) backToTopBtn.style.display = 'none';
+        // Circular Scroll Ring Progress
+        if (totalHeight > 0 && progressRingBar) {
+            const progress = Math.min(1, Math.max(0, scrollY / totalHeight));
+            const offset = circumference - (progress * circumference);
+            progressRingBar.style.strokeDashoffset = offset;
         }
-    });
+
+        // Show/Hide Back-To-Top
+        if (scrollY > 350) {
+            backToTopBtn?.classList.add('show');
+        } else {
+            backToTopBtn?.classList.remove('show');
+        }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
 
     if (backToTopBtn) {
         backToTopBtn.addEventListener('click', function () {
@@ -25,35 +51,256 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 2. Animated Numerical Counters
-    const counters = document.querySelectorAll('.counter-val');
-    if (counters.length > 0) {
-        const observer = new IntersectionObserver((entries, obs) => {
+    // -------------------------------------------------------------
+    // 2. Interactive Cursor Spotlight on Hero Giant Card
+    // -------------------------------------------------------------
+    const heroCard = document.querySelector('.hero-giant-card');
+    if (heroCard) {
+        heroCard.addEventListener('mousemove', function (e) {
+            const rect = heroCard.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            heroCard.style.setProperty('--mouse-x', `${x}px`);
+            heroCard.style.setProperty('--mouse-y', `${y}px`);
+        });
+    }
+
+    // -------------------------------------------------------------
+    // 3. Scroll Reveal Engine (Lightweight 60fps IntersectionObserver)
+    // -------------------------------------------------------------
+    const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+    if (revealElements.length > 0) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.12,
+            rootMargin: '0px 0px -40px 0px'
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+    }
+
+    // -------------------------------------------------------------
+    // 4. Smooth Numerical Counter Animation
+    // -------------------------------------------------------------
+    const counterElements = document.querySelectorAll('.counter-val');
+    if (counterElements.length > 0) {
+        const counterObserver = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const el = entry.target;
-                    const target = parseInt(el.getAttribute('data-target') || '0', 10);
-                    let current = 0;
-                    const increment = Math.max(1, Math.ceil(target / 40));
-                    const timer = setInterval(() => {
-                        current += increment;
-                        if (current >= target) {
-                            el.textContent = target;
-                            clearInterval(timer);
+                    const target = parseFloat(el.getAttribute('data-target') || '0');
+                    const isDecimal = String(target).includes('.');
+                    const duration = 1600;
+                    const startTime = performance.now();
+
+                    function updateCounter(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        // Easing curve: easeOutCubic
+                        const easeOut = 1 - Math.pow(1 - progress, 3);
+                        const currentVal = target * easeOut;
+
+                        if (isDecimal) {
+                            el.textContent = currentVal.toFixed(1);
                         } else {
-                            el.textContent = current;
+                            el.textContent = Math.floor(currentVal);
                         }
-                    }, 30);
+
+                        if (progress < 1) {
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            el.textContent = isDecimal ? target.toFixed(1) : target;
+                        }
+                    }
+
+                    requestAnimationFrame(updateCounter);
                     obs.unobserve(el);
+                }
+            });
+        }, { threshold: 0.25 });
+
+        counterElements.forEach(c => counterObserver.observe(c));
+    }
+
+    // -------------------------------------------------------------
+    // 5. Section 2 Dynamic Progress Bar (Customer Repetition)
+    // -------------------------------------------------------------
+    const dynProgressBar = document.querySelector('.dynamic-progress-bar');
+    if (dynProgressBar) {
+        const barObserver = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const targetWidth = dynProgressBar.getAttribute('data-target') || '95%';
+                    dynProgressBar.style.width = targetWidth;
+                    obs.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.3 });
 
-        counters.forEach(c => observer.observe(c));
+        barObserver.observe(dynProgressBar);
     }
 
-    // 3. Client-Side Instant Product Filter & Search
-    const productGrid = document.getElementById('productsGrid');
+    // -------------------------------------------------------------
+    // 6. Section 4 Dark Process Neon Bar & Step Percentage Counters
+    // -------------------------------------------------------------
+    const darkProcessCard = document.querySelector('.dark-process-card');
+    const processNeonBar = document.getElementById('processNeonBar');
+    const pctCounters = document.querySelectorAll('.counter-pct');
+
+    if (darkProcessCard) {
+        const processObserver = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Fill illuminated neon bar
+                    if (processNeonBar) {
+                        processNeonBar.style.width = '100%';
+                    }
+
+                    // Animate step percentage numbers
+                    pctCounters.forEach(pctEl => {
+                        const target = parseInt(pctEl.getAttribute('data-target') || '0', 10);
+                        const duration = 1400;
+                        const start = performance.now();
+
+                        function countUp(time) {
+                            const progress = Math.min((time - start) / duration, 1);
+                            const ease = 1 - Math.pow(1 - progress, 3);
+                            pctEl.textContent = Math.floor(target * ease);
+                            if (progress < 1) {
+                                requestAnimationFrame(countUp);
+                            } else {
+                                pctEl.textContent = target;
+                            }
+                        }
+
+                        requestAnimationFrame(countUp);
+                    });
+
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.25 });
+
+        processObserver.observe(darkProcessCard);
+    }
+
+    // -------------------------------------------------------------
+    // 7. Dynamic Buyer Profiles ("Business We Help To Grow")
+    // -------------------------------------------------------------
+    const profileTabs = document.querySelectorAll('.business-profile-tab');
+    const profileContent = document.getElementById('businessProfileContent');
+
+    const profileData = {
+        enterprise: {
+            tag: 'Dedicated Support',
+            title: 'Enterprise Garment Manufacturers',
+            description: 'We provide a complete range of accessories tailored to high-volume production needs. Our commitment is to streamline operations, reduce supply chain delays, and deliver superior-quality apparel trims so large manufacturers can focus on global export schedules.',
+            bullets: [
+                'High-volume monthly output capacity exceeding 10M trims/month',
+                'Dedicated merchandising account managers & direct ERP link',
+                'Punctual delivery across industrial export clusters (Gazipur, Savar, Ashulia, Chattogram)'
+            ],
+            image1: '/images/slider/slide-1.jpg',
+            image2: '/images/slider/slide-2.jpg'
+        },
+        startup: {
+            tag: 'Agile & Flexible',
+            title: 'Emerging Labels & Fashion Startups',
+            description: 'Launch your apparel brand with low minimum order quantities (MOQ), bespoke fabric development, and rapid design sampling. We empower new clothing lines with world-class packaging and brand identification.',
+            bullets: [
+                'Low MOQ batches with zero compromise on premium quality',
+                'Rapid swatch sampling delivered within 48 to 72 business hours',
+                'Complete creative assistance on woven labels, hang-tags & care labels'
+            ],
+            image1: '/images/slider/slide-3.jpg',
+            image2: '/images/products/Buttons.jpg'
+        },
+        merchandiser: {
+            tag: 'Speed & Accuracy',
+            title: 'Apparel Merchandisers & Sourcing Teams',
+            description: 'Instant cost estimations, rapid lab dips, and technical spec-sheet approvals. We provide merchandisers with verified tech-pack costing within 2-4 hours to streamline buyer presentations.',
+            bullets: [
+                'Direct factory cost computations with transparent pricing breakdown',
+                'Compliant OEKO-TEX Standard 100 chemical safety test certifications',
+                'Real-time order progress tracking and digital swatch catalogs'
+            ],
+            image1: '/images/slider/slide-2.jpg',
+            image2: '/images/slider/slide-1.jpg'
+        },
+        garments: {
+            tag: 'Continuous Feed',
+            title: 'Export-Oriented RMG Factories',
+            description: 'Consistent high-speed trims supply preventing floor downtime. We manufacture precision twill tapes, drawstrings, elastic bands, zippers, and gum tapes for seamless finishing lines.',
+            bullets: [
+                'Zero-tolerance tensile strength, elasticity, and wash-test resilience',
+                'Bulk packaging engineered for rapid automated garment sewing lines',
+                'Dedicated buffer stock reserved for rapid turnaround re-orders'
+            ],
+            image1: '/images/about-s3-pic.jpg',
+            image2: '/images/machineries/screenprint.jpg'
+        },
+        trader: {
+            tag: 'Global Wholesale',
+            title: 'Wholesalers, Buying Houses & Trims Traders',
+            description: 'High-margin wholesale pricing and white-label trims distribution. Access bulk factory quantities with customized branding, export packing, and swift port clearances.',
+            bullets: [
+                'Competitive container-load wholesale pricing and flexible credit terms',
+                'OEM & private-label packaging tailored to overseas buyers',
+                'Complete customs documentation and smooth logistics support'
+            ],
+            image1: '/images/slider/slide-1.jpg',
+            image2: '/images/slider/slide-3.jpg'
+        }
+    };
+
+    if (profileTabs.length > 0 && profileContent) {
+        profileTabs.forEach(tab => {
+            tab.addEventListener('click', function (e) {
+                e.preventDefault();
+                const key = this.getAttribute('data-tab');
+                const data = profileData[key];
+                if (!data) return;
+
+                profileTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Smooth crossfade animation
+                profileContent.classList.add('fade-out');
+
+                setTimeout(() => {
+                    const tagEl = profileContent.querySelector('.profile-tag');
+                    const titleEl = profileContent.querySelector('.profile-title');
+                    const descEl = profileContent.querySelector('.profile-desc');
+                    const listEl = profileContent.querySelector('.profile-bullets');
+                    const img1El = profileContent.querySelector('.profile-img-1');
+                    const img2El = profileContent.querySelector('.profile-img-2');
+
+                    if (tagEl) tagEl.textContent = data.tag;
+                    if (titleEl) titleEl.textContent = data.title;
+                    if (descEl) descEl.textContent = data.description;
+                    if (listEl) {
+                        listEl.innerHTML = data.bullets.map(b => `<li class="mb-2"><i class="bi bi-check-circle-fill text-indigo me-2"></i> ${b}</li>`).join('');
+                    }
+                    if (img1El) img1El.src = data.image1;
+                    if (img2El) img2El.src = data.image2;
+
+                    profileContent.classList.remove('fade-out');
+                    profileContent.classList.add('fade-in');
+                    setTimeout(() => profileContent.classList.remove('fade-in'), 400);
+                }, 200);
+            });
+        });
+    }
+
+    // -------------------------------------------------------------
+    // 8. Client-Side Instant Product Filter & Search
+    // -------------------------------------------------------------
     const filterButtons = document.querySelectorAll('.product-filter-btn');
     const searchInput = document.getElementById('productSearchInput');
     const productCards = document.querySelectorAll('.product-item-col');
@@ -105,7 +352,9 @@ document.addEventListener('DOMContentLoaded', function () {
         searchInput.addEventListener('input', filterProducts);
     }
 
-    // 4. Client-side Machinery Category Filter
+    // -------------------------------------------------------------
+    // 9. Client-side Machinery Category Filter
+    // -------------------------------------------------------------
     const machFilterBtns = document.querySelectorAll('.machinery-filter-btn');
     const machCards = document.querySelectorAll('.machinery-item-col');
 
@@ -129,30 +378,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 5. Work Process Interactive Tab Switching
-    const processPills = document.querySelectorAll('.process-pill');
-    const processPanes = document.querySelectorAll('.process-pane');
-
-    if (processPills.length > 0) {
-        processPills.forEach(pill => {
-            pill.addEventListener('click', function () {
-                const targetStep = this.getAttribute('data-step');
-                processPills.forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-
-                processPanes.forEach(pane => {
-                    if (pane.getAttribute('data-step') === targetStep) {
-                        pane.classList.remove('d-none');
-                        pane.classList.add('fade-in');
-                    } else {
-                        pane.classList.add('d-none');
-                    }
-                });
-            });
-        });
-    }
-
-    // 6. Global Quick Quote Modal trigger pre-fill
+    // -------------------------------------------------------------
+    // 10. Global Quick Quote & Quick View Modal triggers
+    // -------------------------------------------------------------
     window.openQuoteModal = function (productName, serviceType) {
         const quoteModalEl = document.getElementById('quickQuoteModal');
         if (quoteModalEl) {
@@ -171,7 +399,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // 7. Product Quick View Modal
     window.openProductQuickView = function (title, category, imgSrc, desc, specs) {
         const modalEl = document.getElementById('productQuickViewModal');
         if (modalEl) {

@@ -239,10 +239,6 @@
         </div>
     </div>
 
-    <!-- Back to Top Button -->
-    <button type="button" id="backToTopBtn" aria-label="Back to top">
-        <i class="bi bi-chevron-up fs-5"></i>
-    </button>
 
     <!-- Clean Modern Footer (Matching Reference Image) -->
     <footer class="site-footer crosshair-corner">
@@ -340,6 +336,15 @@
             </div>
         </div>
     </footer>
+
+    <!-- Circular Scroll Progress Back-To-Top Button -->
+    <button type="button" id="backToTopBtn" class="back-to-top-circle" aria-label="Back to top" title="Scroll to top">
+        <svg class="progress-ring" width="46" height="46">
+            <circle class="progress-ring-bg" stroke="#e0e7ff" stroke-width="3" fill="transparent" r="20" cx="23" cy="23" />
+            <circle id="progressRingBar" class="progress-ring-bar" stroke="var(--brand-indigo)" stroke-width="3" stroke-linecap="round" fill="transparent" r="20" cx="23" cy="23" />
+        </svg>
+        <i class="bi bi-arrow-up"></i>
+    </button>
 
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
