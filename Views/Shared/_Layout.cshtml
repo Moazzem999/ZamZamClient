@@ -6,6 +6,20 @@
     <title>@ViewData["Title"] - ZamZam Trims (BD) Limited | Leading Apparel Accessories & Trims Manufacturer</title>
     <meta name="description" content="ZamZam Trims (BD) Limited - Premier manufacturer, importer & supplier of international standard apparel accessories, trims, woven labels, hang tags, buttons, zippers, and digital printing solutions in Bangladesh." />
     
+    <!-- Dark Mode Immediate Initializer (Prevents FOUT) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('zamzam_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+            }
+        })();
+    </script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,6 +101,11 @@
                     </ul>
 
                     <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                        <!-- Dark / Light Mode Switcher -->
+                        <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle dark / light mode">
+                            <i class="bi bi-moon-stars-fill theme-icon-dark"></i>
+                            <i class="bi bi-sun-fill theme-icon-light"></i>
+                        </button>
                         <a href="tel:+8801874633431" class="btn btn-modern-outline d-none d-xl-inline-flex">
                             <i class="bi bi-telephone"></i> Call Us
                         </a>

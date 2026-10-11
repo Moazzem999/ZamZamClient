@@ -421,4 +421,21 @@ document.addEventListener('DOMContentLoaded', function () {
             modal.show();
         }
     };
+
+    // -------------------------------------------------------------
+    // 11. Dark Mode / Light Mode Theme Controller
+    // -------------------------------------------------------------
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', function () {
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', newTheme);
+            try {
+                localStorage.setItem('zamzam_theme', newTheme);
+            } catch (e) {
+                console.warn('Unable to persist theme to localStorage', e);
+            }
+        });
+    }
 });

@@ -39,13 +39,46 @@
     --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* =========================================================
+   DARK MODE PALETTE TOKENS
+   ========================================================= */
+[data-bs-theme="dark"] {
+    --brand-primary: #f8fafc;
+    --brand-indigo: #6366f1;
+    --brand-indigo-light: #818cf8;
+    --brand-indigo-dark: #4f46e5;
+    --brand-periwinkle-soft: rgba(99, 102, 241, 0.12);
+    --brand-periwinkle-border: rgba(99, 102, 241, 0.22);
+    
+    --brand-accent: #6366f1;
+    --brand-accent-dark: #4f46e5;
+    --brand-accent-light: rgba(99, 102, 241, 0.16);
+    --brand-accent-glow: rgba(99, 102, 241, 0.4);
+    
+    --surface-bg: #090d16;              /* Deep luxury midnight slate */
+    --surface-card: #111827;            /* Card surface */
+    --surface-border: #1e293b;
+    --surface-border-subtle: #1f293d;
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    
+    --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+    --shadow-hover: 0 20px 40px -10px rgba(99, 102, 241, 0.25);
+    --shadow-card: 0 12px 32px -4px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.45);
+}
+
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: var(--text-primary);
     background-color: var(--surface-bg);
     line-height: 1.6;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 
 img {
     max-width: 100%;
@@ -775,6 +808,68 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 /* =========================================================
+   TEAM MEMBER CARDS (Leadership & Management)
+   ========================================================= */
+.team-card {
+    background: var(--surface-card);
+    border: 1px solid var(--brand-periwinkle-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.04);
+}
+.team-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+    border-color: #c7d2fe;
+}
+.team-img-wrapper {
+    width: 100%;
+    height: 290px;
+    background: #f1f5f9;
+    overflow: hidden;
+    position: relative;
+}
+.team-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform 0.5s ease;
+}
+.team-card:hover .team-img {
+    transform: scale(1.06);
+}
+.team-body {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.team-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--brand-primary);
+    margin-bottom: 4px;
+}
+.team-role {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--brand-indigo);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+}
+.team-bio {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* =========================================================
    DARK PROCESS CARD (Matching "Effortless process" in image)
    ========================================================= */
 .dark-process-card {
@@ -1169,4 +1264,447 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 .back-to-top-circle:hover i {
     transform: translateY(-3px);
+}
+
+/* =========================================================
+   THEME TOGGLE BUTTON
+   ========================================================= */
+.theme-toggle-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+}
+.theme-toggle-btn:hover {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    color: var(--brand-indigo);
+    transform: scale(1.06);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+}
+.theme-icon-light {
+    display: none;
+    font-size: 1.15rem;
+    color: #f59e0b;
+}
+.theme-icon-dark {
+    display: inline-block;
+    font-size: 1.05rem;
+    color: #6366f1;
+}
+
+[data-bs-theme="dark"] .theme-toggle-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f59e0b;
+}
+[data-bs-theme="dark"] .theme-toggle-btn:hover {
+    background: #283548;
+    border-color: #6366f1;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.35);
+}
+[data-bs-theme="dark"] .theme-icon-light {
+    display: inline-block;
+}
+[data-bs-theme="dark"] .theme-icon-dark {
+    display: none;
+}
+
+/* =========================================================
+   COMPONENT OVERRIDES FOR DARK MODE
+   ========================================================= */
+[data-bs-theme="dark"] .bg-white {
+    background-color: var(--surface-card) !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: #0c121e !important;
+}
+
+[data-bs-theme="dark"] .text-dark {
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .border {
+    border-color: var(--surface-border) !important;
+}
+
+[data-bs-theme="dark"] .top-announcement-bar {
+    background: #090d16;
+    border-bottom-color: var(--surface-border);
+}
+
+[data-bs-theme="dark"] .site-navbar {
+    background: rgba(17, 24, 39, 0.94);
+    border-bottom-color: rgba(99, 102, 241, 0.2);
+}
+[data-bs-theme="dark"] .site-navbar.scrolled {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+[data-bs-theme="dark"] .brand-main-title {
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .nav-link {
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .nav-link:hover,
+[data-bs-theme="dark"] .nav-link.active {
+    color: #818cf8 !important;
+    background: rgba(99, 102, 241, 0.15);
+}
+
+[data-bs-theme="dark"] .hero-canvas {
+    background-color: var(--surface-bg);
+}
+
+[data-bs-theme="dark"] .hero-giant-card {
+    background: linear-gradient(135deg, #0d1424 0%, #111a2e 45%, #181938 100%);
+    border-color: rgba(99, 102, 241, 0.25);
+    box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.7);
+}
+
+[data-bs-theme="dark"] .hero-main-title {
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .hero-lead-text {
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .hero-floating-stat {
+    background: rgba(17, 24, 39, 0.94);
+    border-color: rgba(99, 102, 241, 0.35);
+    box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.6);
+}
+
+[data-bs-theme="dark"] .hero-thumb-box {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .brand-marquee-container {
+    background: #0b0f19;
+    border-color: var(--surface-border);
+}
+
+[data-bs-theme="dark"] .marquee-brand-pill {
+    background: #111827;
+    border-color: #1e293b;
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .marquee-brand-pill:hover {
+    background: rgba(99, 102, 241, 0.18);
+    border-color: #6366f1;
+    color: #818cf8;
+}
+
+[data-bs-theme="dark"] .page-header-banner {
+    background: linear-gradient(135deg, #0e1626 0%, #131c2e 45%, #181938 100%);
+    border-bottom-color: rgba(99, 102, 241, 0.25);
+}
+
+[data-bs-theme="dark"] .page-header-banner h1,
+[data-bs-theme="dark"] .page-header-banner h2 {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .site-footer {
+    background: #070a12;
+    border-top-color: var(--surface-border);
+}
+
+[data-bs-theme="dark"] .footer-title,
+[data-bs-theme="dark"] .footer-heading {
+    color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .footer-links a {
+    color: #94a3b8;
+}
+
+[data-bs-theme="dark"] .footer-links a:hover {
+    color: #818cf8;
+}
+
+[data-bs-theme="dark"] .footer-contact-item {
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .footer-bottom {
+    border-top-color: var(--surface-border);
+    color: #94a3b8;
+}
+
+[data-bs-theme="dark"] .footer-logo,
+[data-bs-theme="dark"] .navbar-brand-logo {
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.12));
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: var(--surface-card);
+    border-color: var(--surface-border);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .value-card,
+[data-bs-theme="dark"] .service-card,
+[data-bs-theme="dark"] .product-card,
+[data-bs-theme="dark"] .machinery-card,
+[data-bs-theme="dark"] .contact-card-box,
+[data-bs-theme="dark"] .testimonial-card,
+[data-bs-theme="dark"] .team-card {
+    background: var(--surface-card);
+    border-color: var(--surface-border);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+}
+
+[data-bs-theme="dark"] .team-img-wrapper {
+    background: #0d131f;
+}
+
+[data-bs-theme="dark"] .team-name {
+    color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .team-role {
+    color: #818cf8;
+}
+
+[data-bs-theme="dark"] .team-bio {
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .service-icon-box {
+    background: rgba(99, 102, 241, 0.15);
+    color: #818cf8;
+}
+
+[data-bs-theme="dark"] .product-img-wrapper,
+[data-bs-theme="dark"] .machinery-img-wrapper {
+    background: #0d131f;
+}
+
+[data-bs-theme="dark"] .filter-btn {
+    background: #111827;
+    border-color: #1e293b;
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .filter-btn:hover,
+[data-bs-theme="dark"] .filter-btn.active {
+    background: var(--brand-indigo);
+    color: #ffffff;
+    border-color: var(--brand-indigo);
+}
+
+[data-bs-theme="dark"] .badge-pill-soft {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #818cf8;
+}
+
+[data-bs-theme="dark"] .badge-status {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #818cf8;
+}
+
+[data-bs-theme="dark"] .badge.bg-light.text-dark {
+    background-color: #1e293b !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-light.text-primary {
+    background-color: rgba(99, 102, 241, 0.15) !important;
+    color: #818cf8 !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-light.text-success {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Dark Mode Primary & Dark Button Inversion with Crisp Dark Text */
+[data-bs-theme="dark"] .btn-modern-primary,
+[data-bs-theme="dark"] .btn-modern-dark,
+[data-bs-theme="dark"] .btn-dark {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-bs-theme="dark"] .btn-modern-primary i,
+[data-bs-theme="dark"] .btn-modern-dark i,
+[data-bs-theme="dark"] .btn-dark i {
+    color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .btn-modern-primary:hover,
+[data-bs-theme="dark"] .btn-modern-dark:hover,
+[data-bs-theme="dark"] .btn-dark:hover {
+    background-color: var(--brand-indigo) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-indigo) !important;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45) !important;
+}
+
+[data-bs-theme="dark"] .btn-modern-primary:hover i,
+[data-bs-theme="dark"] .btn-modern-dark:hover i,
+[data-bs-theme="dark"] .btn-dark:hover i {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-dark {
+    border-color: #475569 !important;
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-dark:hover {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-dark:hover i {
+    color: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .btn-modern-outline {
+    border-color: #334155;
+    color: #f8fafc;
+    background: #111827;
+}
+
+[data-bs-theme="dark"] .btn-modern-outline:hover {
+    border-color: #6366f1;
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.15);
+}
+
+[data-bs-theme="dark"] .btn-light {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .btn-light:hover {
+    background-color: #334155;
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+    border-color: #334155;
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+    background-color: #1e293b;
+    border-color: #6366f1;
+    color: #818cf8;
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #111827;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: #161f30;
+    border-color: #6366f1;
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .input-group-text {
+    background-color: #161f30;
+    border-color: #334155;
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: #111827;
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .modal-body.bg-light {
+    background-color: #0c121e !important;
+}
+
+[data-bs-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-bs-theme="dark"] .btn-close.btn-close-white {
+    filter: none;
+}
+
+[data-bs-theme="dark"] .progress {
+    background-color: #1e293b;
+}
+
+[data-bs-theme="dark"] .vr {
+    opacity: 0.25;
+    background-color: #475569;
+}
+
+[data-bs-theme="dark"] hr {
+    border-color: #1e293b;
+    opacity: 1;
+}
+
+[data-bs-theme="dark"] .text-secondary {
+    color: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .border-top,
+[data-bs-theme="dark"] .border-bottom,
+[data-bs-theme="dark"] .border-start,
+[data-bs-theme="dark"] .border-end {
+    border-color: var(--surface-border) !important;
+}
+
+[data-bs-theme="dark"] .back-to-top-circle {
+    background: #111827;
+    color: #818cf8;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+[data-bs-theme="dark"] .back-to-top-circle svg .progress-ring-bg {
+    stroke: #1e293b;
+}
+
+[data-bs-theme="dark"] .back-to-top-circle:hover {
+    background: #161f30;
+    color: #a5b4fc;
+}
+
+[data-bs-theme="dark"] .crosshair-corner::before,
+[data-bs-theme="dark"] .crosshair-corner::after {
+    color: #283548;
 }
