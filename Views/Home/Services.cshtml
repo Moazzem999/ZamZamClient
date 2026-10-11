@@ -7,9 +7,9 @@
 <!-- Page Header -->
 <section class="page-header-banner">
     <div class="container text-center">
-        <span class="badge bg-teal text-white px-3 py-2 text-uppercase mb-2">11 Core Manufacturing & Sourcing Capabilities</span>
-        <h1 class="display-5 fw-bold font-heading mb-2 text-white">Our Services & Solutions</h1>
-        <p class="lead text-slate-300 max-w-2xl mx-auto mb-0">
+        <span class="badge-pill-soft mb-3"><i class="bi bi-gear-wide-connected text-indigo"></i> 11 Core Capabilities</span>
+        <h1 class="display-5 fw-bold font-heading mb-2">Our Services & Solutions</h1>
+        <p class="lead text-secondary max-w-2xl mx-auto mb-0">
             Advanced setups for apparel accessories & trims, digital print, emboss print, heat press, lamination, and international sourcing with top quality and competitive pricing.
         </p>
     </div>
@@ -20,13 +20,13 @@
     <div class="container">
         @if (selected != null)
         {
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 border-start border-4 border-teal bg-white">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 border-start border-4 border-indigo bg-white">
                 <div class="row align-items-center g-4">
                     <div class="col-md-5">
                         <img src="@selected.ImageUrl" alt="@selected.Title" class="img-fluid rounded-4 shadow w-100" style="max-height: 280px; object-fit: cover;" onerror="this.src='/images/services/ManufacturingService.jpg';" />
                     </div>
                     <div class="col-md-7">
-                        <span class="badge bg-teal text-white mb-2">Selected Capability</span>
+                        <span class="badge bg-indigo rounded-pill px-3 py-1 mb-2">Selected Capability</span>
                         <h2 class="fw-bold font-heading mb-2">@selected.Title</h2>
                         <p class="text-secondary mb-3">@selected.FullDescription</p>
                         
@@ -34,7 +34,7 @@
                             @foreach (var h in selected.Highlights)
                             {
                                 <div class="col-sm-6 small text-secondary">
-                                    <i class="bi bi-check-circle-fill text-teal me-1"></i> @h
+                                    <i class="bi bi-check-circle-fill text-indigo me-1"></i> @h
                                 </div>
                             }
                         </div>
@@ -67,12 +67,12 @@
                         <p class="service-desc">@s.FullDescription</p>
 
                         <div class="mb-4">
-                            <h6 class="small fw-bold text-uppercase text-teal mb-2">Highlights:</h6>
+                            <h6 class="small fw-bold text-uppercase text-indigo mb-2">Highlights:</h6>
                             <ul class="list-unstyled mb-0">
                                 @foreach (var hl in s.Highlights)
                                 {
                                     <li class="d-flex align-items-start gap-2 small text-secondary mb-1">
-                                        <i class="bi bi-check-lg text-teal"></i>
+                                        <i class="bi bi-check-lg text-indigo"></i>
                                         <span>@hl</span>
                                     </li>
                                 }

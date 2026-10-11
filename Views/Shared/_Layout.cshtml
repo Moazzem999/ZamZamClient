@@ -21,31 +21,35 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <!-- Top Announcement Bar -->
+    <!-- Top Announcement Bar (Clean & Light) -->
     <div class="top-announcement-bar d-none d-md-block">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <span class="badge-status me-3">
                     <span class="status-dot"></span> Open for Production
                 </span>
-                <span><i class="bi bi-clock me-1 text-teal"></i> Sat - Thu : 9:30 AM – 6:00 PM</span>
+                <span><i class="bi bi-clock me-1 text-primary"></i> Sat - Thu : 9:30 AM – 6:00 PM</span>
                 <span class="top-bar-divider"></span>
-                <span><i class="bi bi-geo-alt me-1 text-teal"></i> Uttara & Motijheel, Dhaka, Bangladesh</span>
+                <span><i class="bi bi-geo-alt me-1 text-primary"></i> Uttara & Motijheel, Dhaka, Bangladesh</span>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <a href="tel:+8801874633431"><i class="bi bi-telephone-fill me-1 text-teal"></i> +88 01874633431</a>
+                <a href="tel:+8801874633431"><i class="bi bi-telephone-fill me-1 text-primary"></i> +88 01874633431</a>
                 <span class="top-bar-divider"></span>
-                <a href="mailto:info@zztbl.com"><i class="bi bi-envelope-fill me-1 text-teal"></i> info@zztbl.com</a>
+                <a href="mailto:info@zztbl.com"><i class="bi bi-envelope-fill me-1 text-primary"></i> info@zztbl.com</a>
             </div>
         </div>
     </div>
 
     <!-- Main Sticky Navbar -->
     <header>
-        <nav class="navbar navbar-expand-lg site-navbar py-2">
+        <nav class="navbar navbar-expand-lg site-navbar py-3">
             <div class="container">
                 <a class="navbar-brand-wrapper" asp-controller="Home" asp-action="Index">
                     <img src="~/images/logo.png" alt="ZamZam Trims (BD) Limited" class="navbar-brand-logo" onerror="this.onerror=null; this.src='/assets/images/logo.png';" />
+                    <div class="brand-title-group">
+                        <span class="brand-main-title">ZamZam Trims</span>
+                        <span class="brand-sub-title">(BD) LIMITED • ESTD 2019</span>
+                    </div>
                 </a>
 
                 <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarContent" aria-controls="mainNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,12 +70,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Services" ? "active" : "")" asp-controller="Home" asp-action="Services">
-                                Services
+                                Services <span class="nav-badge">11</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Products" ? "active" : "")" asp-controller="Home" asp-action="Products">
-                                Products
+                                Products <span class="nav-badge">74+</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -91,7 +95,7 @@
                             <i class="bi bi-telephone"></i> Call Us
                         </a>
                         <button type="button" class="btn btn-modern-primary" onclick="openQuoteModal('', '')">
-                            <i class="bi bi-file-earmark-text"></i> Request Quote
+                            <i class="bi bi-file-earmark-text"></i> Request Quotes
                         </button>
                     </div>
                 </div>
@@ -103,7 +107,7 @@
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="container mt-3">
-            <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-2" role="alert">
+            <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-2 rounded-4" role="alert">
                 <i class="bi bi-check-circle-fill fs-5 text-success"></i>
                 <div>@TempData["SuccessMessage"]</div>
                 <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -113,7 +117,7 @@
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="container mt-3">
-            <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-2" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-2 rounded-4" role="alert">
                 <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
                 <div>@TempData["ErrorMessage"]</div>
                 <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -133,7 +137,7 @@
                 <div class="modal-header bg-dark text-white p-4">
                     <div>
                         <h4 class="modal-title font-heading fw-bold mb-1" id="quickQuoteModalLabel">
-                            <i class="bi bi-lightning-charge text-teal me-2"></i>Request an Instant Quotation
+                            <i class="bi bi-lightning-charge text-warning me-2"></i>Request an Instant Quotation
                         </h4>
                         <p class="text-secondary small mb-0">Fill in your requirements and our estimation department will provide pricing within 2-4 hours.</p>
                     </div>
@@ -191,8 +195,8 @@
                     <div class="modal-footer bg-white p-3 border-top d-flex justify-content-between">
                         <span class="small text-muted"><i class="bi bi-shield-lock me-1"></i> Your information is kept strictly confidential.</span>
                         <div>
-                            <button type="button" class="btn btn-light rounded-3 px-3 me-2" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-modern-primary rounded-3 px-4">
+                            <button type="button" class="btn btn-light rounded-pill px-3 me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-modern-indigo rounded-pill px-4">
                                 <i class="bi bi-send-fill me-1"></i> Submit Quotation Request
                             </button>
                         </div>
@@ -207,7 +211,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="modal-header border-bottom p-3">
-                    <span class="badge bg-dark rounded-pill px-3 py-2 text-uppercase" id="quickViewCategory">Category</span>
+                    <span class="badge bg-primary rounded-pill px-3 py-2 text-uppercase" id="quickViewCategory">Category</span>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -222,15 +226,15 @@
                             <p class="text-secondary mb-3" id="quickViewDesc">Description here</p>
                             
                             <div class="p-3 bg-light rounded-3 mb-4">
-                                <h6 class="fw-bold small text-uppercase text-teal mb-2"><i class="bi bi-cpu me-1"></i> Technical Specs</h6>
+                                <h6 class="fw-bold small text-uppercase text-primary mb-2"><i class="bi bi-cpu me-1"></i> Technical Specs</h6>
                                 <p class="small text-muted mb-0" id="quickViewSpecs">Specifications</p>
                             </div>
 
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-modern-primary flex-grow-1" id="quickViewQuoteBtn">
+                                <button type="button" class="btn btn-modern-indigo flex-grow-1" id="quickViewQuoteBtn">
                                     <i class="bi bi-file-earmark-text"></i> Inquire / Quote This Item
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -244,24 +248,22 @@
         <i class="bi bi-chevron-up fs-5"></i>
     </button>
 
-    <!-- Ultra-Modern Footer -->
-    <footer class="site-footer">
+    <!-- Clean Modern Footer (Matching Reference Image) -->
+    <footer class="site-footer crosshair-corner">
         <div class="container">
             <div class="row g-4">
                 <!-- Company Info -->
                 <div class="col-lg-4 col-md-6">
                     <div class="mb-3">
-                        <div class="d-inline-block bg-white px-3 py-2 rounded-3 shadow-sm">
-                            <img src="~/images/logo.png" alt="ZamZam Trims (BD) Limited" style="height: 38px; width: auto;" onerror="this.onerror=null; this.src='/assets/images/logo.png';" />
-                        </div>
+                        <img src="~/images/logo.png" alt="ZamZam Trims (BD) Limited" class="footer-logo" style="height: 46px; width: auto;" onerror="this.onerror=null; this.src='/assets/images/logo.png';" />
                     </div>
-                    <p class="text-slate-400 small mb-4">
+                    <p class="text-secondary small mb-4">
                         An apparel accessories and trims products manufacturer, importer and supplier company in Bangladesh. Operating state-of-the-art mechanized production facilities with a dedicated workforce of 250+ delivering export-standard excellence since 2019.
                     </p>
-                    <div class="d-flex gap-3">
-                        <a href="https://facebook.com" target="_blank" class="btn btn-sm btn-outline-light rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-facebook"></i></a>
-                        <a href="https://linkedin.com" target="_blank" class="btn btn-sm btn-outline-light rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-linkedin"></i></a>
-                        <a href="https://whatsapp.com" target="_blank" class="btn btn-sm btn-outline-light rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-whatsapp"></i></a>
+                    <div class="d-flex gap-2">
+                        <a href="https://facebook.com" target="_blank" class="btn btn-sm btn-outline-secondary rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-facebook"></i></a>
+                        <a href="https://linkedin.com" target="_blank" class="btn btn-sm btn-outline-secondary rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://whatsapp.com" target="_blank" class="btn btn-sm btn-outline-secondary rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-whatsapp"></i></a>
                     </div>
                 </div>
 
@@ -269,13 +271,13 @@
                 <div class="col-lg-2 col-md-6">
                     <h5 class="footer-heading">Quick Links</h5>
                     <ul class="footer-links">
-                        <li><a asp-controller="Home" asp-action="Index"><i class="bi bi-chevron-right text-teal"></i> Home</a></li>
-                        <li><a asp-controller="Home" asp-action="About"><i class="bi bi-chevron-right text-teal"></i> About Us</a></li>
-                        <li><a asp-controller="Home" asp-action="Services"><i class="bi bi-chevron-right text-teal"></i> Our Services</a></li>
-                        <li><a asp-controller="Home" asp-action="Products"><i class="bi bi-chevron-right text-teal"></i> All Products</a></li>
-                        <li><a asp-controller="Home" asp-action="Machineries"><i class="bi bi-chevron-right text-teal"></i> Machineries</a></li>
-                        <li><a asp-controller="Home" asp-action="Contact"><i class="bi bi-chevron-right text-teal"></i> Contact Us</a></li>
-                        <li><a asp-controller="Home" asp-action="RequestQuote"><i class="bi bi-chevron-right text-teal"></i> Request a Quote</a></li>
+                        <li><a asp-controller="Home" asp-action="Index"><i class="bi bi-chevron-right text-primary"></i> Home</a></li>
+                        <li><a asp-controller="Home" asp-action="About"><i class="bi bi-chevron-right text-primary"></i> About Us</a></li>
+                        <li><a asp-controller="Home" asp-action="Services"><i class="bi bi-chevron-right text-primary"></i> Our Services</a></li>
+                        <li><a asp-controller="Home" asp-action="Products"><i class="bi bi-chevron-right text-primary"></i> All Products (74+)</a></li>
+                        <li><a asp-controller="Home" asp-action="Machineries"><i class="bi bi-chevron-right text-primary"></i> Machineries</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact"><i class="bi bi-chevron-right text-primary"></i> Contact Us</a></li>
+                        <li><a asp-controller="Home" asp-action="RequestQuote"><i class="bi bi-chevron-right text-primary"></i> Request a Quote</a></li>
                     </ul>
                 </div>
 
@@ -283,13 +285,13 @@
                 <div class="col-lg-3 col-md-6">
                     <h5 class="footer-heading">Key Capabilities</h5>
                     <ul class="footer-links">
-                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="manufacturing"><i class="bi bi-chevron-right text-teal"></i> Garment Trims Manufacturing</a></li>
-                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="digital-printing"><i class="bi bi-chevron-right text-teal"></i> Advanced Digital Printing</a></li>
-                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="apparel-labeling"><i class="bi bi-chevron-right text-teal"></i> Apparel Labeling Solutions</a></li>
-                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="paper-embossing"><i class="bi bi-chevron-right text-teal"></i> 3D Paper Embossing</a></li>
-                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="heat-pressing"><i class="bi bi-chevron-right text-teal"></i> Heat Press & Transfer</a></li>
-                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="direct-selling"><i class="bi bi-chevron-right text-teal"></i> Direct Selling & Ready Stock</a></li>
-                        <li><a asp-controller="Home" asp-action="Machineries"><i class="bi bi-chevron-right text-teal"></i> Heidelberg Offset & Rotary</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="manufacturing"><i class="bi bi-chevron-right text-primary"></i> Garment Trims Manufacturing</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="digital-printing"><i class="bi bi-chevron-right text-primary"></i> Advanced Digital Printing</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="apparel-labeling"><i class="bi bi-chevron-right text-primary"></i> Apparel Labeling Solutions</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="paper-embossing"><i class="bi bi-chevron-right text-primary"></i> 3D Paper Embossing</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="heat-pressing"><i class="bi bi-chevron-right text-primary"></i> Heat Press & Transfer</a></li>
+                        <li><a asp-controller="Home" asp-action="Services" asp-route-slug="direct-selling"><i class="bi bi-chevron-right text-primary"></i> Direct Selling & Ready Stock</a></li>
+                        <li><a asp-controller="Home" asp-action="Machineries"><i class="bi bi-chevron-right text-primary"></i> Heidelberg Offset & Rotary</a></li>
                     </ul>
                 </div>
 
@@ -299,29 +301,29 @@
                     <div class="footer-contact-item">
                         <i class="bi bi-geo-alt-fill footer-contact-icon"></i>
                         <div>
-                            <strong class="text-white d-block">Factory & Corporate Office:</strong>
-                            House # 21, 21/1, 21/2, Road # 01, Dhour, Turag, Dhaka-Word # 54, Uttara, Dhaka-1230, Bangladesh.
+                            <strong class="text-dark d-block">Factory & Corporate:</strong>
+                            House # 21, 21/1, Road # 01, Dhour, Turag, Uttara, Dhaka-1230.
                         </div>
                     </div>
                     <div class="footer-contact-item">
                         <i class="bi bi-building footer-contact-icon"></i>
                         <div>
-                            <strong class="text-white d-block">Registered Sales Office:</strong>
-                            10 / 10, Arambagh, Motijheel, Dhaka - 1000, Bangladesh.
+                            <strong class="text-dark d-block">Registered Sales Office:</strong>
+                            10 / 10, Arambagh, Motijheel, Dhaka - 1000.
                         </div>
                     </div>
                     <div class="footer-contact-item">
                         <i class="bi bi-telephone-fill footer-contact-icon"></i>
                         <div>
-                            <strong class="text-white d-block">Direct Line & WhatsApp:</strong>
-                            <a href="tel:+8801874633431" class="text-white text-decoration-none">+88 01874633431</a>
+                            <strong class="text-dark d-block">Direct Line & WhatsApp:</strong>
+                            <a href="tel:+8801874633431" class="text-secondary text-decoration-none">+88 01874633431</a>
                         </div>
                     </div>
                     <div class="footer-contact-item">
                         <i class="bi bi-envelope-fill footer-contact-icon"></i>
                         <div>
-                            <strong class="text-white d-block">Email Address:</strong>
-                            <a href="mailto:info@zztbl.com" class="text-white text-decoration-none">info@zztbl.com</a>
+                            <strong class="text-dark d-block">Email Address:</strong>
+                            <a href="mailto:info@zztbl.com" class="text-secondary text-decoration-none">info@zztbl.com</a>
                         </div>
                     </div>
                 </div>
@@ -333,11 +335,11 @@
                     &copy; @DateTime.Now.Year <strong>ZamZam Trims (BD) Limited</strong>. All Rights Reserved.
                 </div>
                 <div class="d-flex gap-3 small">
-                    <span class="text-slate-400">Export Standard Quality</span>
+                    <span class="text-muted">Export Standard Quality</span>
                     <span>•</span>
-                    <span class="text-slate-400">OEKO-TEX Compliant</span>
+                    <span class="text-muted">OEKO-TEX Compliant</span>
                     <span>•</span>
-                    <span class="text-slate-400">24/7 Production Support</span>
+                    <span class="text-muted">24/7 Production Support</span>
                 </div>
             </div>
         </div>
