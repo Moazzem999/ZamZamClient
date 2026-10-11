@@ -226,6 +226,16 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
     pointer-events: none;
 }
+.modal-header-theme .btn-light {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: none !important;
+}
+.modal-header-theme .btn-light:hover {
+    background-color: #f1f5f9 !important;
+    color: #000000 !important;
+    transform: translateY(-2px);
+}
 
 /* =========================================================
    MAIN NAVBAR (Clean Frosted Glass with Pill Navigation)
