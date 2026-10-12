@@ -237,6 +237,19 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     transform: translateY(-2px);
 }
 
+/* Quick Quote Modal Logo Emblem */
+.modal-quote-logo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    background: transparent !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.06));
+    transition: transform var(--transition-bounce, 0.25s ease);
+}
+.modal-quote-logo:hover {
+    transform: rotate(15deg) scale(1.05);
+}
+
 /* =========================================================
    MAIN NAVBAR (Clean Frosted Glass with Pill Navigation)
    ========================================================= */

@@ -149,14 +149,17 @@
     <div class="modal fade" id="quickQuoteModal" tabindex="-1" aria-labelledby="quickQuoteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="modal-header modal-header-theme text-white p-4">
-                    <div>
-                        <h4 class="modal-title font-heading fw-bold mb-1 text-white" id="quickQuoteModalLabel">
-                            <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Request an Instant Quotation
-                        </h4>
-                        <p class="small mb-0" style="color: rgba(255, 255, 255, 0.9);">Fill in your requirements and our estimation department will provide pricing within 2-4 hours.</p>
+                <div class="modal-header border-bottom p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="~/images/logo-icon.png" alt="ZamZam Trims Logo" class="modal-quote-logo" style="width: 44px; height: 44px; object-fit: contain; flex-shrink: 0;" />
+                        <div>
+                            <h4 class="modal-title font-heading fw-bold mb-1" id="quickQuoteModalLabel">
+                                Request an Instant Quotation
+                            </h4>
+                            <p class="small text-muted mb-0">Fill in your requirements and our estimation department will provide pricing within 2-4 hours.</p>
+                        </div>
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form asp-controller="Home" asp-action="SubmitQuote" method="post">
                     @Html.AntiForgeryToken()
