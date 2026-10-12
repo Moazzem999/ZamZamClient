@@ -1,8 +1,7 @@
 /**
  * ZamZam Trims (BD) Limited - Account Controller Script (account.js)
  * ------------------------------------------------------------------
- * Password visibility toggling, demo credential auto-fill,
- * and login button submission state.
+ * Password visibility toggling and login button submission state.
  */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -22,31 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 2. Demo credentials auto-filler chips
-    const demoButtons = document.querySelectorAll('.demo-fill-btn');
-    const usernameInput = document.querySelector('input[name="Username"]') || document.querySelector('input[name="Email"]');
-
-    if (demoButtons.length > 0 && usernameInput && passwordInput) {
-        demoButtons.forEach(btn => {
-            btn.addEventListener('click', function () {
-                const user = this.getAttribute('data-username') || this.getAttribute('data-email');
-                const pass = this.getAttribute('data-pass');
-
-                usernameInput.value = user || '';
-                passwordInput.value = pass || '';
-
-                // Subtle animation highlight
-                usernameInput.classList.add('is-valid');
-                passwordInput.classList.add('is-valid');
-                setTimeout(() => {
-                    usernameInput.classList.remove('is-valid');
-                    passwordInput.classList.remove('is-valid');
-                }, 1200);
-            });
-        });
-    }
-
-    // 3. Form submit feedback
+    // 2. Form submit feedback
     const loginForm = document.getElementById('loginForm');
     const submitBtn = document.getElementById('loginSubmitBtn');
 

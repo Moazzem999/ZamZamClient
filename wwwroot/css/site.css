@@ -2053,17 +2053,6 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     border-color: var(--brand-indigo);
 }
 
-.demo-fill-btn {
-    font-size: 0.78rem;
-    transition: all 0.2s ease;
-}
-
-.demo-fill-btn:hover {
-    background-color: var(--brand-indigo);
-    border-color: var(--brand-indigo);
-    color: #ffffff;
-    transform: translateY(-1px);
-}
 
 [data-bs-theme="dark"] .auth-card {
     background: #111827 !important;

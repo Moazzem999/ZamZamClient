@@ -31,13 +31,10 @@ public class AccountController : Controller
             return View(model);
         }
 
-        // Demo login check: accepts standard demo credentials or any validly formatted test account
-        bool isValidCredentials = 
-            (model.Username.Equals("admin", StringComparison.OrdinalIgnoreCase) && model.Password == "admin123") ||
-            (model.Username.Equals("buyer", StringComparison.OrdinalIgnoreCase) && model.Password == "buyer123") ||
-            (model.Username.Equals("admin@zztbl.com", StringComparison.OrdinalIgnoreCase) && model.Password == "admin123") ||
-            (model.Username.Equals("buyer@garments.com", StringComparison.OrdinalIgnoreCase) && model.Password == "buyer123") ||
-            (!string.IsNullOrWhiteSpace(model.Username) && model.Password.Length >= 6);
+        // Standard authentication check (non-empty username and minimum password requirement)
+        bool isValidCredentials = !string.IsNullOrWhiteSpace(model.Username) && 
+                                  !string.IsNullOrWhiteSpace(model.Password) && 
+                                  model.Password.Length >= 6;
 
         if (isValidCredentials)
         {
