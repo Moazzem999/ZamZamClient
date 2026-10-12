@@ -20,16 +20,16 @@
         <!-- Category Filter Pills -->
         <div class="catalog-filter-bar mb-5">
             <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "all" ? "active" : "")" data-filter="all">
-                All Machineries (17+)
+                All Machineries
             </button>
             <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "offset" ? "active" : "")" data-filter="offset">
-                <i class="bi bi-printer"></i> Offset Printing & Finishing
+                Offset Printing & Finishing
             </button>
             <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "label" ? "active" : "")" data-filter="label">
-                <i class="bi bi-tags"></i> Label Weaving & Printing
+                Label Weaving & Printing
             </button>
             <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "others" ? "active" : "")" data-filter="others">
-                <i class="bi bi-layers"></i> Embossing & Specialized
+                Embossing & Specialized
             </button>
         </div>
 
@@ -85,3 +85,7 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script src="~/js/machineries.js" asp-append-version="true"></script>
+}

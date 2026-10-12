@@ -59,10 +59,6 @@
                             </div>
                         </div>
 
-                        <div class="service-icon-box">
-                            <i class="bi @s.IconClass"></i>
-                        </div>
-
                         <h3 class="service-title">@s.Title</h3>
                         <p class="service-desc">@s.FullDescription</p>
 
@@ -99,7 +95,7 @@
     <div class="quote-banner">
         <div class="row align-items-center g-4 position-relative z-1">
             <div class="col-lg-8">
-                <h3 class="fw-bold text-white mb-2">Need a Customized Apparel Accessories Solution?</h3>
+                <h3 class="fw-bold text-black mb-2" s>Need a Customized Apparel Accessories Solution?</h3>
                 <p class="text-slate-300 mb-0">
                     Our technical and design teams are ready to analyze your tech-packs, provide yarn strike-offs, and recommend cost-effective fabrication.
                 </p>
@@ -112,3 +108,7 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script src="~/js/services.js" asp-append-version="true"></script>
+}
