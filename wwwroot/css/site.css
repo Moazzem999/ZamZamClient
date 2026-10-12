@@ -243,7 +243,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     height: 44px;
     object-fit: contain;
     background: transparent !important;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.06));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.6));
     transition: transform var(--transition-bounce, 0.25s ease);
 }
 .modal-quote-logo:hover {
