@@ -2023,3 +2023,99 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 [data-bs-theme="dark"] .crosshair-corner::after {
     color: #283548;
 }
+
+/* =========================================================
+   AUTHENTICATION & CLIENT PORTAL (Login Page Styling)
+   ========================================================= */
+.auth-page-wrapper {
+    min-height: calc(100vh - 280px);
+    display: flex;
+    align-items: center;
+    background: radial-gradient(circle at top, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
+}
+
+.auth-card {
+    background: var(--surface-card);
+    transition: transform var(--transition-bounce), box-shadow 0.3s ease;
+    border: 1px solid var(--surface-border) !important;
+}
+
+.auth-card:hover {
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1) !important;
+}
+
+.auth-header {
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.auth-card .form-control:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    border-color: var(--brand-indigo);
+}
+
+.demo-fill-btn {
+    font-size: 0.78rem;
+    transition: all 0.2s ease;
+}
+
+.demo-fill-btn:hover {
+    background-color: var(--brand-indigo);
+    border-color: var(--brand-indigo);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+[data-bs-theme="dark"] .auth-card {
+    background: #111827 !important;
+    border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+[data-bs-theme="dark"] .auth-header {
+    border-bottom-color: #1f293d;
+}
+
+[data-bs-theme="dark"] .auth-card .card-footer {
+    background: #0d1424 !important;
+    border-top-color: #1f293d !important;
+}
+
+[data-bs-theme="dark"] .auth-card .bg-light {
+    background-color: #161f30 !important;
+}
+
+/* Auth Dedicated Layout */
+.auth-layout-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at 50% 12%, rgba(99, 102, 241, 0.08) 0%, rgba(248, 250, 252, 0.95) 45%, #eef2f6 100%);
+    position: relative;
+    overflow-x: hidden;
+}
+
+[data-bs-theme="dark"] .auth-layout-body {
+    background: radial-gradient(circle at 50% 12%, rgba(99, 102, 241, 0.15) 0%, rgba(15, 23, 42, 0.98) 50%, #070c14 100%) !important;
+}
+
+.auth-top-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    width: 100%;
+    z-index: 20;
+}
+
+.auth-center-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.auth-minimal-footer {
+    padding: 1rem 1.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
