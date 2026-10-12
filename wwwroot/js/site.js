@@ -423,7 +423,136 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // -------------------------------------------------------------
-    // 11. Dark Mode / Light Mode Theme Controller
+    // 12. Giant Factory Carousel Interactive Controller
+    // -------------------------------------------------------------
+    const factoryCarouselEl = document.getElementById('factoryHeroCarousel');
+    if (factoryCarouselEl) {
+        const carouselInstance = bootstrap.Carousel.getOrCreateInstance(factoryCarouselEl, {
+            interval: 6500,
+            ride: 'carousel',
+            pause: 'hover',
+            wrap: true,
+            touch: true
+        });
+
+        const thumbCards = document.querySelectorAll('.factory-thumb-card');
+        const hudCounterCur = document.querySelector('.factory-hud-counter .cur-slide');
+        const playPauseBtn = document.getElementById('factoryCarouselPlayPause');
+        const prevBtn = document.getElementById('factoryCarouselPrev');
+        const nextBtn = document.getElementById('factoryCarouselNext');
+        const progressBarFill = document.getElementById('factoryProgressBarFill');
+
+        let isPlaying = true;
+        let progressAnimFrame = null;
+        let slideStartTime = performance.now();
+        const slideDuration = 6500;
+
+        function updateProgress() {
+            if (!isPlaying) return;
+            const elapsed = performance.now() - slideStartTime;
+            const pct = Math.min(100, (elapsed / slideDuration) * 100);
+            if (progressBarFill) {
+                progressBarFill.style.width = `${pct}%`;
+            }
+            if (elapsed < slideDuration) {
+                progressAnimFrame = requestAnimationFrame(updateProgress);
+            }
+        }
+
+        function resetProgress() {
+            if (progressAnimFrame) cancelAnimationFrame(progressAnimFrame);
+            slideStartTime = performance.now();
+            if (progressBarFill) {
+                progressBarFill.style.width = '0%';
+            }
+            if (isPlaying) {
+                progressAnimFrame = requestAnimationFrame(updateProgress);
+            }
+        }
+
+        // Handle slide change event
+        factoryCarouselEl.addEventListener('slide.bs.carousel', function (e) {
+            const nextIdx = e.to;
+            // Update active thumbnail
+            thumbCards.forEach((card, idx) => {
+                if (idx === nextIdx) {
+                    card.classList.add('active');
+                    // Scroll into view on mobile if needed
+                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+
+            // Update HUD counter
+            if (hudCounterCur) {
+                hudCounterCur.textContent = String(nextIdx + 1).padStart(2, '0');
+            }
+
+            resetProgress();
+        });
+
+        // Thumbnail clicks
+        thumbCards.forEach(card => {
+            card.addEventListener('click', function () {
+                const targetIdx = parseInt(this.getAttribute('data-bs-slide-to') || '0', 10);
+                carouselInstance.to(targetIdx);
+            });
+        });
+
+        // Prev & Next buttons
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function () {
+                carouselInstance.prev();
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () {
+                carouselInstance.next();
+            });
+        }
+
+        // Play/Pause toggle
+        if (playPauseBtn) {
+            playPauseBtn.addEventListener('click', function () {
+                const icon = playPauseBtn.querySelector('i');
+                if (isPlaying) {
+                    carouselInstance.pause();
+                    isPlaying = false;
+                    if (icon) {
+                        icon.className = 'bi bi-play-fill';
+                    }
+                    playPauseBtn.title = 'Play Slideshow';
+                    if (progressAnimFrame) cancelAnimationFrame(progressAnimFrame);
+                } else {
+                    carouselInstance.cycle();
+                    isPlaying = true;
+                    if (icon) {
+                        icon.className = 'bi bi-pause-fill';
+                    }
+                    playPauseBtn.title = 'Pause Slideshow';
+                    slideStartTime = performance.now() - ((parseFloat(progressBarFill?.style.width || '0') / 100) * slideDuration);
+                    progressAnimFrame = requestAnimationFrame(updateProgress);
+                }
+            });
+        }
+
+        // Keyboard arrow navigation
+        document.addEventListener('keydown', function (e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === 'ArrowLeft') {
+                carouselInstance.prev();
+            } else if (e.key === 'ArrowRight') {
+                carouselInstance.next();
+            }
+        });
+
+        // Start initial progress bar
+        resetProgress();
+    }
+
+    // -------------------------------------------------------------
+    // 13. Dark Mode / Light Mode Theme Controller
     // -------------------------------------------------------------
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     if (themeToggleBtn) {

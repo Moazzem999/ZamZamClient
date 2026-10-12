@@ -3,76 +3,336 @@
     ViewData["Title"] = "Your Trusted Partner in Garments Accessories";
 }
 
-<!-- Hero Canvas (Faithfully matching Reference Image) -->
-<section class="hero-canvas">
-    <div class="container">
-        <div class="hero-giant-card text-center position-relative">
-            <!-- Floating Glass Badges with Organic Floating Physics -->
-            <div class="position-absolute d-none d-md-flex align-items-center hero-floating-stat float-1" style="top: 15%; left: 6%;">
-                <div class="stat-dot-blue"></div>
-                <div class="text-start">
-                    <div class="stat-val-text"><span class="counter-val" data-target="250">0</span>+</div>
-                    <div class="stat-label-text">Skilled Workforce</div>
-                </div>
+<!-- =========================================================
+     GIANT FACTORY HERO CAROUSEL (Eye-Catching Showcase for Global Buyers)
+     ========================================================= -->
+<section class="factory-hero-section">
+    <div class="container-xl">
+        <div class="factory-carousel-wrapper position-relative">
+            <!-- Dynamic Top Slide Progress Bar -->
+            <div class="factory-progress-bar-track">
+                <div class="factory-progress-bar-fill" id="factoryProgressBarFill"></div>
             </div>
 
-            <div class="position-absolute d-none d-md-flex align-items-center hero-floating-stat float-2" style="bottom: 35%; left: 10%;">
-                <i class="bi bi-globe-americas text-primary fs-5"></i>
-                <div class="text-start ms-2">
-                    <div class="stat-val-text"><span class="counter-val" data-target="100">0</span>+</div>
-                    <div class="stat-label-text">Product Varieties</div>
+            <!-- Floating Top-Right HUD Navigation Controls -->
+            <div class="factory-carousel-hud">
+                <div class="factory-hud-counter">
+                    <span class="cur-slide">01</span><span class="text-white-50 mx-1">/</span><span class="total-slide">05</span>
                 </div>
-            </div>
-
-            <div class="position-absolute d-none d-md-flex align-items-center hero-floating-stat float-3" style="top: 18%; right: 7%;">
-                <i class="bi bi-star-fill text-warning fs-5"></i>
-                <div class="text-start ms-2">
-                    <div class="stat-val-text"><span class="counter-val" data-target="4.9">0.0</span>/5</div>
-                    <div class="stat-label-text">Quality Rating</div>
-                </div>
-            </div>
-
-            <div class="position-absolute d-none d-md-flex align-items-center hero-floating-stat float-4" style="bottom: 35%; right: 10%;">
-                <i class="bi bi-arrow-repeat text-primary fs-5"></i>
-                <div class="text-start ms-2">
-                    <div class="stat-val-text"><span class="counter-val" data-target="98">0</span>%</div>
-                    <div class="stat-label-text">On-Time Delivery</div>
-                </div>
-            </div>
-
-            <!-- Central Hero Headline -->
-            <h1 class="hero-main-title">
-                Your trusted partner in <span class="gradient-text-indigo">garments accessories</span>
-            </h1>
-            <p class="hero-lead-text">
-                Delivering quality, creativity, and reliability in every trim. We operate modern mechanized production floors providing world-class labels, tags, buttons, zippers, and digital printing.
-            </p>
-
-            <!-- Pill CTA Buttons -->
-            <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-                <a asp-controller="Home" asp-action="Products" class="btn btn-modern-primary px-4 py-2">
-                    Explore Products
-                </a>
-                <button type="button" class="btn btn-modern-outline px-4 py-2" onclick="openQuoteModal('', '')">
-                    Request Quotes
+                <button type="button" class="factory-hud-btn" id="factoryCarouselPlayPause" title="Pause Slideshow" aria-label="Pause slideshow">
+                    <i class="bi bi-pause-fill"></i>
+                </button>
+                <button type="button" class="factory-hud-btn" id="factoryCarouselPrev" title="Previous Slide" aria-label="Previous slide">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button type="button" class="factory-hud-btn" id="factoryCarouselNext" title="Next Slide" aria-label="Next slide">
+                    <i class="bi bi-chevron-right"></i>
                 </button>
             </div>
 
-            <!-- 3 Bottom Image Showcase within Hero Card -->
-            <div class="row g-3 hero-images-row justify-content-center">
-                <div class="col-md-4 col-sm-6">
-                    <div class="hero-thumb-box">
-                        <img src="~/images/slider/slide-1.jpg" alt="Machinery Production Line" class="hero-thumb-img" onerror="this.src='/images/machineries/gto.jpg';" />
+            <!-- Giant Bootstrap Carousel -->
+            <div id="factoryHeroCarousel" class="carousel slide factory-carousel" data-bs-ride="carousel" data-bs-interval="6500" data-bs-pause="hover">
+                <div class="carousel-inner">
+                    <!-- Slide 1: Automated Weaving & Narrow Fabric Plant -->
+                    <div class="carousel-item active factory-slide-item">
+                        <div class="factory-slide-bg">
+                            <img src="~/images/factory/weaving-floor.jpg" alt="Müller Jacquard Weaving Plant" class="factory-slide-img" onerror="this.src='/images/slider/slide-1.jpg';" />
+                        </div>
+                        <div class="factory-slide-overlay"></div>
+                        <div class="container h-100 position-relative">
+                            <div class="factory-slide-content-wrap">
+                                <div class="factory-slide-content">
+                                    <div class="factory-eyebrow-badge">
+                                        <i class="bi bi-cpu-fill text-warning"></i> Automated Weaving Facility &bull; 10M+ Trims / Month
+                                    </div>
+                                    <h1 class="factory-slide-title">
+                                        World-Class Jacquard Weaving & <span class="highlight-text">Narrow Fabric Complex</span>
+                                    </h1>
+                                    <p class="factory-slide-desc">
+                                        Operating Swiss Müller and high-speed computerized electronic Jacquard looms with automated tension control and ultrasonic zero-fray cutting. Engineered for export-grade woven labels, twill tapes, and high-resilience elastics.
+                                    </p>
+                                    <div class="factory-spec-pills">
+                                        <span class="factory-spec-pill"><i class="bi bi-people-fill text-primary"></i> 250+ Master Operators</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-shield-check text-success"></i> OEKO-TEX Standard 100</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-lightning-charge-fill text-warning"></i> 24/7 Production Shifts</span>
+                                    </div>
+                                    <div class="factory-slide-actions">
+                                        <button type="button" class="btn btn-giant-primary" onclick="openQuoteModal('', 'Woven Labels & Weaving')">
+                                            <i class="bi bi-file-earmark-text"></i> Request Factory Quote
+                                        </button>
+                                        <a asp-controller="Home" asp-action="Machineries" class="btn btn-giant-glass">
+                                            <i class="bi bi-gear-wide-connected"></i> Explore All Machineries
+                                        </a>
+                                        <button type="button" class="btn btn-giant-inspect" onclick="openProductQuickView('Automated Weaving Plant', 'Production Facility', '/images/factory/weaving-floor.jpg', 'Swiss Müller and high-speed computerized Jacquard weaving lines running 24/7 with zero-defect ultrasonic cutting.', 'Capacity: 10M+ Units/Month | Standard: OEKO-TEX Class 1 | Operators: 250+')" title="Expand High-Res Photo">
+                                            <i class="bi bi-arrows-fullscreen"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2: German Heidelberg Offset Printing & Hang Tags -->
+                    <div class="carousel-item factory-slide-item">
+                        <div class="factory-slide-bg">
+                            <img src="~/images/factory/printing-press.jpg" alt="German Heidelberg Offset Press" class="factory-slide-img" onerror="this.src='/images/machineries/gto.jpg';" />
+                        </div>
+                        <div class="factory-slide-overlay"></div>
+                        <div class="container h-100 position-relative">
+                            <div class="factory-slide-content-wrap">
+                                <div class="factory-slide-content">
+                                    <div class="factory-eyebrow-badge">
+                                        <i class="bi bi-printer-fill text-info"></i> German Heidelberg Presses &bull; Speedmaster XL Lines
+                                    </div>
+                                    <h2 class="factory-slide-title">
+                                        Ultra-Precision Multi-Color Offset & <span class="highlight-text">Luxury Hang Tags</span>
+                                    </h2>
+                                    <p class="factory-slide-desc">
+                                        Heidelberg Speedmaster presses delivering microscopic dot fidelity, automated spectrophotometric ink density control, luxury foil stamping, 3D embossing, and FSC-certified recyclable apparel tags.
+                                    </p>
+                                    <div class="factory-spec-pills">
+                                        <span class="factory-spec-pill"><i class="bi bi-speedometer2 text-info"></i> 15,000 Sheets/Hour Speed</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-palette-fill text-danger"></i> Exact Pantone Delta-E Match</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-recycle text-success"></i> FSC Recyclable Stock</span>
+                                    </div>
+                                    <div class="factory-slide-actions">
+                                        <button type="button" class="btn btn-giant-primary" onclick="openQuoteModal('', 'Hang Tags & Packaging')">
+                                            <i class="bi bi-file-earmark-text"></i> Request Print Sample
+                                        </button>
+                                        <a asp-controller="Home" asp-action="Products" asp-route-category="hangtag" class="btn btn-giant-glass">
+                                            <i class="bi bi-tags-fill"></i> View Hang Tag Gallery
+                                        </a>
+                                        <button type="button" class="btn btn-giant-inspect" onclick="openProductQuickView('Heidelberg Offset Printing Press', 'Printing Division', '/images/factory/printing-press.jpg', 'Multi-color German Heidelberg offset press setup with computerized ink management and inline coating.', 'Output: 15,000 Sheets/Hr | Finishes: Foil, Spot UV, Emboss | Substrate: FSC Certified')" title="Expand High-Res Photo">
+                                            <i class="bi bi-arrows-fullscreen"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3: Accredited In-House Testing Laboratory -->
+                    <div class="carousel-item factory-slide-item">
+                        <div class="factory-slide-bg">
+                            <img src="~/images/factory/qa-laboratory.jpg" alt="In-House Testing Laboratory" class="factory-slide-img" onerror="this.src='/images/about-s3-pic.jpg';" />
+                        </div>
+                        <div class="factory-slide-overlay"></div>
+                        <div class="container h-100 position-relative">
+                            <div class="factory-slide-content-wrap">
+                                <div class="factory-slide-content">
+                                    <div class="factory-eyebrow-badge">
+                                        <i class="bi bi-shield-fill-check text-success"></i> ISO 17025 Accredited &bull; 99.8% AQL Compliance
+                                    </div>
+                                    <h2 class="factory-slide-title">
+                                        Advanced In-House QA Testing Lab & <span class="highlight-text">Color Spectrophotometry</span>
+                                    </h2>
+                                    <p class="factory-slide-desc">
+                                        Every batch is verified in our climate-controlled testing lab using digital spectrophotometers, accelerated wash fastness baths, and tensile fatigue instruments to ensure 100% compliance with buyer tech-packs.
+                                    </p>
+                                    <div class="factory-spec-pills">
+                                        <span class="factory-spec-pill"><i class="bi bi-patch-check-fill text-success"></i> REACH & Azo-Free Certified</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-eye-fill text-primary"></i> Digital Weave Micro-Inspection</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-check2-circle text-warning"></i> 48-Hour Rapid Lab Dips</span>
+                                    </div>
+                                    <div class="factory-slide-actions">
+                                        <button type="button" class="btn btn-giant-primary" onclick="openQuoteModal('', 'Export QC Inquiries')">
+                                            <i class="bi bi-patch-check-fill"></i> Inquire Export Compliance
+                                        </button>
+                                        <a asp-controller="Home" asp-action="About" class="btn btn-giant-glass">
+                                            <i class="bi bi-award-fill"></i> Quality Standards & Lab
+                                        </a>
+                                        <button type="button" class="btn btn-giant-inspect" onclick="openProductQuickView('Quality Assurance Laboratory', 'Testing Division', '/images/factory/qa-laboratory.jpg', 'Accredited physical and chemical testing laboratory ensuring export standard wash-fastness, tensile strength, and skin safety.', 'Standard: ISO 17025 & OEKO-TEX | Instruments: Spectrophotometer, Wash Testers, Tensile Gauge')" title="Expand High-Res Photo">
+                                            <i class="bi bi-arrows-fullscreen"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 4: Automated Metal Trims & Zipper Workshop -->
+                    <div class="carousel-item factory-slide-item">
+                        <div class="factory-slide-bg">
+                            <img src="~/images/factory/metal-trims.jpg" alt="Metal Trims & Zipper Manufacturing" class="factory-slide-img" onerror="this.src='/images/products/Zippers.jpg';" />
+                        </div>
+                        <div class="factory-slide-overlay"></div>
+                        <div class="container h-100 position-relative">
+                            <div class="factory-slide-content-wrap">
+                                <div class="factory-slide-content">
+                                    <div class="factory-eyebrow-badge">
+                                        <i class="bi bi-tools text-warning"></i> Automated Metal & Zipper Lines &bull; Heavy-Duty Hardware
+                                    </div>
+                                    <h2 class="factory-slide-title">
+                                        Heavy-Duty Zippers, Metal Buttons & <span class="highlight-text">Custom Hardware</span>
+                                    </h2>
+                                    <p class="factory-slide-desc">
+                                        Computerized teeth-mounting machines, lead-free non-toxic electroplating, and pull-cycle durability testing. Built to withstand high-stress denim washes, heavy outerwear, and activewear demands.
+                                    </p>
+                                    <div class="factory-spec-pills">
+                                        <span class="factory-spec-pill"><i class="bi bi-shield-lock text-info"></i> Lead-Free & Nickel-Free Plating</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-arrow-repeat text-success"></i> 5,000+ Pull Cycle Strength</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-gem text-warning"></i> Custom Logo Die-Casting</span>
+                                    </div>
+                                    <div class="factory-slide-actions">
+                                        <button type="button" class="btn btn-giant-primary" onclick="openQuoteModal('', 'Zippers & Metal Trims')">
+                                            <i class="bi bi-file-earmark-text"></i> Order Hardware Samples
+                                        </button>
+                                        <a asp-controller="Home" asp-action="Products" asp-route-category="zipper" class="btn btn-giant-glass">
+                                            <i class="bi bi-box-seam-fill"></i> Browse Zipper Line
+                                        </a>
+                                        <button type="button" class="btn btn-giant-inspect" onclick="openProductQuickView('Metal Trims & Zipper Workshop', 'Hardware Division', '/images/factory/metal-trims.jpg', 'High-speed automated zipper assembly and metal button manufacturing lines.', 'Capacity: 1.5M Meters/Month | Finishes: Antique Brass, Gunmetal, Nickel-Free | Strength: 5,000+ Cycles')" title="Expand High-Res Photo">
+                                            <i class="bi bi-arrows-fullscreen"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 5: 45,000 Sq. Ft. Integrated Manufacturing Floor -->
+                    <div class="carousel-item factory-slide-item">
+                        <div class="factory-slide-bg">
+                            <img src="~/images/slider/slide-2.jpg" alt="Integrated Manufacturing Campus" class="factory-slide-img" onerror="this.src='/images/slider/slide-1.jpg';" />
+                        </div>
+                        <div class="factory-slide-overlay"></div>
+                        <div class="container h-100 position-relative">
+                            <div class="factory-slide-content-wrap">
+                                <div class="factory-slide-content">
+                                    <div class="factory-eyebrow-badge">
+                                        <i class="bi bi-building-check text-info"></i> 45,000 Sq.Ft Factory Campus &bull; Turag, Uttara Dhaka
+                                    </div>
+                                    <h2 class="factory-slide-title">
+                                        Integrated Manufacturing Infrastructure for <span class="highlight-text">Global Fashion Brands</span>
+                                    </h2>
+                                    <p class="factory-slide-desc">
+                                        Strategically situated in Dhaka with rapid access to Hazrat Shahjalal International Airport and primary garment clusters. Reliable supply chains, on-time export delivery, and dedicated merchandising teams.
+                                    </p>
+                                    <div class="factory-spec-pills">
+                                        <span class="factory-spec-pill"><i class="bi bi-building text-primary"></i> 45,000 Sq. Ft. Clean Facility</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-globe2 text-success"></i> Exporting to Europe & Americas</span>
+                                        <span class="factory-spec-pill"><i class="bi bi-stopwatch-fill text-warning"></i> 98% On-Time Delivery Record</span>
+                                    </div>
+                                    <div class="factory-slide-actions">
+                                        <button type="button" class="btn btn-giant-primary" onclick="openQuoteModal('', 'Factory Tour Request')">
+                                            <i class="bi bi-calendar-check-fill"></i> Schedule Factory Visit
+                                        </button>
+                                        <a asp-controller="Home" asp-action="Contact" class="btn btn-giant-glass">
+                                            <i class="bi bi-geo-alt-fill"></i> Factory Location & Contacts
+                                        </a>
+                                        <button type="button" class="btn btn-giant-inspect" onclick="openProductQuickView('Factory Production Floor', 'Facility Overview', '/images/slider/slide-2.jpg', 'Main production campus in Turag, Uttara Dhaka housing label weaving, offset printing, and finishing lines.', 'Area: 45,000 Sq.Ft | Location: Turag, Uttara Dhaka | Security: 24/7 CCTV & Fire Compliant')" title="Expand High-Res Photo">
+                                            <i class="bi bi-arrows-fullscreen"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="hero-thumb-box">
-                        <img src="~/images/slider/slide-3.jpg" alt="Thread Spools & Trims" class="hero-thumb-img" onerror="this.src='/images/products/Cotton.jpg';" />
+
+                <!-- Bottom Interactive Thumbnail Navigator (Dock) -->
+                <div class="factory-thumb-dock">
+                    <div class="container">
+                        <div class="factory-thumb-dock-inner">
+                            <div class="factory-thumb-card active" data-bs-slide-to="0">
+                                <div class="factory-thumb-img-wrap">
+                                    <img src="~/images/factory/weaving-floor.jpg" alt="Weaving Plant Thumbnail" onerror="this.src='/images/slider/slide-1.jpg';" />
+                                </div>
+                                <div class="factory-thumb-meta">
+                                    <span class="factory-thumb-index">01 &bull; Floor</span>
+                                    <span class="factory-thumb-title">Weaving Complex</span>
+                                </div>
+                            </div>
+
+                            <div class="factory-thumb-card" data-bs-slide-to="1">
+                                <div class="factory-thumb-img-wrap">
+                                    <img src="~/images/factory/printing-press.jpg" alt="Offset Press Thumbnail" onerror="this.src='/images/machineries/gto.jpg';" />
+                                </div>
+                                <div class="factory-thumb-meta">
+                                    <span class="factory-thumb-index">02 &bull; Press</span>
+                                    <span class="factory-thumb-title">Heidelberg Offset</span>
+                                </div>
+                            </div>
+
+                            <div class="factory-thumb-card" data-bs-slide-to="2">
+                                <div class="factory-thumb-img-wrap">
+                                    <img src="~/images/factory/qa-laboratory.jpg" alt="QC Lab Thumbnail" onerror="this.src='/images/about-s3-pic.jpg';" />
+                                </div>
+                                <div class="factory-thumb-meta">
+                                    <span class="factory-thumb-index">03 &bull; Lab</span>
+                                    <span class="factory-thumb-title">QA & Testing Lab</span>
+                                </div>
+                            </div>
+
+                            <div class="factory-thumb-card" data-bs-slide-to="3">
+                                <div class="factory-thumb-img-wrap">
+                                    <img src="~/images/factory/metal-trims.jpg" alt="Metal Trims Thumbnail" onerror="this.src='/images/products/Zippers.jpg';" />
+                                </div>
+                                <div class="factory-thumb-meta">
+                                    <span class="factory-thumb-index">04 &bull; Trims</span>
+                                    <span class="factory-thumb-title">Zippers & Metal</span>
+                                </div>
+                            </div>
+
+                            <div class="factory-thumb-card" data-bs-slide-to="4">
+                                <div class="factory-thumb-img-wrap">
+                                    <img src="~/images/slider/slide-2.jpg" alt="Production Campus Thumbnail" onerror="this.src='/images/slider/slide-1.jpg';" />
+                                </div>
+                                <div class="factory-thumb-meta">
+                                    <span class="factory-thumb-index">05 &bull; Campus</span>
+                                    <span class="factory-thumb-title">45,000 Sq.Ft Floor</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 d-none d-md-block">
-                    <div class="hero-thumb-box">
-                        <img src="~/images/slider/slide-2.jpg" alt="Label Printing Systems" class="hero-thumb-img" onerror="this.src='/images/machineries/autoscreen.jpg';" />
+            </div>
+        </div>
+
+        <!-- High-Impact Factory Proof Strip for Global Buyers -->
+        <div class="factory-proof-strip">
+            <div class="row g-3">
+                <div class="col-6 col-lg-3">
+                    <div class="factory-proof-card">
+                        <div class="factory-proof-icon">
+                            <i class="bi bi-buildings-fill"></i>
+                        </div>
+                        <div>
+                            <div class="factory-proof-val">45,000+</div>
+                            <div class="factory-proof-lbl">Sq. Ft. Factory Floor Space</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="factory-proof-card">
+                        <div class="factory-proof-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div>
+                            <div class="factory-proof-val"><span class="counter-val" data-target="250">0</span>+</div>
+                            <div class="factory-proof-lbl">Skilled Workforce & Engineers</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="factory-proof-card">
+                        <div class="factory-proof-icon">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <div>
+                            <div class="factory-proof-val">10M+</div>
+                            <div class="factory-proof-lbl">Accessories Monthly Capacity</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="factory-proof-card">
+                        <div class="factory-proof-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <div class="factory-proof-val">OEKO-TEX</div>
+                            <div class="factory-proof-lbl">Standard 100 & ISO Compliant</div>
+                        </div>
                     </div>
                 </div>
             </div>
