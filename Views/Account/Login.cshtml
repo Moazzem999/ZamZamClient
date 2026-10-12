@@ -16,8 +16,7 @@
                                 <img src="~/images/logo.png" alt="ZamZam Trims (BD) Limited" class="img-fluid" style="max-height: 48px;" onerror="this.src='/images/logo-icon.png';" />
                             </a>
                         </div>
-                        <h4 class="fw-bold font-heading mb-1">Welcome Back</h4>
-                        <p class="text-secondary small mb-0">Sign in to track orders, tech-packs & quotations</p>
+                        <h4 class="fw-bold font-heading mb-1">Welcome</h4>
                     </div>
 
                     <!-- Login Form Body -->
@@ -44,7 +43,7 @@
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <label asp-for="Password" class="form-label small fw-bold mb-0">Password</label>
-                                    <a href="javascript:void(0)" class="small text-decoration-none text-indigo" onclick="alert('For password resets, please contact IT administration at info@zztbl.com')">Forgot?</a>
+                                    <a href="javascript:void(0)" class="small text-decoration-none text-indigo" onclick="alert('For password resets, please contact IT administration')">Forgot?</a>
                                 </div>
                                 <div class="input-group mt-1">
                                     <span class="input-group-text bg-light border-end-0 text-muted">
@@ -58,13 +57,7 @@
                                 <span asp-validation-for="Password" class="text-danger small"></span>
                             </div>
 
-                            <!-- Remember Me Checkbox -->
-                            <div class="form-check mb-4">
-                                <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMeCheck" />
-                                <label asp-for="RememberMe" class="form-check-label small text-secondary" for="rememberMeCheck">
-                                    Remember my credentials on this device
-                                </label>
-                            </div>
+                            <hr />
 
                             <!-- Submit Button -->
                             <div class="d-grid mb-3">
