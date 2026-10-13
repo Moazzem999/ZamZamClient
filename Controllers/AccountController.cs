@@ -22,36 +22,6 @@ public class AccountController : Controller
         return View(model);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Login(LoginViewModel model)
-    {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
-        // Standard authentication check (non-empty username and minimum password requirement)
-        bool isValidCredentials = !string.IsNullOrWhiteSpace(model.Username) && 
-                                  !string.IsNullOrWhiteSpace(model.Password) && 
-                                  model.Password.Length >= 6;
-
-        if (isValidCredentials)
-        {
-            _logger.LogInformation("User {Username} logged in successfully.", model.Username);
-            TempData["SuccessMessage"] = $"Welcome back, {model.Username}! You have successfully signed in.";
-
-            if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-            {
-                return Redirect(model.ReturnUrl);
-            }
-
-            return RedirectToAction("Index", "Home");
-        }
-
-        ModelState.AddModelError(string.Empty, "Invalid username or password. Please check your credentials.");
-        return View(model);
-    }
 
     [HttpGet]
     public IActionResult Logout()
