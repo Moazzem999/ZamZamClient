@@ -155,6 +155,73 @@ body.dashboard-body.sidebar-open {
     color: #3b82f6;
 }
 
+/* Submenu Styles */
+.menu-link[data-bs-toggle="collapse"] .chevron-icon {
+    transition: transform 0.25s ease;
+}
+
+.menu-link[data-bs-toggle="collapse"][aria-expanded="true"] .chevron-icon,
+.menu-link[data-bs-toggle="collapse"]:not(.collapsed) .chevron-icon {
+    transform: rotate(180deg);
+}
+
+.submenu-collapse {
+    transition: height 0.25s ease;
+}
+
+.submenu-list {
+    list-style: none;
+    margin: 0.35rem 0 0.5rem 1rem;
+    padding: 0 0 0 0.75rem;
+    border-left: 1px dashed rgba(148, 163, 184, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.submenu-item {
+    position: relative;
+}
+
+.submenu-link {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--dash-sidebar-text);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.submenu-icon {
+    font-size: 0.95rem;
+    color: #64748b;
+    transition: color 0.2s ease;
+}
+
+.submenu-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.submenu-link:hover .submenu-icon {
+    color: #60a5fa;
+}
+
+.submenu-item.active .submenu-link {
+    color: #ffffff;
+    background-color: rgba(37, 99, 235, 0.2);
+    font-weight: 600;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.submenu-item.active .submenu-icon {
+    color: #3b82f6;
+}
+
 /* Mobile Sidebar Backdrop */
 .sidebar-backdrop {
     position: fixed;

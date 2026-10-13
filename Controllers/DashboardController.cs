@@ -27,4 +27,21 @@ public class DashboardController : Controller
 
         return View();
     }
+
+    [HttpGet]
+    public IActionResult BrandImages()
+    {
+        // Server-side authentication check
+        var token = Request.Cookies["zamzam_token"] ?? Request.Cookies["token"];
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            _logger.LogWarning("Unauthorized attempt to access Brand Images without authentication. Redirecting to Login.");
+            return RedirectToAction("Login", "Account");
+        }
+
+        ViewBag.UserDisplayName = System.Net.WebUtility.UrlDecode(Request.Cookies["userDisplayName"] ?? "");
+        ViewBag.UserDisplayEmail = System.Net.WebUtility.UrlDecode(Request.Cookies["userDisplayEmail"] ?? "");
+
+        return View();
+    }
 }
