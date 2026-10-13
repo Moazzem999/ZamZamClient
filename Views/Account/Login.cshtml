@@ -1,4 +1,5 @@
 @model ZamZamClient.Models.LoginViewModel
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{
     Layout = "_AuthLayout";
     ViewData["Title"] = "Sign In - ZamZam Client & Merchandising Portal";
@@ -21,7 +22,7 @@
 
                     <!-- Login Form Body -->
                     <div class="card-body p-4 pt-3">
-                        <form asp-controller="Account" asp-action="Login" method="post" id="loginForm">
+                        <form asp-controller="Account" asp-action="Login" method="post" id="loginForm" data-api-base-url="@Configuration["ApiBaseUrl"]">
                             @Html.AntiForgeryToken()
                             <input type="hidden" asp-for="ReturnUrl" />
 
