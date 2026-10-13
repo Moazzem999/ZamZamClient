@@ -5,16 +5,20 @@ namespace ZamZamClient.Controllers;
 
 public class AccountController : Controller
 {
+    private readonly IConfiguration _configuration;
     private readonly ILogger<AccountController> _logger;
 
-    public AccountController(ILogger<AccountController> logger)
+    public AccountController(IConfiguration configuration, ILogger<AccountController> logger)
     {
+        _configuration = configuration;
         _logger = logger;
     }
 
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
     {
+        ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:7148";
+
         var model = new LoginViewModel
         {
             ReturnUrl = returnUrl
