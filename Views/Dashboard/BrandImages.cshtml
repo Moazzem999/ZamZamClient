@@ -23,14 +23,6 @@
             <p class="dashboard-subtitle">Browse, view, and organize brand and factory gallery images.</p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <!-- Quick Stat Badges -->
-            <div class="d-inline-flex align-items-center gap-2 bg-white px-3 py-2 rounded-3 border shadow-sm">
-                <span class="text-muted small fw-medium">Total:</span>
-                <span class="badge bg-primary rounded-pill px-2" id="totalImagesBadge">0</span>
-                <span class="text-muted small fw-medium ms-2">Active:</span>
-                <span class="badge bg-success rounded-pill px-2" id="activeImagesBadge">0</span>
-            </div>
-
             <!-- Refresh Button -->
             <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnRefreshBrandImages" title="Reload from API">
                 <i class="bi bi-arrow-clockwise refresh-icon"></i>
@@ -54,10 +46,10 @@
                 </div>
             </div>
 
-            <!-- Search & Filters Toolbar -->
+            <!-- Search Controls Toolbar -->
             <div class="dash-toolbar-controls">
                 <!-- Live Search Box -->
-                <div class="dash-search-group">
+                <div class="dash-search-group" style="min-width: 280px;">
                     <i class="bi bi-search dash-search-icon"></i>
                     <input type="text" 
                            id="searchBrandImagesInput" 
@@ -68,15 +60,6 @@
                         <i class="bi bi-x"></i>
                     </button>
                 </div>
-
-                <!-- Status Filter Dropdown -->
-                <div>
-                    <select class="form-select form-select-sm rounded-3 border-1 text-secondary fw-medium" id="statusFilterSelect" style="min-width: 140px; padding: 0.55rem 2rem 0.55rem 0.85rem;">
-                        <option value="all">All Statuses</option>
-                        <option value="active">Active Only</option>
-                        <option value="inactive">Inactive Only</option>
-                    </select>
-                </div>
             </div>
         </div>
 
@@ -85,13 +68,10 @@
             <table class="dash-custom-table" id="brandImagesTable">
                 <thead>
                     <tr>
-                        <th style="width: 70px;"># ID</th>
-                        <th style="width: 80px;">Preview</th>
-                        <th>Name / Title</th>
+                        <th style="width: 80px;" class="text-center"># ID</th>
+                        <th style="width: 90px;" class="text-center">Preview</th>
+                        <th style="width: 28%;">Name / Title</th>
                         <th>Remarks</th>
-                        <th style="width: 120px;">Status</th>
-                        <th style="width: 170px;">Created Date</th>
-                        <th style="width: 170px;">Updated Date</th>
                         <th style="width: 110px;" class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -100,7 +80,7 @@
                 </tbody>
             </table>
 
-            <!-- Loading State (Skeleton Rows) -->
+            <!-- Loading State -->
             <div id="tableLoadingState" class="dash-table-state-box">
                 <div class="dash-state-icon-circle icon-loading">
                     <div class="spinner-border text-primary" style="width: 2rem; height: 2rem;" role="status">
@@ -140,7 +120,7 @@
                     <i class="bi bi-search"></i>
                 </div>
                 <h3 class="dash-state-title">No Matching Records</h3>
-                <p class="dash-state-desc">No brand images match your search query or selected filter criteria.</p>
+                <p class="dash-state-desc">No brand images match your search query.</p>
             </div>
         </div>
 
@@ -181,29 +161,9 @@
 
                 <!-- Metadata Grid -->
                 <div class="brand-meta-grid">
-                    <div>
+                    <div style="grid-column: span 2;">
                         <div class="brand-meta-label">Remarks / Description</div>
                         <div class="brand-meta-val" id="modalImageRemarks">—</div>
-                    </div>
-                    <div>
-                        <div class="brand-meta-label">Status</div>
-                        <div class="brand-meta-val" id="modalImageStatus">—</div>
-                    </div>
-                    <div>
-                        <div class="brand-meta-label">Created Date</div>
-                        <div class="brand-meta-val" id="modalImageCreatedOn">—</div>
-                    </div>
-                    <div>
-                        <div class="brand-meta-label">Last Updated</div>
-                        <div class="brand-meta-val" id="modalImageUpdatedOn">—</div>
-                    </div>
-                    <div>
-                        <div class="brand-meta-label">Created By</div>
-                        <div class="brand-meta-val" id="modalImageCreatedBy">—</div>
-                    </div>
-                    <div>
-                        <div class="brand-meta-label">Updated By</div>
-                        <div class="brand-meta-val" id="modalImageUpdatedBy">—</div>
                     </div>
 
                     <!-- Direct URL Box with One-Click Copy -->

@@ -1,12 +1,32 @@
 /**
  * ZamZam Trims (BD) Limited - Brand Images Manager (brand-images.js)
  * -------------------------------------------------------------------
- * Fetches, filters, searches, previews, and manages brand images from:
+ * Fetches, searches, previews, and manages brand images from:
  * {ApiBaseUrl}/api/BrandImages/GetAll
  */
 
 $(function () {
     'use strict';
+
+    // 0. Force cleanup of any lingering cached elements & synchronize thead structure
+    // Removes old stat badges container if still served by in-memory Razor cache
+    $('#totalImagesBadge').closest('.d-inline-flex').remove();
+    // Removes old status dropdown container if still served by in-memory Razor cache
+    $('#statusFilterSelect').closest('div').remove();
+
+    // Enforce exact 5 columns in thead so it NEVER desyncs with tbody
+    const $tableHead = $('#brandImagesTable thead');
+    if ($tableHead.length) {
+        $tableHead.html(`
+            <tr>
+                <th style="width: 80px;" class="text-center"># ID</th>
+                <th style="width: 90px;" class="text-center">Preview</th>
+                <th style="width: 28%;">Name / Title</th>
+                <th>Remarks</th>
+                <th style="width: 110px;" class="text-end">Actions</th>
+            </tr>
+        `);
+    }
 
     // 1. DOM Elements & References
     const $container = $('#brandImagesPageContainer');
@@ -20,9 +40,6 @@ $(function () {
     const $retryBtn = $('#btnRetryBrandImages');
     const $searchInput = $('#searchBrandImagesInput');
     const $searchClearBtn = $('#searchClearBtn');
-    const $statusFilter = $('#statusFilterSelect');
-    const $totalCountBadge = $('#totalImagesBadge');
-    const $activeCountBadge = $('#activeImagesBadge');
     const $tableCountSummary = $('#tableCountSummary');
     const $toast = $('#dashToast');
     const $toastMessage = $('#dashToastMessage');
@@ -33,11 +50,6 @@ $(function () {
     const $modalImg = $('#modalPreviewImage');
     const $modalTitle = $('#modalImageTitle');
     const $modalRemarks = $('#modalImageRemarks');
-    const $modalStatus = $('#modalImageStatus');
-    const $modalCreatedOn = $('#modalImageCreatedOn');
-    const $modalUpdatedOn = $('#modalImageUpdatedOn');
-    const $modalCreatedBy = $('#modalImageCreatedBy');
-    const $modalUpdatedBy = $('#modalImageUpdatedBy');
     const $modalUrlText = $('#modalImageUrlText');
     const $modalOpenBtn = $('#modalOpenNewTabBtn');
     const $modalCopyBtn = $('#modalCopyUrlBtn');
@@ -60,26 +72,6 @@ $(function () {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
-    }
-
-    // Helper: Format ISO Date into human-readable string
-    function formatDate(isoString) {
-        if (!isoString) return '—';
-        try {
-            const date = new Date(isoString);
-            if (isNaN(date.getTime())) return isoString;
-            return date.toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            }) + ', ' + date.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-        } catch (e) {
-            return isoString;
-        }
     }
 
     // Helper: Construct full absolute image URL
@@ -123,7 +115,7 @@ $(function () {
         }, 3000);
     }
 
-    // Helper: Copy Text to Clipboard
+    // Helper: Copy Text to Clipboard (modal copy button)
     window.copyBrandImageUrl = function (url) {
         if (!url) return;
         if (navigator.clipboard && window.isSecureContext) {
@@ -195,13 +187,6 @@ $(function () {
 
                 if (response && (response.succeeded === true || response.statusCode === 200 || Array.isArray(response.data))) {
                     allBrandImages = Array.isArray(response.data) ? response.data : [];
-                    
-                    // Update header badges
-                    const totalCount = allBrandImages.length;
-                    const activeCount = allBrandImages.filter(item => item.status === 1).length;
-                    $totalCountBadge.text(totalCount);
-                    $activeCountBadge.text(activeCount);
-
                     applyFilterAndRender();
                 } else {
                     const msg = response?.message || 'Unexpected response format received from server.';
@@ -244,15 +229,12 @@ $(function () {
         $tableBody.empty();
         $errorMessageText.text(message);
         $errorState.removeClass('d-none');
-        $totalCountBadge.text('0');
-        $activeCountBadge.text('0');
         $tableCountSummary.text('0 items');
     }
 
-    // 4. Filter, Search & Render Pipeline
+    // 4. Filter & Search Pipeline
     function applyFilterAndRender() {
         const query = ($searchInput.val() || '').trim().toLowerCase();
-        const selectedStatus = $statusFilter.val();
 
         // Update clear button visibility
         if (query.length > 0) {
@@ -261,26 +243,13 @@ $(function () {
             $searchClearBtn.hide();
         }
 
-        // Apply filters
+        // Filter by name, remarks, or id
         currentFilteredImages = allBrandImages.filter(item => {
-            // Search query match (name, remarks, id)
-            let matchesQuery = true;
-            if (query.length > 0) {
-                const name = (item.name || '').toLowerCase();
-                const remarks = (item.remarks || '').toLowerCase();
-                const id = String(item.id || '');
-                matchesQuery = name.includes(query) || remarks.includes(query) || id.includes(query);
-            }
-
-            // Status match
-            let matchesStatus = true;
-            if (selectedStatus === 'active') {
-                matchesStatus = (item.status === 1);
-            } else if (selectedStatus === 'inactive') {
-                matchesStatus = (item.status !== 1);
-            }
-
-            return matchesQuery && matchesStatus;
+            if (query.length === 0) return true;
+            const name = (item.name || '').toLowerCase();
+            const remarks = (item.remarks || '').toLowerCase();
+            const id = String(item.id || '');
+            return name.includes(query) || remarks.includes(query) || id.includes(query);
         });
 
         // Update count summary
@@ -306,7 +275,7 @@ $(function () {
         renderTableRows(currentFilteredImages);
     }
 
-    // 5. Render Table Rows
+    // 5. Render Exactly 5 Balanced Columns
     function renderTableRows(items) {
         const rowsHtml = items.map((item, index) => {
             const id = item.id ?? (index + 1);
@@ -314,20 +283,17 @@ $(function () {
             const name = escapeHtml(item.name || 'Untitled');
             const remarks = escapeHtml(item.remarks || '—');
             const fullImgUrl = getFullImageUrl(item.imagePath);
-            const isActive = item.status === 1;
-            const createdOnFormatted = formatDate(item.createdOn);
-            const updatedOnFormatted = formatDate(item.updatedOn);
 
             return `
                 <tr data-id="${id}">
-                    <!-- ID Column -->
-                    <td class="text-nowrap">
+                    <!-- 1. ID Column -->
+                    <td class="text-nowrap text-center">
                         <span class="dash-id-badge">#${formattedId}</span>
                     </td>
 
-                    <!-- Image Preview Thumbnail Column -->
-                    <td class="brand-thumb-cell">
-                        <div class="brand-thumb-wrapper" 
+                    <!-- 2. Preview Column -->
+                    <td class="brand-thumb-cell text-center">
+                        <div class="brand-thumb-wrapper mx-auto" 
                              onclick="window.openBrandImageModal(${id})" 
                              title="Click to zoom / preview">
                             ${fullImgUrl ? `
@@ -347,7 +313,7 @@ $(function () {
                         </div>
                     </td>
 
-                    <!-- Name / Title Column -->
+                    <!-- 3. Name / Title Column -->
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-building text-primary opacity-75"></i>
@@ -355,39 +321,14 @@ $(function () {
                         </div>
                     </td>
 
-                    <!-- Remarks Column -->
+                    <!-- 4. Remarks Column -->
                     <td>
                         <span class="text-secondary ${remarks === '—' ? 'opacity-50' : ''}">${remarks}</span>
                     </td>
 
-                    <!-- Status Column -->
-                    <td>
-                        <span class="dash-status-badge ${isActive ? 'status-active' : 'status-inactive'}">
-                            <span class="status-dot"></span>
-                            <span>${isActive ? 'Active' : 'Inactive'}</span>
-                        </span>
-                    </td>
-
-                    <!-- Created On Column -->
-                    <td class="text-nowrap">
-                        <div class="d-flex align-items-center gap-1 text-muted small">
-                            <i class="bi bi-calendar3 opacity-75"></i>
-                            <span>${createdOnFormatted}</span>
-                        </div>
-                    </td>
-
-                    <!-- Updated On Column -->
-                    <td class="text-nowrap">
-                        <div class="d-flex align-items-center gap-1 text-muted small">
-                            <i class="bi bi-clock-history opacity-75"></i>
-                            <span>${updatedOnFormatted}</span>
-                        </div>
-                    </td>
-
-                    <!-- Action Controls Column -->
-                    <td class="dash-actions-cell">
+                    <!-- 5. Actions Column (Preview Modal & Open in New Tab) -->
+                    <td class="dash-actions-cell text-end">
                         <div class="dash-action-btn-group">
-                            <!-- Preview in Modal -->
                             <button type="button" 
                                     class="dash-action-btn btn-view" 
                                     onclick="window.openBrandImageModal(${id})" 
@@ -395,14 +336,7 @@ $(function () {
                                 <i class="bi bi-eye"></i>
                             </button>
 
-                            <!-- Copy Direct URL -->
                             ${fullImgUrl ? `
-                                <button type="button" 
-                                        class="dash-action-btn btn-copy" 
-                                        onclick="window.copyBrandImageUrl('${escapeHtml(fullImgUrl)}')" 
-                                        title="Copy image link">
-                                    <i class="bi bi-link-45deg"></i>
-                                </button>
                                 <a href="${escapeHtml(fullImgUrl)}" 
                                    target="_blank" 
                                    rel="noopener noreferrer" 
@@ -426,22 +360,9 @@ $(function () {
         if (!item || !imageModal) return;
 
         const fullImgUrl = getFullImageUrl(item.imagePath);
-        const isActive = item.status === 1;
 
         $modalTitle.text(item.name || 'Brand Image Preview');
         $modalRemarks.text(item.remarks || 'None');
-        
-        $modalStatus.html(`
-            <span class="dash-status-badge ${isActive ? 'status-active' : 'status-inactive'}">
-                <span class="status-dot"></span>
-                <span>${isActive ? 'Active' : 'Inactive'}</span>
-            </span>
-        `);
-
-        $modalCreatedOn.text(formatDate(item.createdOn));
-        $modalUpdatedOn.text(formatDate(item.updatedOn));
-        $modalCreatedBy.text(item.createdBy ? `User #${item.createdBy}` : '—');
-        $modalUpdatedBy.text(item.updatedBy ? `User #${item.updatedBy}` : '—');
 
         if (fullImgUrl) {
             $modalImg.attr('src', fullImgUrl).attr('alt', item.name || 'Image Preview').show();
@@ -482,11 +403,6 @@ $(function () {
         $searchInput.val('');
         applyFilterAndRender();
         $searchInput.focus();
-    });
-
-    // Status filter dropdown
-    $statusFilter.on('change', function () {
-        applyFilterAndRender();
     });
 
     // Initial API Fetch
