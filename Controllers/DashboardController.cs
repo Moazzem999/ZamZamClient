@@ -22,6 +22,9 @@ public class DashboardController : Controller
             return RedirectToAction("Login", "Account");
         }
 
+        ViewBag.UserDisplayName = System.Net.WebUtility.UrlDecode(Request.Cookies["userDisplayName"] ?? "");
+        ViewBag.UserDisplayEmail = System.Net.WebUtility.UrlDecode(Request.Cookies["userDisplayEmail"] ?? "");
+
         return View();
     }
 }

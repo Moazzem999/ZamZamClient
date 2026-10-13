@@ -33,6 +33,8 @@ public class AccountController : Controller
         _logger.LogInformation("User logged out.");
         Response.Cookies.Delete("zamzam_token");
         Response.Cookies.Delete("token");
+        Response.Cookies.Delete("userDisplayName");
+        Response.Cookies.Delete("userDisplayEmail");
         TempData["SuccessMessage"] = "You have been logged out successfully.";
         return RedirectToAction("Login", "Account");
     }

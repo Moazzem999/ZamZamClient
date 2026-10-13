@@ -82,18 +82,26 @@ $(function () {
                         const token = data.token || '';
                         const expiresIn = data.expiresIn ? data.expiresIn * 60 : 1800;
 
+                        // Extract user displayName and displayEmail from API response
+                        const displayName = user.name || user.Name || user.userName || user.UserName || userName;
+                        const displayEmail = user.email || user.Email || '';
+
                         // Cache token & user in localStorage
                         if (token) {
                             try {
                                 localStorage.setItem('token', token);
                                 localStorage.setItem('user', JSON.stringify(user));
+                                localStorage.setItem('userDisplayName', displayName);
+                                localStorage.setItem('userDisplayEmail', displayEmail);
                             } catch (storageEx) {
                                 console.warn('LocalStorage error:', storageEx);
                             }
 
-                            // Set cookies for server-side authorization check
+                            // Set cookies for server-side authorization and header population
                             document.cookie = `zamzam_token=${encodeURIComponent(token)}; path=/; max-age=${expiresIn}; SameSite=Lax`;
                             document.cookie = `token=${encodeURIComponent(token)}; path=/; max-age=${expiresIn}; SameSite=Lax`;
+                            document.cookie = `userDisplayName=${encodeURIComponent(displayName)}; path=/; max-age=${expiresIn}; SameSite=Lax`;
+                            document.cookie = `userDisplayEmail=${encodeURIComponent(displayEmail)}; path=/; max-age=${expiresIn}; SameSite=Lax`;
                         }
 
                         // Immediate redirection to Dashboard

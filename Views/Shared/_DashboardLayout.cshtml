@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Business Solution Dashboard</title>
+    <title>@ViewData["Title"] - ZamZam Trims (BD) Ltd.</title>
 
     <!-- Immediate Authentication Guard: Block unauthenticated access without screen flash -->
     <script>
@@ -40,7 +40,7 @@
         <!-- Brand Title -->
         <a asp-controller="Dashboard" asp-action="Index" class="sidebar-brand">
             <h4 class="brand-title">
-                <span class="text-primary-blue">Business</span> <span class="text-white-heading">Solution</span>
+                <span class="text-primary-blue">ZamZam</span> <span class="text-white-heading">Trims</span>
             </h4>
         </a>
 
@@ -55,40 +55,6 @@
                     </span>
                 </a>
             </li>
-
-            <!-- Employees Item -->
-            <li class="menu-item">
-                <a href="javascript:void(0)" class="menu-link">
-                    <span class="menu-link-inner">
-                        <span class="menu-icon"><i class="bi bi-people"></i></span>
-                        <span>Employees</span>
-                    </span>
-                    <i class="bi bi-chevron-down chevron-icon"></i>
-                </a>
-            </li>
-
-            <!-- Suppliers Item -->
-            <li class="menu-item">
-                <a href="javascript:void(0)" class="menu-link">
-                    <span class="menu-link-inner">
-                        <span class="menu-icon"><i class="bi bi-truck"></i></span>
-                        <span>Suppliers</span>
-                    </span>
-                    <i class="bi bi-chevron-down chevron-icon"></i>
-                </a>
-            </li>
-
-            <!-- Accounts Item -->
-            <li class="menu-item">
-                <a href="javascript:void(0)" class="menu-link">
-                    <span class="menu-link-inner">
-                        <span class="menu-icon"><i class="bi bi-folder2"></i></span>
-                        <span>Accounts</span>
-                    </span>
-                    <i class="bi bi-chevron-down chevron-icon"></i>
-                </a>
-            </li>
-
             <!-- Settings Item -->
             <li class="menu-item">
                 <a href="javascript:void(0)" class="menu-link">
@@ -106,37 +72,32 @@
         <!-- Top Sticky Header Navigation -->
         <header class="dashboard-topbar">
             <div class="topbar-actions">
-                <!-- Theme / Palette Icon -->
-                <button type="button" class="topbar-icon-btn" title="Theme Palette" aria-label="Theme">
-                    <i class="bi bi-palette"></i>
-                </button>
-
-                <!-- Notifications Bell -->
-                <button type="button" class="topbar-icon-btn position-relative" title="Notifications" aria-label="Notifications">
-                    <i class="bi bi-bell"></i>
-                </button>
-
                 <!-- User Profile Avatar & Dropdown -->
                 <div class="dropdown">
                     <div class="user-avatar-circle" id="userAvatarInitials" data-bs-toggle="dropdown" aria-expanded="false" title="Account Menu">
-                        MH
+                        @{
+                            var initialDisplayName = ViewBag.UserDisplayName as string;
+                            var defaultInitials = "MH";
+                            if (!string.IsNullOrWhiteSpace(initialDisplayName))
+                            {
+                                var parts = initialDisplayName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                if (parts.Length >= 2)
+                                {
+                                    defaultInitials = $"{parts[0][0]}{parts[1][0]}".ToUpper();
+                                }
+                                else if (parts.Length == 1 && parts[0].Length >= 2)
+                                {
+                                    defaultInitials = parts[0].Substring(0, 2).ToUpper();
+                                }
+                            }
+                        }
+                        @defaultInitials
                     </div>
                     <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu shadow-sm" aria-labelledby="userAvatarInitials">
                         <li class="px-3 py-2 border-bottom">
-                            <div class="fw-bold text-dark" id="userDisplayName">Moazzem Hossain</div>
-                            <small class="text-muted text-truncate d-block" id="userDisplayEmail">meraj2@gmail.com</small>
+                            <div class="fw-bold text-dark" id="userDisplayName">@(ViewBag.UserDisplayName ?? "")</div>
+                            <small class="text-muted text-truncate d-block" id="userDisplayEmail">@(ViewBag.UserDisplayEmail ?? "")</small>
                         </li>
-                        @* <li>
-                            <a class="dropdown-item py-2 small" href="javascript:void(0)">
-                                <i class="bi bi-person me-2 text-primary"></i> My Profile
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item py-2 small" href="javascript:void(0)">
-                                <i class="bi bi-gear me-2 text-muted"></i> Account Settings
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider my-1"></li> *@
                         <li>
                             <button type="button" class="dropdown-item py-2 small text-danger" onclick="logoutDashboard()">
                                 <i class="bi bi-box-arrow-right me-2"></i> Sign Out
@@ -158,44 +119,81 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Populate profile dynamically from stored user data
-        document.addEventListener('DOMContentLoaded', function () {
-            const userJson = localStorage.getItem('user');
-            if (userJson) {
-                try {
-                    const user = JSON.parse(userJson);
-                    const name = user.name || user.userName || 'Moazzem Hossain';
-                    const email = user.email || 'meraj2@gmail.com';
+        // Populate profile dynamically from stored login API response
+        function populateUserProfile() {
+            let name = localStorage.getItem('userDisplayName') || '';
+            let email = localStorage.getItem('userDisplayEmail') || '';
 
-                    const nameEl = document.getElementById('userDisplayName');
-                    if (nameEl) nameEl.textContent = name;
-
-                    const emailEl = document.getElementById('userDisplayEmail');
-                    if (emailEl) emailEl.textContent = email;
-
-                    // Initials for avatar
-                    const parts = name.trim().split(/\s+/);
-                    let initials = 'MH';
-                    if (parts.length >= 2) {
-                        initials = (parts[0][0] + parts[1][0]).toUpperCase();
-                    } else if (parts.length === 1 && parts[0].length >= 2) {
-                        initials = parts[0].substring(0, 2).toUpperCase();
+            // If not found in standalone keys, inspect stored user JSON object
+            if (!name || !email) {
+                const userJson = localStorage.getItem('user');
+                if (userJson) {
+                    try {
+                        const user = JSON.parse(userJson);
+                        if (!name) name = user.name || user.Name || user.userName || user.UserName || '';
+                        if (!email) email = user.email || user.Email || '';
+                    } catch (e) {
+                        console.warn('Error reading stored user', e);
                     }
-                    const avatarEl = document.getElementById('userAvatarInitials');
-                    if (avatarEl) avatarEl.textContent = initials;
-                } catch (e) {
-                    console.warn('Error reading stored user', e);
                 }
             }
-        });
+
+            // Fallback: decode JWT payload if available
+            if (!name || !email) {
+                const token = localStorage.getItem('token');
+                if (token && token.includes('.')) {
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+                        if (!name) name = payload.unique_name || payload.name || payload.sub || '';
+                        if (!email) email = payload.email || '';
+                    } catch (e) {}
+                }
+            }
+
+            const nameEl = document.getElementById('userDisplayName');
+            if (nameEl && name) {
+                nameEl.textContent = name;
+            }
+
+            const emailEl = document.getElementById('userDisplayEmail');
+            if (emailEl && email) {
+                emailEl.textContent = email;
+            }
+
+            // Update avatar initials
+            const currentName = name || (nameEl ? nameEl.textContent : '') || '';
+            if (currentName) {
+                const parts = currentName.trim().split(/\s+/);
+                let initials = 'MH';
+                if (parts.length >= 2) {
+                    initials = (parts[0][0] + parts[1][0]).toUpperCase();
+                } else if (parts.length === 1 && parts[0].length >= 2) {
+                    initials = parts[0].substring(0, 2).toUpperCase();
+                } else if (parts.length === 1 && parts[0].length === 1) {
+                    initials = parts[0].toUpperCase();
+                }
+                const avatarEl = document.getElementById('userAvatarInitials');
+                if (avatarEl) {
+                    avatarEl.textContent = initials;
+                }
+            }
+        }
+
+        // Run immediately and on DOMContentLoaded
+        populateUserProfile();
+        document.addEventListener('DOMContentLoaded', populateUserProfile);
 
         // Sign Out Handler
         function logoutDashboard() {
             try {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
+                localStorage.removeItem('userDisplayName');
+                localStorage.removeItem('userDisplayEmail');
                 document.cookie = "token=; path=/; max-age=0";
                 document.cookie = "zamzam_token=; path=/; max-age=0";
+                document.cookie = "userDisplayName=; path=/; max-age=0";
+                document.cookie = "userDisplayEmail=; path=/; max-age=0";
             } catch (e) {}
             window.location.href = '/Account/Logout';
         }
