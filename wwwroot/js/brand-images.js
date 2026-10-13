@@ -23,7 +23,7 @@ $(function () {
                 <th style="width: 90px;" class="text-center">Preview</th>
                 <th style="width: 28%;">Name / Title</th>
                 <th>Remarks</th>
-                <th style="width: 155px;" class="text-end">Actions</th>
+                <th style="width: 125px;" class="text-end">Actions</th>
             </tr>
         `);
     }
@@ -616,7 +616,7 @@ $(function () {
                         <span class="text-secondary ${remarks === '—' ? 'opacity-50' : ''}">${remarks}</span>
                     </td>
 
-                    <!-- 5. Actions Column (Preview Modal, Edit Modal, Open in New Tab, Delete) -->
+                    <!-- 5. Actions Column (Preview Modal, Edit Modal, Delete) -->
                     <td class="dash-actions-cell text-end">
                         <div class="dash-action-btn-group">
                             <!-- Preview Modal -->
@@ -634,17 +634,6 @@ $(function () {
                                     title="Edit / Update brand image">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
-
-                            <!-- Open in New Tab -->
-                            ${fullImgUrl ? `
-                                <a href="${escapeHtml(fullImgUrl)}" 
-                                   target="_blank" 
-                                   rel="noopener noreferrer" 
-                                   class="dash-action-btn" 
-                                   title="Open image in new tab">
-                                    <i class="bi bi-box-arrow-up-right"></i>
-                                </a>
-                            ` : ''}
 
                             <!-- Delete Action Button -->
                             <button type="button" 
