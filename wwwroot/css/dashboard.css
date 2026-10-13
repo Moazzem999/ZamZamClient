@@ -1162,3 +1162,272 @@ body.dashboard-body.sidebar-open {
     }
 }
 
+/* =========================================================
+   7. ULTRA-MODERN DELETE CONFIRMATION MODAL
+   ========================================================= */
+.modal-backdrop.show {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background-color: rgba(9, 14, 26, 0.65);
+}
+
+.modern-delete-modal-content {
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1px solid rgba(254, 202, 202, 0.75);
+    box-shadow: 0 25px 60px -15px rgba(220, 38, 38, 0.22), 0 10px 30px -10px rgba(15, 23, 42, 0.12);
+    overflow: hidden;
+    position: relative;
+    padding: 2.25rem 2rem 2rem;
+}
+
+.modern-delete-modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ef4444 0%, #f87171 50%, #dc2626 100%);
+}
+
+/* Close X Icon in top right */
+.modal-close-bubble {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #f8fafc;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-close-bubble:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    transform: rotate(90deg);
+}
+
+/* Concentric Pulse Aura Icon */
+.delete-icon-spotlight {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 1.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-pulse-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.14);
+    animation: deletePulseRing 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+.delete-pulse-ring-inner {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.22);
+}
+
+.delete-icon-bubble {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.55rem;
+    box-shadow: 0 10px 20px -5px rgba(220, 38, 38, 0.45);
+}
+
+@keyframes deletePulseRing {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.8;
+    }
+    60% {
+        transform: scale(1.35);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1.35);
+        opacity: 0;
+    }
+}
+
+.delete-modal-heading {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: #0f172a;
+    margin-bottom: 0.35rem;
+}
+
+.delete-modal-subtext {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin-bottom: 1.25rem;
+    line-height: 1.45;
+}
+
+/* Item Spotlight Card */
+.delete-target-preview-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    text-align: left;
+    margin-bottom: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.delete-target-preview-card:hover {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.delete-target-thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    object-fit: cover;
+    background-color: #e2e8f0;
+    border: 1px solid #cbd5e1;
+    flex-shrink: 0;
+}
+
+.delete-target-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.delete-target-badge {
+    display: inline-block;
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: ui-monospace, monospace;
+    background: #e2e8f0;
+    color: #475569;
+    margin-bottom: 0.25rem;
+}
+
+.delete-target-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.delete-target-desc {
+    font-size: 0.78rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 0.15rem;
+}
+
+/* Irreversible Warning Pill */
+.delete-warning-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* Modern Action Buttons */
+.delete-modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.btn-modal-cancel {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.7rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.btn-modal-cancel:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.btn-modal-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 0.7rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px -2px rgba(239, 68, 68, 0.4);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-modal-delete:hover:not(:disabled) {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 8px 22px -3px rgba(220, 38, 38, 0.5);
+    transform: translateY(-1.5px);
+    color: #ffffff;
+}
+
+.btn-modal-delete:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-modal-delete:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+

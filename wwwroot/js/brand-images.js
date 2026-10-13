@@ -29,6 +29,70 @@ $(function () {
         `);
     }
 
+    // Modern Delete Modal HTML template
+    const modernDeleteModalHtml = `
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+                <div class="modal-content modern-delete-modal-content border-0">
+                    <button type="button" class="modal-close-bubble" data-bs-dismiss="modal" aria-label="Close" title="Cancel">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <div class="text-center">
+                        <div class="delete-icon-spotlight">
+                            <div class="delete-pulse-ring"></div>
+                            <div class="delete-pulse-ring-inner"></div>
+                            <div class="delete-icon-bubble">
+                                <i class="bi bi-trash3-fill"></i>
+                            </div>
+                        </div>
+                        <h4 class="delete-modal-heading" id="deleteModalTitle">Delete Brand Image?</h4>
+                        <p class="delete-modal-subtext">
+                            You are about to permanently remove this image from the gallery.
+                        </p>
+                        <div class="delete-target-preview-card">
+                            <img id="deleteTargetThumb" src="" alt="Thumbnail" class="delete-target-thumb" onerror="this.src='/images/logo-icon.png'" />
+                            <div class="delete-target-info">
+                                <div class="delete-target-badge"><span id="deleteTargetId">#00</span></div>
+                                <div class="delete-target-title" id="deleteTargetName">Loading...</div>
+                                <div class="delete-target-desc" id="deleteTargetRemarks">—</div>
+                            </div>
+                        </div>
+                        <div class="delete-warning-pill">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span>This action is permanent and cannot be undone</span>
+                        </div>
+                        <div class="delete-modal-actions">
+                            <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn-modal-delete" id="btnConfirmDelete">
+                                <i class="bi bi-trash3-fill"></i>
+                                <span id="btnConfirmDeleteText">Delete Image</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Ensure the modern delete modal is ALWAYS in the DOM
+    function ensureDeleteModalInDom() {
+        let modalEl = document.getElementById('deleteConfirmModal');
+        if (!modalEl) {
+            $('body').append(modernDeleteModalHtml);
+            modalEl = document.getElementById('deleteConfirmModal');
+        } else if (!$(modalEl).find('.modern-delete-modal-content').length) {
+            $(modalEl).remove();
+            $('body').append(modernDeleteModalHtml);
+            modalEl = document.getElementById('deleteConfirmModal');
+        }
+        return modalEl;
+    }
+
+    // Run immediately on page load
+    ensureDeleteModalInDom();
+
     // 1. DOM Elements & References
     const $container = $('#brandImagesPageContainer');
     const $tableBody = $('#brandImagesTableBody');
@@ -53,12 +117,6 @@ $(function () {
     const $modalRemarks = $('#modalImageRemarks');
     const $modalOpenBtn = $('#modalOpenNewTabBtn');
 
-    // Delete Confirmation Modal Elements
-    const deleteModalEl = document.getElementById('deleteConfirmModal');
-    const deleteModal = deleteModalEl ? new bootstrap.Modal(deleteModalEl) : null;
-    const $deleteTargetName = $('#deleteTargetName');
-    const $btnConfirmDelete = $('#btnConfirmDelete');
-    const $btnConfirmDeleteText = $('#btnConfirmDeleteText');
     let pendingDeleteId = null;
 
     // 2. Configuration & State
@@ -378,20 +436,31 @@ $(function () {
 
     // 7. Delete Brand Image Confirmation & API Call
     window.confirmDeleteBrandImage = function (id) {
+        const modalEl = ensureDeleteModalInDom();
         const item = allBrandImages.find(x => x.id === id);
         pendingDeleteId = id;
+
         const name = item ? item.name : `#${id}`;
+        const remarks = item && item.remarks ? item.remarks : 'No remarks provided';
+        const fullImgUrl = item ? getFullImageUrl(item.imagePath) : '';
 
-        $deleteTargetName.text(`"${name}"`);
+        $('#deleteTargetName').text(name);
+        $('#deleteTargetId').text(`#${String(id).padStart(2, '0')}`);
+        $('#deleteTargetRemarks').text(remarks);
 
-        if (deleteModal) {
-            deleteModal.show();
-        } else if (confirm(`Are you sure you want to delete "${name}"?`)) {
-            executeDeleteBrandImage(id);
+        if (fullImgUrl) {
+            $('#deleteTargetThumb').attr('src', fullImgUrl).show();
+        } else {
+            $('#deleteTargetThumb').attr('src', '/images/logo-icon.png');
         }
+
+        // Always show the ultra-modern Bootstrap Modal (NEVER native confirm)
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modalInstance.show();
     };
 
-    $btnConfirmDelete.on('click', function () {
+    // Global event delegation for confirm delete button
+    $(document).on('click', '#btnConfirmDelete', function () {
         if (!pendingDeleteId) return;
         executeDeleteBrandImage(pendingDeleteId);
     });
@@ -405,8 +474,10 @@ $(function () {
             ajaxHeaders['Authorization'] = `Bearer ${token}`;
         }
 
-        $btnConfirmDelete.prop('disabled', true);
-        $btnConfirmDeleteText.text('Deleting...');
+        const $btn = $('#btnConfirmDelete');
+        const $btnText = $('#btnConfirmDeleteText');
+        $btn.prop('disabled', true);
+        $btnText.text('Deleting...');
 
         const deleteApiUrl = `${apiBaseUrl}/api/BrandImages/${id}`;
         console.log(`[BrandImages] Sending DELETE to: ${deleteApiUrl}`);
@@ -417,7 +488,11 @@ $(function () {
             headers: ajaxHeaders,
             success: function (res) {
                 console.log('[BrandImages] Delete response:', res);
-                if (deleteModal) deleteModal.hide();
+                const modalEl = document.getElementById('deleteConfirmModal');
+                if (modalEl) {
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) modalInstance.hide();
+                }
 
                 // Remove item from local array
                 allBrandImages = allBrandImages.filter(x => x.id !== id);
@@ -435,8 +510,8 @@ $(function () {
                 showToast(msg, 'bi bi-exclamation-triangle-fill text-warning');
             },
             complete: function () {
-                $btnConfirmDelete.prop('disabled', false);
-                $btnConfirmDeleteText.text('Yes, Delete');
+                $btn.prop('disabled', false);
+                $btnText.text('Delete Image');
                 pendingDeleteId = null;
             }
         });
