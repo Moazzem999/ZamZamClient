@@ -80,7 +80,7 @@ $(function () {
                         const data = response.data || {};
                         const user = data.user || {};
                         const token = data.token || '';
-                        const displayName = user.name || userName;
+                        const expiresIn = data.expiresIn ? data.expiresIn * 60 : 1800;
 
                         // Cache token & user in localStorage
                         if (token) {
@@ -90,13 +90,14 @@ $(function () {
                             } catch (storageEx) {
                                 console.warn('LocalStorage error:', storageEx);
                             }
+
+                            // Set cookies for server-side authorization check
+                            document.cookie = `zamzam_token=${encodeURIComponent(token)}; path=/; max-age=${expiresIn}; SameSite=Lax`;
+                            document.cookie = `token=${encodeURIComponent(token)}; path=/; max-age=${expiresIn}; SameSite=Lax`;
                         }
 
-                        // Subtle in-card confirmation
-                        $summaryError.addClass('d-none').text('');
-                        $successBanner.removeClass('d-none').html(
-                            `<i class="bi bi-check-circle-fill me-2"></i> Welcome back, <strong>${escapeHtml(displayName)}</strong>! You are signed in.`
-                        );
+                        // Immediate redirection to Dashboard
+                        window.location.href = '/Dashboard';
                     } else {
                         // Backend returned failed result
                         const errorMsg = response?.message || 'Invalid username or password. Please verify credentials.';
