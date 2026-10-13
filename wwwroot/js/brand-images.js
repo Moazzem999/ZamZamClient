@@ -1,8 +1,9 @@
 /**
  * ZamZam Trims (BD) Limited - Brand Images Manager (brand-images.js)
  * -------------------------------------------------------------------
- * Fetches, searches, previews, and deletes brand images from:
+ * Fetches, searches, previews, creates, and deletes brand images from:
  * {ApiBaseUrl}/api/BrandImages/GetAll
+ * {ApiBaseUrl}/api/BrandImages (POST, multipart/form-data)
  * {ApiBaseUrl}/api/BrandImages/{id} (DELETE)
  */
 
@@ -10,9 +11,7 @@ $(function () {
     'use strict';
 
     // 0. Force cleanup of any lingering cached elements & synchronize thead structure
-    // Removes old stat badges container if still served by in-memory Razor cache
     $('#totalImagesBadge').closest('.d-inline-flex').remove();
-    // Removes old status dropdown container if still served by in-memory Razor cache
     $('#statusFilterSelect').closest('div').remove();
 
     // Enforce exact 5 columns in thead so it NEVER desyncs with tbody
@@ -28,6 +27,128 @@ $(function () {
             </tr>
         `);
     }
+
+    // Ensure "Add Brand Image" button exists in header toolbar
+    if (!$('#btnOpenCreateModal').length && $('#btnRefreshBrandImages').length) {
+        $('#btnRefreshBrandImages').before(`
+            <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnOpenCreateModal" title="Upload new brand image">
+                <i class="bi bi-plus-lg"></i>
+                <span class="fw-semibold">Add Brand Image</span>
+            </button>
+        `);
+    }
+
+    // Modern Create Modal HTML template
+    const modernCreateModalHtml = `
+        <div class="modal fade" id="createBrandImageModal" tabindex="-1" aria-labelledby="createModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+                <div class="modal-content modern-create-modal-content border-0">
+                    <div class="modal-header border-bottom px-4 py-3 align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="create-modal-icon-badge">
+                                <i class="bi bi-image-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title fw-bold text-dark m-0" id="createModalTitle">Add Brand Image</h5>
+                                <small class="text-muted">Upload a new facility or gallery image</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form id="createBrandImageForm" novalidate>
+                        <div class="modal-body px-4 py-3">
+                            <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="createModalAlert" role="alert"></div>
+
+                            <!-- 1. Image File Dropzone -->
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark d-flex justify-content-between align-items-center">
+                                    <span>Image File <span class="text-danger">*</span></span>
+                                    <span class="text-muted fw-normal" style="font-size: 0.75rem;">JPG, PNG, WebP (Max 1MB)</span>
+                                </label>
+
+                                <div class="image-dropzone position-relative" id="createImageDropzone">
+                                    <!-- Full-coverage transparent file input for 100% reliable native click & drag-drop -->
+                                    <input type="file" 
+                                           id="createImageFileInput" 
+                                           name="Image" 
+                                           accept="image/jpeg,image/png,image/webp,image/jpg" 
+                                           class="image-dropzone-input" 
+                                           title="Click to browse or drag and drop image" 
+                                           required />
+                                    
+                                    <div class="dropzone-prompt text-center py-4" id="dropzonePrompt">
+                                        <div class="dropzone-icon mb-2">
+                                            <i class="bi bi-cloud-arrow-up"></i>
+                                        </div>
+                                        <div class="fw-semibold text-dark small mb-1">Click to upload or drag &amp; drop image</div>
+                                        <div class="text-muted mb-3" style="font-size: 0.75rem;">Supports JPEG, PNG, WebP (Max 1MB)</div>
+                                        <span class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold">
+                                            <i class="bi bi-folder2-open me-1"></i> Browse Image
+                                        </span>
+                                    </div>
+
+                                    <div class="dropzone-preview d-none text-center p-2" id="dropzonePreview">
+                                        <img src="" alt="Selected Preview" class="dropzone-preview-img" id="createPreviewImg" />
+                                        <div class="dropzone-preview-overlay d-flex align-items-center justify-content-center gap-2 mt-2">
+                                            <button type="button" class="btn btn-sm btn-light border shadow-sm px-2 py-1 small rounded-2" id="btnChangeImage">
+                                                <i class="bi bi-arrow-repeat me-1"></i> Change
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger shadow-sm px-2 py-1 small rounded-2" id="btnRemoveImage">
+                                                <i class="bi bi-trash3 me-1"></i> Remove
+                                            </button>
+                                        </div>
+                                        <div class="mt-2 small text-white-50 text-truncate px-2" id="createImageFileName"></div>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block d-none" id="createFileFeedback">Please select an image file to upload.</div>
+                            </div>
+
+                            <!-- 2. Facility / Image Name -->
+                            <div class="mb-3">
+                                <label for="createImageName" class="form-label small fw-bold text-dark">
+                                    Image Title / Facility Name <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-building"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control bg-light border-start-0 rounded-end-3" 
+                                           id="createImageName" 
+                                           placeholder="e.g. Laboratory Floor, Printing Press" 
+                                           required 
+                                           autocomplete="off" />
+                                </div>
+                                <div class="invalid-feedback d-block d-none" id="createNameFeedback">Please enter a title or facility name.</div>
+                            </div>
+
+                            <!-- 3. Remarks -->
+                            <div class="mb-2">
+                                <label for="createImageRemarks" class="form-label small fw-bold text-dark">
+                                    Remarks / Description
+                                </label>
+                                <textarea class="form-control bg-light rounded-3" 
+                                          id="createImageRemarks" 
+                                          rows="2" 
+                                          placeholder="Enter short description or remarks (optional)..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-3" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3 px-4 py-2 d-inline-flex align-items-center gap-2 shadow-sm" id="btnSubmitCreate">
+                                <i class="bi bi-cloud-arrow-up-fill"></i>
+                                <span id="btnSubmitCreateText">Upload &amp; Save</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
 
     // Modern Delete Modal HTML template
     const modernDeleteModalHtml = `
@@ -76,22 +197,25 @@ $(function () {
         </div>
     `;
 
-    // Ensure the modern delete modal is ALWAYS in the DOM
-    function ensureDeleteModalInDom() {
-        let modalEl = document.getElementById('deleteConfirmModal');
-        if (!modalEl) {
-            $('body').append(modernDeleteModalHtml);
-            modalEl = document.getElementById('deleteConfirmModal');
-        } else if (!$(modalEl).find('.modern-delete-modal-content').length) {
-            $(modalEl).remove();
-            $('body').append(modernDeleteModalHtml);
-            modalEl = document.getElementById('deleteConfirmModal');
+    // Ensure modals exist in the DOM with latest markup
+    function ensureModalsInDom() {
+        let createEl = document.getElementById('createBrandImageModal');
+        if (!createEl) {
+            $('body').append(modernCreateModalHtml);
+        } else if (!$(createEl).find('.image-dropzone-input').length) {
+            $(createEl).remove();
+            $('body').append(modernCreateModalHtml);
         }
-        return modalEl;
-    }
 
-    // Run immediately on page load
-    ensureDeleteModalInDom();
+        let delEl = document.getElementById('deleteConfirmModal');
+        if (!delEl) {
+            $('body').append(modernDeleteModalHtml);
+        } else if (!$(delEl).find('.modern-delete-modal-content').length) {
+            $(delEl).remove();
+            $('body').append(modernDeleteModalHtml);
+        }
+    }
+    ensureModalsInDom();
 
     // 1. DOM Elements & References
     const $container = $('#brandImagesPageContainer');
@@ -118,11 +242,13 @@ $(function () {
     const $modalOpenBtn = $('#modalOpenNewTabBtn');
 
     let pendingDeleteId = null;
+    let selectedImageFile = null;
 
     // 2. Configuration & State
     const rawApiBaseUrl = $container.data('api-base-url') || 'https://localhost:7148';
     const apiBaseUrl = rawApiBaseUrl.toString().replace(/\/+$/, '');
     const GET_ALL_API_URL = `${apiBaseUrl}/api/BrandImages/GetAll`;
+    const CREATE_API_URL = `${apiBaseUrl}/api/BrandImages`;
 
     let allBrandImages = [];
     let currentFilteredImages = [];
@@ -312,7 +438,7 @@ $(function () {
         renderTableRows(currentFilteredImages);
     }
 
-    // 5. Render Exactly 5 Balanced Columns with Delete Action
+    // 5. Render Exactly 5 Balanced Columns with Actions
     function renderTableRows(items) {
         const rowsHtml = items.map((item, index) => {
             const id = item.id ?? (index + 1);
@@ -434,9 +560,206 @@ $(function () {
         imageModal.show();
     };
 
-    // 7. Delete Brand Image Confirmation & API Call
+    // 7. Create Brand Image Modal Logic & API Call
+    function resetCreateForm() {
+        const form = document.getElementById('createBrandImageForm');
+        if (form) form.reset();
+        selectedImageFile = null;
+        const fileInput = document.getElementById('createImageFileInput');
+        if (fileInput) fileInput.value = '';
+        $('#createPreviewImg').attr('src', '');
+        $('#createImageFileName').text('');
+        $('#dropzonePreview').addClass('d-none');
+        $('#dropzonePrompt').removeClass('d-none');
+        $('#createImageDropzone').removeClass('has-preview');
+        $('#createFileFeedback').addClass('d-none');
+        $('#createNameFeedback').addClass('d-none');
+        $('#createModalAlert').addClass('d-none').text('');
+    }
+
+    // Open create modal
+    $(document).on('click', '#btnOpenCreateModal', function () {
+        ensureModalsInDom();
+        resetCreateForm();
+        const createModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createBrandImageModal'));
+        createModal.show();
+    });
+
+    // Change image button in preview state
+    $(document).on('click', '#btnChangeImage', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const fileInput = document.getElementById('createImageFileInput');
+        if (fileInput) {
+            fileInput.click();
+        }
+    });
+
+    // Remove image button in preview state
+    $(document).on('click', '#btnRemoveImage', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        selectedImageFile = null;
+        const fileInput = document.getElementById('createImageFileInput');
+        if (fileInput) fileInput.value = '';
+        $('#createPreviewImg').attr('src', '');
+        $('#createImageFileName').text('');
+        $('#dropzonePreview').addClass('d-none');
+        $('#dropzonePrompt').removeClass('d-none');
+        $('#createImageDropzone').removeClass('has-preview');
+    });
+
+    // Drag and drop handlers
+    $(document).on('dragover dragenter', '#createImageDropzone', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('dragover');
+    });
+
+    $(document).on('dragleave dragend drop', '#createImageDropzone', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('dragover');
+    });
+
+    $(document).on('drop', '#createImageDropzone', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const files = e.originalEvent.dataTransfer ? e.originalEvent.dataTransfer.files : null;
+        if (files && files.length > 0) {
+            const fileInput = document.getElementById('createImageFileInput');
+            if (fileInput) {
+                try {
+                    fileInput.files = files;
+                } catch (err) {}
+            }
+            handleSelectedImageFile(files[0]);
+        }
+    });
+
+    $(document).on('change', '#createImageFileInput', function () {
+        if (this.files && this.files.length > 0) {
+            handleSelectedImageFile(this.files[0]);
+        }
+    });
+
+    function handleSelectedImageFile(file) {
+        if (!file.type.match(/^image\/(jpeg|png|webp|jpg)$/)) {
+            $('#createModalAlert').removeClass('d-none').text('Please select a valid image file (JPG, PNG, WebP).');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            $('#createModalAlert').removeClass('d-none').text('Image file size must be less than 10MB.');
+            return;
+        }
+
+        selectedImageFile = file;
+        $('#createFileFeedback').addClass('d-none');
+        $('#createModalAlert').addClass('d-none');
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            $('#createPreviewImg').attr('src', e.target.result);
+            $('#createImageFileName').text(`${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+            $('#dropzonePrompt').addClass('d-none');
+            $('#dropzonePreview').removeClass('d-none');
+            $('#createImageDropzone').addClass('has-preview');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Submit Create Form
+    $(document).on('submit', '#createBrandImageForm', function (e) {
+        e.preventDefault();
+
+        const name = ($('#createImageName').val() || '').trim();
+        const remarks = ($('#createImageRemarks').val() || '').trim();
+
+        let isValid = true;
+        if (!selectedImageFile) {
+            $('#createFileFeedback').removeClass('d-none');
+            isValid = false;
+        } else {
+            $('#createFileFeedback').addClass('d-none');
+        }
+
+        if (!name) {
+            $('#createNameFeedback').removeClass('d-none');
+            isValid = false;
+        } else {
+            $('#createNameFeedback').addClass('d-none');
+        }
+
+        if (!isValid) return;
+
+        // Build FormData matching the sample API specification
+        const formData = new FormData();
+        formData.append('Id', '0');
+        formData.append('Name', name);
+        formData.append('Remarks', remarks);
+        formData.append('Image', selectedImageFile, selectedImageFile.name);
+
+        const token = getAuthToken();
+        const ajaxHeaders = {};
+        if (token) {
+            ajaxHeaders['Authorization'] = `Bearer ${token}`;
+        }
+
+        const $submitBtn = $('#btnSubmitCreate');
+        const $submitBtnText = $('#btnSubmitCreateText');
+        $submitBtn.prop('disabled', true);
+        $submitBtnText.html('<span class="spinner-border spinner-border-sm me-2" role="status"></span> Uploading...');
+        $('#createModalAlert').addClass('d-none').text('');
+
+        console.log(`[BrandImages] Submitting Create to: ${CREATE_API_URL}`);
+
+        $.ajax({
+            url: CREATE_API_URL,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: ajaxHeaders,
+            success: function (res) {
+                console.log('[BrandImages] Create Success Response:', res);
+                const createModalEl = document.getElementById('createBrandImageModal');
+                if (createModalEl) {
+                    const inst = bootstrap.Modal.getInstance(createModalEl);
+                    if (inst) inst.hide();
+                }
+
+                resetCreateForm();
+                const successMsg = res && res.message ? res.message : 'Brand image successfully created.';
+                showToast(successMsg, 'bi bi-check-circle-fill text-success');
+
+                // Reload data from API to display newly created item
+                fetchBrandImages();
+            },
+            error: function (xhr, status, error) {
+                console.error('[BrandImages] Create error:', xhr, status, error);
+                let errorMsg = 'Failed to create brand image. Please verify connection and try again.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    try {
+                        const parsed = JSON.parse(xhr.responseText);
+                        if (parsed.message) errorMsg = parsed.message;
+                    } catch (e) {}
+                }
+                $('#createModalAlert').removeClass('d-none').text(errorMsg);
+            },
+            complete: function () {
+                $submitBtn.prop('disabled', false);
+                $submitBtnText.html('Upload &amp; Save');
+            }
+        });
+    });
+
+    // 8. Delete Brand Image Confirmation & API Call
     window.confirmDeleteBrandImage = function (id) {
-        const modalEl = ensureDeleteModalInDom();
+        ensureModalsInDom();
+        const modalEl = document.getElementById('deleteConfirmModal');
         const item = allBrandImages.find(x => x.id === id);
         pendingDeleteId = id;
 
@@ -454,7 +777,6 @@ $(function () {
             $('#deleteTargetThumb').attr('src', '/images/logo-icon.png');
         }
 
-        // Always show the ultra-modern Bootstrap Modal (NEVER native confirm)
         const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
         modalInstance.show();
     };
@@ -494,7 +816,6 @@ $(function () {
                     if (modalInstance) modalInstance.hide();
                 }
 
-                // Remove item from local array
                 allBrandImages = allBrandImages.filter(x => x.id !== id);
                 applyFilterAndRender();
                 showToast('Brand image deleted successfully!', 'bi bi-trash3-fill text-danger');
@@ -517,24 +838,20 @@ $(function () {
         });
     }
 
-    // 8. Event Listeners
-    // Refresh button
+    // 9. Event Listeners
     $refreshBtn.on('click', function () {
         fetchBrandImages();
         showToast('Refreshing brand images...', 'bi bi-arrow-repeat text-primary');
     });
 
-    // Retry button in error state
     $retryBtn.on('click', function () {
         fetchBrandImages();
     });
 
-    // Live search input
     $searchInput.on('input', function () {
         applyFilterAndRender();
     });
 
-    // Clear search
     $searchClearBtn.on('click', function () {
         $searchInput.val('');
         applyFilterAndRender();
