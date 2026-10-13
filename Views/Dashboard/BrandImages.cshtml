@@ -1,7 +1,240 @@
 @{
     Layout = "_DashboardLayout";
-    ViewData["Title"] = "Brand Image - Manage Site";
+    ViewData["Title"] = "Brand Images - Manage Site";
+    var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
 }
 
+<!-- Page Root Container -->
+<div class="brand-images-page-wrapper" id="brandImagesPageContainer" data-api-base-url="@apiBaseUrl">
 
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="dash-breadcrumb">
+        <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span>Manage Site</span>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span class="current">Brand Images</span>
+    </nav>
 
+    <!-- Page Heading Area -->
+    <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="dashboard-title">Brand Images</h1>
+            <p class="dashboard-subtitle">Browse, view, and organize brand and factory gallery images.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- Quick Stat Badges -->
+            <div class="d-inline-flex align-items-center gap-2 bg-white px-3 py-2 rounded-3 border shadow-sm">
+                <span class="text-muted small fw-medium">Total:</span>
+                <span class="badge bg-primary rounded-pill px-2" id="totalImagesBadge">0</span>
+                <span class="text-muted small fw-medium ms-2">Active:</span>
+                <span class="badge bg-success rounded-pill px-2" id="activeImagesBadge">0</span>
+            </div>
+
+            <!-- Refresh Button -->
+            <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnRefreshBrandImages" title="Reload from API">
+                <i class="bi bi-arrow-clockwise refresh-icon"></i>
+                <span class="fw-semibold">Refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Table Card -->
+    <div class="dash-table-card">
+
+        <!-- Card Header Toolbar -->
+        <div class="dash-card-header">
+            <div class="dash-card-header-left">
+                <div class="dash-header-icon">
+                    <i class="bi bi-images"></i>
+                </div>
+                <div>
+                    <h2 class="dash-card-title">All Brand Images</h2>
+                    <p class="dash-card-subtitle">Complete registry of facility and machinery imagery</p>
+                </div>
+            </div>
+
+            <!-- Search & Filters Toolbar -->
+            <div class="dash-toolbar-controls">
+                <!-- Live Search Box -->
+                <div class="dash-search-group">
+                    <i class="bi bi-search dash-search-icon"></i>
+                    <input type="text" 
+                           id="searchBrandImagesInput" 
+                           class="dash-search-input" 
+                           placeholder="Search by name, remarks, or ID..." 
+                           autocomplete="off" />
+                    <button type="button" class="dash-search-clear" id="searchClearBtn" title="Clear search">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+
+                <!-- Status Filter Dropdown -->
+                <div>
+                    <select class="form-select form-select-sm rounded-3 border-1 text-secondary fw-medium" id="statusFilterSelect" style="min-width: 140px; padding: 0.55rem 2rem 0.55rem 0.85rem;">
+                        <option value="all">All Statuses</option>
+                        <option value="active">Active Only</option>
+                        <option value="inactive">Inactive Only</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Responsive Container -->
+        <div class="table-responsive">
+            <table class="dash-custom-table" id="brandImagesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;"># ID</th>
+                        <th style="width: 80px;">Preview</th>
+                        <th>Name / Title</th>
+                        <th>Remarks</th>
+                        <th style="width: 120px;">Status</th>
+                        <th style="width: 170px;">Created Date</th>
+                        <th style="width: 170px;">Updated Date</th>
+                        <th style="width: 110px;" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="brandImagesTableBody">
+                    <!-- Populated dynamically via brand-images.js -->
+                </tbody>
+            </table>
+
+            <!-- Loading State (Skeleton Rows) -->
+            <div id="tableLoadingState" class="dash-table-state-box">
+                <div class="dash-state-icon-circle icon-loading">
+                    <div class="spinner-border text-primary" style="width: 2rem; height: 2rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <h3 class="dash-state-title">Fetching Brand Images</h3>
+                <p class="dash-state-desc">Connecting to secure API server and loading image records...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="tableErrorState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-error">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h3 class="dash-state-title">Unable to Load Brand Images</h3>
+                <p class="dash-state-desc" id="errorMessageText">
+                    Failed to fetch data from the server. Please verify your connection or API status.
+                </p>
+                <button type="button" class="btn btn-primary btn-sm px-4 py-2 rounded-3" id="btnRetryBrandImages">
+                    <i class="bi bi-arrow-repeat me-1"></i> Try Again
+                </button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="tableEmptyState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-empty">
+                    <i class="bi bi-folder2-open"></i>
+                </div>
+                <h3 class="dash-state-title">No Brand Images Found</h3>
+                <p class="dash-state-desc">There are currently no brand images stored in the system database.</p>
+            </div>
+
+            <!-- No Search Results State -->
+            <div id="tableNoResultsState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-empty">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h3 class="dash-state-title">No Matching Records</h3>
+                <p class="dash-state-desc">No brand images match your search query or selected filter criteria.</p>
+            </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="dash-card-footer">
+            <div class="d-flex align-items-center gap-2">
+                <span id="tableCountSummary">Loading...</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 text-muted small">
+                <i class="bi bi-info-circle"></i>
+                <span>Click on any image thumbnail or eye icon to view details &amp; high-res preview</span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- High Resolution Lightbox Modal -->
+<div class="modal fade" id="brandImageDetailModal" tabindex="-1" aria-labelledby="modalImageTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content brand-modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header brand-modal-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-image text-primary fs-5"></i>
+                    <h5 class="modal-title fw-bold text-dark m-0" id="modalImageTitle">Brand Image Preview</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body brand-modal-body">
+                <!-- Main Image Preview Canvas -->
+                <div class="brand-modal-preview-wrapper mb-3">
+                    <img id="modalPreviewImage" src="" alt="Brand Image Preview" class="brand-modal-preview-img" />
+                </div>
+
+                <!-- Metadata Grid -->
+                <div class="brand-meta-grid">
+                    <div>
+                        <div class="brand-meta-label">Remarks / Description</div>
+                        <div class="brand-meta-val" id="modalImageRemarks">—</div>
+                    </div>
+                    <div>
+                        <div class="brand-meta-label">Status</div>
+                        <div class="brand-meta-val" id="modalImageStatus">—</div>
+                    </div>
+                    <div>
+                        <div class="brand-meta-label">Created Date</div>
+                        <div class="brand-meta-val" id="modalImageCreatedOn">—</div>
+                    </div>
+                    <div>
+                        <div class="brand-meta-label">Last Updated</div>
+                        <div class="brand-meta-val" id="modalImageUpdatedOn">—</div>
+                    </div>
+                    <div>
+                        <div class="brand-meta-label">Created By</div>
+                        <div class="brand-meta-val" id="modalImageCreatedBy">—</div>
+                    </div>
+                    <div>
+                        <div class="brand-meta-label">Updated By</div>
+                        <div class="brand-meta-val" id="modalImageUpdatedBy">—</div>
+                    </div>
+
+                    <!-- Direct URL Box with One-Click Copy -->
+                    <div class="brand-url-copy-box">
+                        <div class="brand-url-copy-text" id="modalImageUrlText"></div>
+                        <button type="button" class="btn btn-sm btn-light border py-1 px-2 text-nowrap" id="modalCopyUrlBtn" title="Copy URL">
+                            <i class="bi bi-clipboard me-1"></i> Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-white border-top py-2 px-3">
+                <a id="modalOpenNewTabBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Open in New Tab
+                </a>
+                <button type="button" class="btn btn-secondary btn-sm rounded-3 px-3" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Toast Notification -->
+<div class="dash-toast-container">
+    <div class="dash-toast" id="dashToast" role="alert" aria-live="assertive" aria-atomic="true">
+        <i class="bi bi-check-circle-fill dash-toast-icon"></i>
+        <span id="dashToastMessage">Action completed successfully.</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/brand-images.js" asp-append-version="true"></script>
+}

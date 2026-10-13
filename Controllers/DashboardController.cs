@@ -4,10 +4,12 @@ namespace ZamZamClient.Controllers;
 
 public class DashboardController : Controller
 {
+    private readonly IConfiguration _configuration;
     private readonly ILogger<DashboardController> _logger;
 
-    public DashboardController(ILogger<DashboardController> logger)
+    public DashboardController(IConfiguration configuration, ILogger<DashboardController> logger)
     {
+        _configuration = configuration;
         _logger = logger;
     }
 
@@ -22,6 +24,7 @@ public class DashboardController : Controller
             return RedirectToAction("Login", "Account");
         }
 
+        ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:7148";
         ViewBag.UserDisplayName = System.Net.WebUtility.UrlDecode(Request.Cookies["userDisplayName"] ?? "");
         ViewBag.UserDisplayEmail = System.Net.WebUtility.UrlDecode(Request.Cookies["userDisplayEmail"] ?? "");
 
@@ -39,6 +42,7 @@ public class DashboardController : Controller
             return RedirectToAction("Login", "Account");
         }
 
+        ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:7148";
         ViewBag.UserDisplayName = System.Net.WebUtility.UrlDecode(Request.Cookies["userDisplayName"] ?? "");
         ViewBag.UserDisplayEmail = System.Net.WebUtility.UrlDecode(Request.Cookies["userDisplayEmail"] ?? "");
 
