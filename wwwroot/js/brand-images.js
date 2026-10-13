@@ -23,7 +23,7 @@ $(function () {
                 <th style="width: 90px;" class="text-center">Preview</th>
                 <th style="width: 28%;">Name / Title</th>
                 <th>Remarks</th>
-                <th style="width: 130px;" class="text-end">Actions</th>
+                <th style="width: 155px;" class="text-end">Actions</th>
             </tr>
         `);
     }
@@ -197,6 +197,121 @@ $(function () {
         </div>
     `;
 
+    // Modern Edit Modal HTML template
+    const modernEditModalHtml = `
+        <div class="modal fade" id="editBrandImageModal" tabindex="-1" aria-labelledby="editModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+                <div class="modal-content modern-create-modal-content border-0">
+                    <div class="modal-header border-bottom px-4 py-3 align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="create-modal-icon-badge" style="background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); color: #4f46e5;">
+                                <i class="bi bi-pencil-square"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title fw-bold text-dark m-0" id="editModalTitle">Update Brand Image</h5>
+                                <small class="text-muted">Modify facility title, remarks, or upload replacement image</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form id="editBrandImageForm" novalidate>
+                        <input type="hidden" id="editImageId" name="Id" value="" />
+                        
+                        <div class="modal-body px-4 py-3">
+                            <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="editModalAlert" role="alert"></div>
+
+                            <!-- 1. Image File Dropzone -->
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark d-flex justify-content-between align-items-center">
+                                    <span>Image File <span class="text-muted fw-normal">(Current or replacement)</span></span>
+                                    <span class="text-muted fw-normal" style="font-size: 0.75rem;">JPG, PNG (Max 1MB)</span>
+                                </label>
+
+                                <div class="image-dropzone position-relative has-preview" id="editImageDropzone">
+                                    <!-- Full-coverage transparent file input -->
+                                    <input type="file" 
+                                           id="editImageFileInput" 
+                                           name="Image" 
+                                           accept="image/jpeg,image/png,image/jpg" 
+                                           class="image-dropzone-input" 
+                                           title="Click to browse or drag and drop replacement image" />
+                                    
+                                    <!-- Prompt State -->
+                                    <div class="dropzone-prompt text-center py-4 d-none" id="editDropzonePrompt">
+                                        <div class="dropzone-icon mb-2">
+                                            <i class="bi bi-cloud-arrow-up"></i>
+                                        </div>
+                                        <div class="fw-semibold text-dark small mb-1">Click to upload or drag &amp; drop new image</div>
+                                        <div class="text-muted mb-3" style="font-size: 0.75rem;">Supports JPEG, PNG (Max 1MB)</div>
+                                        <span class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold">
+                                            <i class="bi bi-folder2-open me-1"></i> Browse New Image
+                                        </span>
+                                    </div>
+
+                                    <!-- Preview State -->
+                                    <div class="dropzone-preview text-center p-2" id="editDropzonePreview">
+                                        <img src="" alt="Image Preview" class="dropzone-preview-img" id="editPreviewImg" />
+                                        <div class="dropzone-preview-overlay d-flex align-items-center justify-content-center gap-2 mt-2">
+                                            <button type="button" class="btn btn-sm btn-light border shadow-sm px-2 py-1 small rounded-2" id="btnEditChangeImage">
+                                                <i class="bi bi-arrow-repeat me-1"></i> Replace Image
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary shadow-sm px-2 py-1 small rounded-2 d-none" id="btnEditRevertImage">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Revert to Original
+                                            </button>
+                                        </div>
+                                        <div class="mt-2 small text-white-50 text-truncate px-2" id="editImageFileName">Current Image</div>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block d-none" id="editFileFeedback">Please select an image file.</div>
+                            </div>
+
+                            <!-- 2. Facility / Image Name -->
+                            <div class="mb-3">
+                                <label for="editImageName" class="form-label small fw-bold text-dark">
+                                    Image Title / Facility Name <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-building"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control bg-light border-start-0 rounded-end-3" 
+                                           id="editImageName" 
+                                           placeholder="e.g. Laboratory Floor, Printing Press" 
+                                           required 
+                                           autocomplete="off" />
+                                </div>
+                                <div class="invalid-feedback d-block d-none" id="editNameFeedback">Please enter a title or facility name.</div>
+                            </div>
+
+                            <!-- 3. Remarks -->
+                            <div class="mb-2">
+                                <label for="editImageRemarks" class="form-label small fw-bold text-dark">
+                                    Remarks / Description
+                                </label>
+                                <textarea class="form-control bg-light rounded-3" 
+                                          id="editImageRemarks" 
+                                          rows="2" 
+                                          placeholder="Enter short description or remarks (optional)..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-3" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3 px-4 py-2 d-inline-flex align-items-center gap-2 shadow-sm" id="btnSubmitEdit">
+                                <i class="bi bi-check-lg"></i>
+                                <span id="btnSubmitEditText">Update &amp; Save</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+
     // Ensure modals exist in the DOM with latest markup
     function ensureModalsInDom() {
         let createEl = document.getElementById('createBrandImageModal');
@@ -205,6 +320,14 @@ $(function () {
         } else if (!$(createEl).find('.image-dropzone-input').length) {
             $(createEl).remove();
             $('body').append(modernCreateModalHtml);
+        }
+
+        let editEl = document.getElementById('editBrandImageModal');
+        if (!editEl) {
+            $('body').append(modernEditModalHtml);
+        } else if (!$(editEl).find('.image-dropzone-input').length) {
+            $(editEl).remove();
+            $('body').append(modernEditModalHtml);
         }
 
         let delEl = document.getElementById('deleteConfirmModal');
@@ -243,12 +366,16 @@ $(function () {
 
     let pendingDeleteId = null;
     let selectedImageFile = null;
+    let selectedUpdateImageFile = null;
+    let existingUpdateImageFile = null;
+    let originalEditItem = null;
 
     // 2. Configuration & State
     const rawApiBaseUrl = $container.data('api-base-url') || 'https://localhost:7148';
     const apiBaseUrl = rawApiBaseUrl.toString().replace(/\/+$/, '');
     const GET_ALL_API_URL = `${apiBaseUrl}/api/BrandImages/GetAll`;
     const CREATE_API_URL = `${apiBaseUrl}/api/BrandImages`;
+    const UPDATE_API_URL = `${apiBaseUrl}/api/BrandImages`;
 
     let allBrandImages = [];
     let currentFilteredImages = [];
@@ -489,7 +616,7 @@ $(function () {
                         <span class="text-secondary ${remarks === '—' ? 'opacity-50' : ''}">${remarks}</span>
                     </td>
 
-                    <!-- 5. Actions Column (Preview Modal, Open in New Tab, Delete) -->
+                    <!-- 5. Actions Column (Preview Modal, Edit Modal, Open in New Tab, Delete) -->
                     <td class="dash-actions-cell text-end">
                         <div class="dash-action-btn-group">
                             <!-- Preview Modal -->
@@ -498,6 +625,14 @@ $(function () {
                                     onclick="window.openBrandImageModal(${id})" 
                                     title="View image details">
                                 <i class="bi bi-eye"></i>
+                            </button>
+
+                            <!-- Edit Modal Button -->
+                            <button type="button" 
+                                    class="dash-action-btn btn-edit text-primary" 
+                                    onclick="window.openEditBrandImageModal(${id})" 
+                                    title="Edit / Update brand image">
+                                <i class="bi bi-pencil-square"></i>
                             </button>
 
                             <!-- Open in New Tab -->
@@ -756,7 +891,241 @@ $(function () {
         });
     });
 
-    // 8. Delete Brand Image Confirmation & API Call
+    // 8. Edit / Update Brand Image Modal Logic & API Call
+    window.openEditBrandImageModal = function (imageId) {
+        ensureModalsInDom();
+        const item = allBrandImages.find(x => x.id === imageId);
+        if (!item) return;
+
+        originalEditItem = item;
+        selectedUpdateImageFile = null;
+        existingUpdateImageFile = null;
+
+        const form = document.getElementById('editBrandImageForm');
+        if (form) form.reset();
+
+        $('#editModalAlert').addClass('d-none').text('');
+        $('#editNameFeedback').addClass('d-none');
+        $('#editFileFeedback').addClass('d-none');
+        $('#btnEditRevertImage').addClass('d-none');
+
+        $('#editImageId').val(item.id);
+        $('#editImageName').val(item.name || '');
+        $('#editImageRemarks').val(item.remarks || '');
+
+        const fullImgUrl = getFullImageUrl(item.imagePath);
+        if (fullImgUrl) {
+            $('#editPreviewImg').attr('src', fullImgUrl);
+            const fileName = (item.imagePath || '').split('/').pop() || 'current-image.jpg';
+            $('#editImageFileName').text(`Current: ${fileName}`);
+            $('#editDropzonePreview').removeClass('d-none');
+            $('#editDropzonePrompt').addClass('d-none');
+            $('#editImageDropzone').addClass('has-preview');
+
+            // Pre-fetch the existing image as a File object so if user only updates Name/Remarks,
+            // the backend's required `Image` field is satisfied without forcing user to re-pick an image file.
+            fetch(fullImgUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    const ext = (fileName.split('.').pop() || 'jpg').toLowerCase();
+                    const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
+                    existingUpdateImageFile = new File([blob], fileName, { type: blob.type || mime });
+                    console.log('[BrandImages] Cached existing image file for update:', existingUpdateImageFile.name);
+                })
+                .catch(err => {
+                    console.warn('[BrandImages] Could not pre-fetch existing image file:', err);
+                });
+        } else {
+            $('#editPreviewImg').attr('src', '');
+            $('#editImageFileName').text('');
+            $('#editDropzonePreview').addClass('d-none');
+            $('#editDropzonePrompt').removeClass('d-none');
+            $('#editImageDropzone').removeClass('has-preview');
+        }
+
+        const editModalEl = document.getElementById('editBrandImageModal');
+        const editModal = bootstrap.Modal.getOrCreateInstance(editModalEl);
+        editModal.show();
+    };
+
+    // Replace image button in edit preview state
+    $(document).on('click', '#btnEditChangeImage', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const fileInput = document.getElementById('editImageFileInput');
+        if (fileInput) {
+            fileInput.click();
+        }
+    });
+
+    // Revert to original image in edit preview state
+    $(document).on('click', '#btnEditRevertImage', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        selectedUpdateImageFile = null;
+        const fileInput = document.getElementById('editImageFileInput');
+        if (fileInput) fileInput.value = '';
+
+        if (originalEditItem) {
+            const fullImgUrl = getFullImageUrl(originalEditItem.imagePath);
+            const fileName = (originalEditItem.imagePath || '').split('/').pop() || 'current-image.jpg';
+            $('#editPreviewImg').attr('src', fullImgUrl);
+            $('#editImageFileName').text(`Current: ${fileName}`);
+        }
+        $('#btnEditRevertImage').addClass('d-none');
+        $('#editFileFeedback').addClass('d-none');
+    });
+
+    // Drag and drop handlers for edit dropzone
+    $(document).on('dragover dragenter', '#editImageDropzone', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('dragover');
+    });
+
+    $(document).on('dragleave dragend drop', '#editImageDropzone', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('dragover');
+    });
+
+    $(document).on('drop', '#editImageDropzone', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const files = e.originalEvent.dataTransfer ? e.originalEvent.dataTransfer.files : null;
+        if (files && files.length > 0) {
+            const fileInput = document.getElementById('editImageFileInput');
+            if (fileInput) {
+                try {
+                    fileInput.files = files;
+                } catch (err) {}
+            }
+            handleSelectedEditImageFile(files[0]);
+        }
+    });
+
+    $(document).on('change', '#editImageFileInput', function () {
+        if (this.files && this.files.length > 0) {
+            handleSelectedEditImageFile(this.files[0]);
+        }
+    });
+
+    function handleSelectedEditImageFile(file) {
+        if (!file.type.match(/^image\/(jpeg|png|jpg)$/i)) {
+            $('#editModalAlert').removeClass('d-none').text('Please select a valid image file (.jpg, .jpeg, .png).');
+            return;
+        }
+
+        if (file.size > 1024 * 1024) {
+            $('#editModalAlert').removeClass('d-none').text('Image file size must be less than 1MB.');
+            return;
+        }
+
+        selectedUpdateImageFile = file;
+        $('#editFileFeedback').addClass('d-none');
+        $('#editModalAlert').addClass('d-none');
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            $('#editPreviewImg').attr('src', e.target.result);
+            $('#editImageFileName').text(`New: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+            $('#editDropzonePrompt').addClass('d-none');
+            $('#editDropzonePreview').removeClass('d-none');
+            $('#editImageDropzone').addClass('has-preview');
+            $('#btnEditRevertImage').removeClass('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Submit Edit Form (PUT)
+    $(document).on('submit', '#editBrandImageForm', function (e) {
+        e.preventDefault();
+
+        const id = $('#editImageId').val();
+        const name = ($('#editImageName').val() || '').trim();
+        const remarks = ($('#editImageRemarks').val() || '').trim();
+
+        let isValid = true;
+        if (!name) {
+            $('#editNameFeedback').removeClass('d-none');
+            isValid = false;
+        } else {
+            $('#editNameFeedback').addClass('d-none');
+        }
+
+        const imageToUpload = selectedUpdateImageFile || existingUpdateImageFile;
+        if (!imageToUpload) {
+            $('#editFileFeedback').removeClass('d-none').text('Please select an image file.');
+            isValid = false;
+        } else {
+            $('#editFileFeedback').addClass('d-none');
+        }
+
+        if (!isValid) return;
+
+        // Build FormData matching the PUT API specification: Id, Name, Remarks, Image
+        const formData = new FormData();
+        formData.append('Id', id);
+        formData.append('Name', name);
+        formData.append('Remarks', remarks);
+        formData.append('Image', imageToUpload, imageToUpload.name || 'image.jpg');
+
+        const token = getAuthToken();
+        const ajaxHeaders = {};
+        if (token) {
+            ajaxHeaders['Authorization'] = `Bearer ${token}`;
+        }
+
+        const $submitBtn = $('#btnSubmitEdit');
+        const $submitBtnText = $('#btnSubmitEditText');
+        $submitBtn.prop('disabled', true);
+        $submitBtnText.html('<span class="spinner-border spinner-border-sm me-2" role="status"></span> Updating...');
+        $('#editModalAlert').addClass('d-none').text('');
+
+        console.log(`[BrandImages] Submitting PUT Update to: ${UPDATE_API_URL}`, { id, name, remarks });
+
+        $.ajax({
+            url: UPDATE_API_URL,
+            type: 'PUT',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: ajaxHeaders,
+            success: function (res) {
+                console.log('[BrandImages] Update Success Response:', res);
+                const editModalEl = document.getElementById('editBrandImageModal');
+                if (editModalEl) {
+                    const inst = bootstrap.Modal.getInstance(editModalEl);
+                    if (inst) inst.hide();
+                }
+
+                const successMsg = res && res.message ? res.message : 'Brand image successfully updated.';
+                showToast(successMsg, 'bi bi-check-circle-fill text-success');
+
+                // Reload data from API to display updated item
+                fetchBrandImages();
+            },
+            error: function (xhr, status, error) {
+                console.error('[BrandImages] Update error:', xhr, status, error);
+                let errorMsg = 'Failed to update brand image. Please verify details and try again.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    try {
+                        const parsed = JSON.parse(xhr.responseText);
+                        if (parsed.message) errorMsg = parsed.message;
+                    } catch (e) {}
+                }
+                $('#editModalAlert').removeClass('d-none').text(errorMsg);
+            },
+            complete: function () {
+                $submitBtn.prop('disabled', false);
+                $submitBtnText.html('Update &amp; Save');
+            }
+        });
+    });
+
+    // 9. Delete Brand Image Confirmation & API Call
     window.confirmDeleteBrandImage = function (id) {
         ensureModalsInDom();
         const modalEl = document.getElementById('deleteConfirmModal');

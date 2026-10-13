@@ -935,6 +935,17 @@ body.dashboard-body.sidebar-open {
     border-color: #bfdbfe;
 }
 
+.dash-action-btn.btn-edit {
+    color: #4f46e5;
+}
+
+.dash-action-btn.btn-edit:hover {
+    color: #4338ca;
+    background-color: #eef2ff;
+    border-color: #c7d2fe;
+    transform: translateY(-1px);
+}
+
 .dash-action-btn.btn-delete {
     color: #ef4444;
 }
