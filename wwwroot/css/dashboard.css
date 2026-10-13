@@ -1,6 +1,8 @@
 /**
- * Business Solution - Dashboard Layout & Page Styles
- * Matching the specified UI design
+ * ZamZam Trims (BD) Ltd. - Business Solution Dashboard
+ * Responsive Stylesheet (dashboard.css)
+ * --------------------------------------------------------
+ * Supports all viewport sizes: Desktop (1200px+), Tablet (768px-1199px), Mobile (<768px)
  */
 
 :root {
@@ -20,6 +22,10 @@
     --dash-primary-blue: #2563eb;
 }
 
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body.dashboard-body {
     margin: 0;
     padding: 0;
@@ -29,10 +35,15 @@ body.dashboard-body {
     min-height: 100vh;
     display: flex;
     overflow-x: hidden;
+    position: relative;
+}
+
+body.dashboard-body.sidebar-open {
+    overflow: hidden;
 }
 
 /* =========================================================
-   SIDEBAR STYLES
+   1. SIDEBAR STYLES (DESKTOP & MOBILE DRAWER)
    ========================================================= */
 .dashboard-sidebar {
     width: var(--dash-sidebar-width);
@@ -45,13 +56,18 @@ body.dashboard-body {
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: 1000;
+    z-index: 1050;
     padding: 1.5rem 1rem;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    width: 100%;
 }
 
 .sidebar-brand {
-    padding: 0.5rem 0.75rem 2rem 0.75rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -63,9 +79,11 @@ body.dashboard-body {
     font-weight: 800;
     letter-spacing: -0.5px;
     margin: 0;
+    line-height: 1.2;
 }
 
-.brand-title .text-primary-blue {
+.brand-title .text-primary-blue,
+.brand-text-mobile .text-primary-blue {
     color: var(--dash-primary-blue);
 }
 
@@ -137,8 +155,29 @@ body.dashboard-body {
     color: #3b82f6;
 }
 
+/* Mobile Sidebar Backdrop */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(9, 14, 26, 0.65);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.sidebar-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
 /* =========================================================
-   MAIN APP WRAPPER & TOPBAR
+   2. MAIN WRAPPER & TOPBAR
    ========================================================= */
 .dashboard-main-wrapper {
     margin-left: var(--dash-sidebar-width);
@@ -146,6 +185,8 @@ body.dashboard-body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    min-width: 0;
+    width: calc(100% - var(--dash-sidebar-width));
     background-color: var(--dash-body-bg);
 }
 
@@ -155,17 +196,37 @@ body.dashboard-body {
     border-bottom: 1px solid #eef2f6;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: 0 2.5rem;
     position: sticky;
     top: 0;
     z-index: 900;
 }
 
+.sidebar-toggle-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dash-text-dark);
+}
+
+.sidebar-toggle-btn:hover {
+    background-color: #f1f5f9;
+}
+
+.brand-text-mobile {
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+}
+
 .topbar-actions {
     display: flex;
     align-items: center;
     gap: 1.25rem;
+    margin-left: auto;
 }
 
 .topbar-icon-btn {
@@ -204,6 +265,7 @@ body.dashboard-body {
     border: 2px solid #ffffff;
     box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
     transition: transform 0.2s ease;
+    user-select: none;
 }
 
 .user-avatar-circle:hover {
@@ -213,6 +275,7 @@ body.dashboard-body {
 /* User Dropdown */
 .user-dropdown-menu {
     min-width: 230px;
+    max-width: 280px;
     padding: 0.5rem;
     border-radius: 14px;
     border: 1px solid #e2e8f0;
@@ -220,11 +283,12 @@ body.dashboard-body {
 }
 
 /* =========================================================
-   DASHBOARD CONTENT CANVAS
+   3. DASHBOARD CONTENT CANVAS
    ========================================================= */
 .dashboard-content {
     padding: 2.5rem 3rem;
     flex: 1;
+    min-width: 0;
 }
 
 .dashboard-heading-area {
@@ -246,11 +310,11 @@ body.dashboard-body {
 }
 
 /* =========================================================
-   METRIC OVERVIEW CARDS (MATCHING REFERENCE IMAGE)
+   4. METRIC OVERVIEW CARDS (MATCHING REFERENCE IMAGE)
    ========================================================= */
 .metric-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-bottom: 2.5rem;
 }
@@ -265,11 +329,12 @@ body.dashboard-body {
     gap: 1.25rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 0;
 }
 
 .metric-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
 .metric-icon-box {
@@ -304,6 +369,7 @@ body.dashboard-body {
 .metric-info {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .metric-label {
@@ -311,7 +377,8 @@ body.dashboard-body {
     font-weight: 500;
     color: var(--dash-text-muted);
     margin-bottom: 0.2rem;
-    line-height: 1.3;
+    line-height: 1.35;
+    word-break: normal;
 }
 
 .metric-value {
@@ -322,11 +389,25 @@ body.dashboard-body {
     margin: 0;
 }
 
-/* Responsive adjustments */
-@media (max-width: 992px) {
+/* =========================================================
+   5. RESPONSIVE BREAKPOINTS
+   ========================================================= */
+
+/* Desktop & Laptop Breakpoint (>= 992px) */
+@media (min-width: 992px) {
     .dashboard-sidebar {
+        transform: translateX(0) !important;
+    }
+    .sidebar-backdrop {
+        display: none !important;
+    }
+}
+
+/* Tablet Breakpoint (768px - 991.98px) */
+@media (max-width: 991.98px) {
+    .dashboard-sidebar {
+        width: 270px;
         transform: translateX(-100%);
-        transition: transform 0.3s ease;
     }
 
     .dashboard-sidebar.show {
@@ -335,9 +416,105 @@ body.dashboard-body {
 
     .dashboard-main-wrapper {
         margin-left: 0;
+        width: 100%;
+    }
+
+    .dashboard-topbar {
+        padding: 0 1.5rem;
+        height: 66px;
     }
 
     .dashboard-content {
-        padding: 1.5rem;
+        padding: 2rem 1.5rem;
+    }
+
+    .metric-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    .metric-cards-grid > .metric-card:last-child {
+        grid-column: span 2;
+    }
+}
+
+/* Mobile Devices (< 768px) */
+@media (max-width: 767.98px) {
+    .dashboard-sidebar {
+        width: 280px;
+        max-width: 82vw;
+    }
+
+    .dashboard-topbar {
+        padding: 0 1rem;
+        height: 60px;
+    }
+
+    .dashboard-content {
+        padding: 1.25rem 1rem;
+    }
+
+    .dashboard-heading-area {
+        margin-bottom: 1.5rem;
+    }
+
+    .dashboard-title {
+        font-size: 1.45rem;
+    }
+
+    .dashboard-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .metric-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .metric-cards-grid > .metric-card:last-child {
+        grid-column: span 1;
+    }
+
+    .metric-card {
+        padding: 1.25rem 1rem;
+        gap: 1rem;
+        border-radius: 14px;
+    }
+
+    .metric-icon-box {
+        width: 46px;
+        height: 46px;
+        font-size: 1.25rem;
+        border-radius: 12px;
+    }
+
+    .metric-icon-box.icon-green {
+        font-size: 1.45rem;
+    }
+
+    .metric-value {
+        font-size: 1.65rem;
+    }
+
+    .metric-label {
+        font-size: 0.8rem;
+    }
+
+    .user-avatar-circle {
+        width: 38px;
+        height: 38px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Extra Small Phones (< 400px) */
+@media (max-width: 399.98px) {
+    .brand-text-mobile {
+        font-size: 1rem !important;
+    }
+
+    .metric-card {
+        padding: 1rem;
     }
 }

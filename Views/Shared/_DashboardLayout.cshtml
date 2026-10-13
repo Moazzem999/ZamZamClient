@@ -37,12 +37,15 @@
 
     <!-- Left Navigation Sidebar -->
     <aside class="dashboard-sidebar" id="dashboardSidebar">
-        <!-- Brand Title -->
-        <a asp-controller="Dashboard" asp-action="Index" class="sidebar-brand">
-            <h4 class="brand-title">
-                <span class="text-primary-blue">ZamZam</span> <span class="text-white-heading">Trims</span>
-            </h4>
-        </a>
+        <!-- Sidebar Top Header with Brand and Mobile Close Button -->
+        <div class="sidebar-header d-flex justify-content-between align-items-center mb-4 px-2">
+            <a asp-controller="Dashboard" asp-action="Index" class="sidebar-brand text-decoration-none p-0 m-0">
+                <h4 class="brand-title m-0">
+                    <span class="text-primary-blue">ZamZam</span> <span class="text-white-heading">Trims</span>
+                </h4>
+            </a>
+            <button type="button" class="btn-close btn-close-white d-lg-none p-2" id="sidebarCloseBtn" aria-label="Close menu"></button>
+        </div>
 
         <!-- Menu Navigation Items -->
         <ul class="sidebar-menu">
@@ -67,10 +70,24 @@
         </ul>
     </aside>
 
+    <!-- Mobile Sidebar Dark Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
     <!-- Main Content Area Wrapper -->
     <div class="dashboard-main-wrapper">
         <!-- Top Sticky Header Navigation -->
         <header class="dashboard-topbar">
+            <!-- Mobile Toggle & Brand Indicator -->
+            <div class="topbar-left-controls d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-light border d-lg-none sidebar-toggle-btn shadow-sm" id="sidebarToggleBtn" aria-label="Toggle menu" title="Toggle menu">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="d-lg-none fw-bold fs-5 brand-text-mobile ms-1">
+                    <span class="text-primary-blue">ZamZam</span> <span class="text-dark">Trims</span>
+                </div>
+            </div>
+
+            <!-- Topbar Right Actions -->
             <div class="topbar-actions">
                 <!-- User Profile Avatar & Dropdown -->
                 <div class="dropdown">
@@ -181,7 +198,47 @@
 
         // Run immediately and on DOMContentLoaded
         populateUserProfile();
-        document.addEventListener('DOMContentLoaded', populateUserProfile);
+        document.addEventListener('DOMContentLoaded', function () {
+            populateUserProfile();
+
+            // Mobile Sidebar Interactions
+            const sidebar = document.getElementById('dashboardSidebar');
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            const closeBtn = document.getElementById('sidebarCloseBtn');
+            const backdrop = document.getElementById('sidebarBackdrop');
+
+            function openSidebar() {
+                if (sidebar) sidebar.classList.add('show');
+                if (backdrop) backdrop.classList.add('show');
+                document.body.classList.add('sidebar-open');
+            }
+
+            function closeSidebar() {
+                if (sidebar) sidebar.classList.remove('show');
+                if (backdrop) backdrop.classList.remove('show');
+                document.body.classList.remove('sidebar-open');
+            }
+
+            if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
+            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+            if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+            // Close on Escape key press
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeSidebar();
+            });
+
+            // Auto-close on menu link click on mobile
+            if (sidebar) {
+                sidebar.querySelectorAll('.menu-link').forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        if (window.innerWidth < 992) {
+                            closeSidebar();
+                        }
+                    });
+                });
+            }
+        });
 
         // Sign Out Handler
         function logoutDashboard() {
