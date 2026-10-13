@@ -159,26 +159,19 @@
                     <img id="modalPreviewImage" src="" alt="Brand Image Preview" class="brand-modal-preview-img" />
                 </div>
 
-                <!-- Metadata Grid -->
-                <div class="brand-meta-grid">
-                    <div style="grid-column: span 2;">
-                        <div class="brand-meta-label">Remarks / Description</div>
-                        <div class="brand-meta-val" id="modalImageRemarks">—</div>
-                    </div>
-
-                    <!-- Direct URL Box with One-Click Copy -->
-                    <div class="brand-url-copy-box">
-                        <div class="brand-url-copy-text" id="modalImageUrlText"></div>
-                        <button type="button" class="btn btn-sm btn-light border py-1 px-2 text-nowrap" id="modalCopyUrlBtn" title="Copy URL">
-                            <i class="bi bi-clipboard me-1"></i> Copy
-                        </button>
+                <!-- Clean Remarks Info Box (Only remarks displayed) -->
+                <div class="bg-white p-3 rounded-3 border d-flex align-items-center gap-2 shadow-sm" id="modalRemarksWrapper">
+                    <i class="bi bi-info-circle text-primary fs-5"></i>
+                    <div>
+                        <div class="text-muted small fw-medium" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">Remarks</div>
+                        <div class="fw-semibold text-dark small" id="modalImageRemarks">—</div>
                     </div>
                 </div>
             </div>
 
             <!-- Modal Footer -->
             <div class="modal-footer bg-white border-top py-2 px-3">
-                <a id="modalOpenNewTabBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm rounded-3">
+                <a id="modalOpenNewTabBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm rounded-3">
                     <i class="bi bi-box-arrow-up-right me-1"></i> Open in New Tab
                 </a>
                 <button type="button" class="btn btn-secondary btn-sm rounded-3 px-3" data-bs-dismiss="modal">Close</button>

@@ -50,9 +50,7 @@ $(function () {
     const $modalImg = $('#modalPreviewImage');
     const $modalTitle = $('#modalImageTitle');
     const $modalRemarks = $('#modalImageRemarks');
-    const $modalUrlText = $('#modalImageUrlText');
     const $modalOpenBtn = $('#modalOpenNewTabBtn');
-    const $modalCopyBtn = $('#modalCopyUrlBtn');
 
     // 2. Configuration & State
     const rawApiBaseUrl = $container.data('api-base-url') || 'https://localhost:7148';
@@ -354,28 +352,34 @@ $(function () {
         $tableBody.html(rowsHtml);
     }
 
-    // 6. Open Lightbox Preview Modal
+    // 6. Open Lightbox Preview Modal (Only Image & Remarks shown)
     window.openBrandImageModal = function (imageId) {
         const item = allBrandImages.find(x => x.id === imageId);
         if (!item || !imageModal) return;
 
+        // Force remove any legacy modal metadata fields if present from cached HTML
+        $('#brandImageDetailModal .brand-meta-grid').remove();
+        $('#brandImageDetailModal .brand-url-copy-box').remove();
+
         const fullImgUrl = getFullImageUrl(item.imagePath);
 
         $modalTitle.text(item.name || 'Brand Image Preview');
-        $modalRemarks.text(item.remarks || 'None');
+
+        const remarks = (item.remarks || '').trim();
+        if (remarks) {
+            $modalRemarks.text(remarks);
+            $('#modalRemarksWrapper').show();
+        } else {
+            $modalRemarks.text('—');
+            $('#modalRemarksWrapper').hide();
+        }
 
         if (fullImgUrl) {
             $modalImg.attr('src', fullImgUrl).attr('alt', item.name || 'Image Preview').show();
-            $modalUrlText.text(fullImgUrl);
             $modalOpenBtn.attr('href', fullImgUrl).show();
-            $modalCopyBtn.show().off('click').on('click', function () {
-                window.copyBrandImageUrl(fullImgUrl);
-            });
         } else {
             $modalImg.hide();
-            $modalUrlText.text('No URL specified');
             $modalOpenBtn.hide();
-            $modalCopyBtn.hide();
         }
 
         imageModal.show();
