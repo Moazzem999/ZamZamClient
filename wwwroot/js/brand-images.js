@@ -1,8 +1,9 @@
 /**
  * ZamZam Trims (BD) Limited - Brand Images Manager (brand-images.js)
  * -------------------------------------------------------------------
- * Fetches, searches, previews, and manages brand images from:
+ * Fetches, searches, previews, and deletes brand images from:
  * {ApiBaseUrl}/api/BrandImages/GetAll
+ * {ApiBaseUrl}/api/BrandImages/{id} (DELETE)
  */
 
 $(function () {
@@ -23,7 +24,7 @@ $(function () {
                 <th style="width: 90px;" class="text-center">Preview</th>
                 <th style="width: 28%;">Name / Title</th>
                 <th>Remarks</th>
-                <th style="width: 110px;" class="text-end">Actions</th>
+                <th style="width: 130px;" class="text-end">Actions</th>
             </tr>
         `);
     }
@@ -51,6 +52,14 @@ $(function () {
     const $modalTitle = $('#modalImageTitle');
     const $modalRemarks = $('#modalImageRemarks');
     const $modalOpenBtn = $('#modalOpenNewTabBtn');
+
+    // Delete Confirmation Modal Elements
+    const deleteModalEl = document.getElementById('deleteConfirmModal');
+    const deleteModal = deleteModalEl ? new bootstrap.Modal(deleteModalEl) : null;
+    const $deleteTargetName = $('#deleteTargetName');
+    const $btnConfirmDelete = $('#btnConfirmDelete');
+    const $btnConfirmDeleteText = $('#btnConfirmDeleteText');
+    let pendingDeleteId = null;
 
     // 2. Configuration & State
     const rawApiBaseUrl = $container.data('api-base-url') || 'https://localhost:7148';
@@ -111,34 +120,6 @@ $(function () {
         toastTimeout = setTimeout(function () {
             $toast.removeClass('show');
         }, 3000);
-    }
-
-    // Helper: Copy Text to Clipboard (modal copy button)
-    window.copyBrandImageUrl = function (url) {
-        if (!url) return;
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(url).then(function () {
-                showToast('Image URL copied to clipboard!', 'bi bi-clipboard-check-fill text-success');
-            }).catch(function () {
-                fallbackCopyText(url);
-            });
-        } else {
-            fallbackCopyText(url);
-        }
-    };
-
-    function fallbackCopyText(text) {
-        const tempInput = document.createElement('input');
-        tempInput.value = text;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        try {
-            document.execCommand('copy');
-            showToast('Image URL copied to clipboard!', 'bi bi-clipboard-check-fill text-success');
-        } catch (e) {
-            prompt('Copy image URL:', text);
-        }
-        document.body.removeChild(tempInput);
     }
 
     // Helper: Image Error Fallback Handler
@@ -273,7 +254,7 @@ $(function () {
         renderTableRows(currentFilteredImages);
     }
 
-    // 5. Render Exactly 5 Balanced Columns
+    // 5. Render Exactly 5 Balanced Columns with Delete Action
     function renderTableRows(items) {
         const rowsHtml = items.map((item, index) => {
             const id = item.id ?? (index + 1);
@@ -324,9 +305,10 @@ $(function () {
                         <span class="text-secondary ${remarks === '—' ? 'opacity-50' : ''}">${remarks}</span>
                     </td>
 
-                    <!-- 5. Actions Column (Preview Modal & Open in New Tab) -->
+                    <!-- 5. Actions Column (Preview Modal, Open in New Tab, Delete) -->
                     <td class="dash-actions-cell text-end">
                         <div class="dash-action-btn-group">
+                            <!-- Preview Modal -->
                             <button type="button" 
                                     class="dash-action-btn btn-view" 
                                     onclick="window.openBrandImageModal(${id})" 
@@ -334,6 +316,7 @@ $(function () {
                                 <i class="bi bi-eye"></i>
                             </button>
 
+                            <!-- Open in New Tab -->
                             ${fullImgUrl ? `
                                 <a href="${escapeHtml(fullImgUrl)}" 
                                    target="_blank" 
@@ -343,6 +326,14 @@ $(function () {
                                     <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
                             ` : ''}
+
+                            <!-- Delete Action Button -->
+                            <button type="button" 
+                                    class="dash-action-btn btn-delete text-danger" 
+                                    onclick="window.confirmDeleteBrandImage(${id})" 
+                                    title="Delete brand image">
+                                <i class="bi bi-trash3"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -385,7 +376,73 @@ $(function () {
         imageModal.show();
     };
 
-    // 7. Event Listeners
+    // 7. Delete Brand Image Confirmation & API Call
+    window.confirmDeleteBrandImage = function (id) {
+        const item = allBrandImages.find(x => x.id === id);
+        pendingDeleteId = id;
+        const name = item ? item.name : `#${id}`;
+
+        $deleteTargetName.text(`"${name}"`);
+
+        if (deleteModal) {
+            deleteModal.show();
+        } else if (confirm(`Are you sure you want to delete "${name}"?`)) {
+            executeDeleteBrandImage(id);
+        }
+    };
+
+    $btnConfirmDelete.on('click', function () {
+        if (!pendingDeleteId) return;
+        executeDeleteBrandImage(pendingDeleteId);
+    });
+
+    function executeDeleteBrandImage(id) {
+        const token = getAuthToken();
+        const ajaxHeaders = {
+            'Accept': 'application/json'
+        };
+        if (token) {
+            ajaxHeaders['Authorization'] = `Bearer ${token}`;
+        }
+
+        $btnConfirmDelete.prop('disabled', true);
+        $btnConfirmDeleteText.text('Deleting...');
+
+        const deleteApiUrl = `${apiBaseUrl}/api/BrandImages/${id}`;
+        console.log(`[BrandImages] Sending DELETE to: ${deleteApiUrl}`);
+
+        $.ajax({
+            url: deleteApiUrl,
+            type: 'DELETE',
+            headers: ajaxHeaders,
+            success: function (res) {
+                console.log('[BrandImages] Delete response:', res);
+                if (deleteModal) deleteModal.hide();
+
+                // Remove item from local array
+                allBrandImages = allBrandImages.filter(x => x.id !== id);
+                applyFilterAndRender();
+                showToast('Brand image deleted successfully!', 'bi bi-trash3-fill text-danger');
+            },
+            error: function (xhr, status, error) {
+                console.error('[BrandImages] Delete error:', xhr, status, error);
+                let msg = 'Failed to delete brand image. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                } else if (xhr.statusText && xhr.statusText !== 'error') {
+                    msg = `Error (${xhr.status}): ${xhr.statusText}`;
+                }
+                showToast(msg, 'bi bi-exclamation-triangle-fill text-warning');
+            },
+            complete: function () {
+                $btnConfirmDelete.prop('disabled', false);
+                $btnConfirmDeleteText.text('Yes, Delete');
+                pendingDeleteId = null;
+            }
+        });
+    }
+
+    // 8. Event Listeners
     // Refresh button
     $refreshBtn.on('click', function () {
         fetchBrandImages();

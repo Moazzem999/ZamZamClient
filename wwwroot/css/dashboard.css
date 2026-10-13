@@ -935,6 +935,17 @@ body.dashboard-body.sidebar-open {
     border-color: #bfdbfe;
 }
 
+.dash-action-btn.btn-delete {
+    color: #ef4444;
+}
+
+.dash-action-btn.btn-delete:hover {
+    color: #dc2626;
+    background-color: #fef2f2;
+    border-color: #fecaca;
+    transform: translateY(-1px);
+}
+
 /* Card Footer */
 .dash-card-footer {
     padding: 1.1rem 1.75rem;
