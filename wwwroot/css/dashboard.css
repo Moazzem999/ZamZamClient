@@ -1637,6 +1637,105 @@ body.dashboard-body.sidebar-open {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+/* About Us Detail Modal Responsive Enhancements */
+#aboutUsDetailModal {
+    z-index: 1060;
+}
+
+#aboutUsDetailModal .modal-footer {
+    position: relative;
+    z-index: 1065;
+}
+
+#btnCloseAboutUsDetails {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+}
+
+@media (max-width: 767.98px) {
+    #aboutUsDetailModal {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    #aboutUsDetailModal .modal-dialog {
+        margin: 0.5rem auto;
+        max-width: calc(100% - 1rem);
+        height: calc(100% - 1rem);
+        max-height: calc(100% - 1rem);
+        display: flex;
+        flex-direction: column;
+    }
+
+    #aboutUsDetailModal .modal-content {
+        max-height: 100%;
+        display: flex;
+        flex-direction: column;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    #aboutUsDetailModal .modal-header {
+        flex-shrink: 0;
+        padding: 0.85rem 1rem;
+    }
+
+    #aboutUsDetailModal .modal-header .modal-title {
+        font-size: 1rem;
+    }
+
+    #aboutUsDetailModal .modal-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 1rem !important;
+    }
+
+    #aboutUsDetailModal .modal-footer {
+        flex-shrink: 0;
+        padding: 0.75rem 1rem;
+        background-color: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        position: sticky;
+        bottom: 0;
+        z-index: 1070;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    #aboutUsDetailModal #btnCloseAboutUsDetails {
+        width: 100%;
+        padding: 0.65rem 1.25rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Character Counter & Form Validation Styling */
+.char-counter {
+    font-size: 0.72rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.input-group.is-invalid .form-control,
+.input-group.is-invalid .input-group-text {
+    border-color: #dc3545 !important;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.is-invalid:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+}
+
 
 
 

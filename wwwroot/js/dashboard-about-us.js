@@ -38,11 +38,14 @@ $(function () {
                         <div class="modal-body px-4 py-3" style="max-height: 70vh; overflow-y: auto;">
                             <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="createModalAlert" role="alert"></div>
 
-                            <!-- 1. Section Tagline / Label (Bigger & Full-Width) -->
+                            <!-- 1. Section Tagline / Label (Max 50 chars) -->
                             <div class="mb-3">
-                                <label for="createSectionLabel" class="form-label small fw-bold text-dark mb-1">
-                                    Section Tagline / Label <span class="text-danger">*</span></span>
-                                </label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="createSectionLabel" class="form-label small fw-bold text-dark mb-0">
+                                        Section Tagline / Label
+                                    </label>
+                                    <span class="char-counter text-muted" id="createSectionLabelCount">0/50</span>
+                                </div>
                                 <div class="input-group input-group-lg shadow-none">
                                     <span class="input-group-text bg-light border-end-0 text-muted px-3">
                                         <i class="bi bi-tag fs-5"></i>
@@ -50,15 +53,20 @@ $(function () {
                                     <input type="text" 
                                            class="form-control bg-light border-start-0 rounded-end-3 fs-6 py-2" 
                                            id="createSectionLabel" 
+                                           maxlength="50"
                                            placeholder="e.g. Our Story &amp; Heritage" />
                                 </div>
+                                <div class="invalid-feedback d-none" id="createLabelFeedback">Section label cannot exceed 50 characters.</div>
                             </div>
 
-                            <!-- 2. Main Heading -->
+                            <!-- 2. Main Heading (Required, Max 100 chars) -->
                             <div class="mb-3">
-                                <label for="createMainHeading" class="form-label small fw-bold text-dark mb-1">
-                                    Main Heading <span class="text-danger">*</span>
-                                </label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="createMainHeading" class="form-label small fw-bold text-dark mb-0">
+                                        Main Heading <span class="text-danger">*</span>
+                                    </label>
+                                    <span class="char-counter text-muted" id="createMainHeadingCount">0/100</span>
+                                </div>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0 text-muted">
                                         <i class="bi bi-type-h1"></i>
@@ -66,53 +74,71 @@ $(function () {
                                     <input type="text" 
                                            class="form-control bg-light border-start-0 rounded-end-3" 
                                            id="createMainHeading" 
+                                           maxlength="100"
                                            placeholder="e.g. Built on Trust &amp; Precision Engineering" 
                                            required />
                                 </div>
-                                <div class="invalid-feedback d-none" id="createHeadingFeedback">Please enter a main heading.</div>
+                                <div class="invalid-feedback d-none" id="createHeadingFeedback">Please enter a main heading (maximum 100 characters).</div>
                             </div>
 
-                            <!-- 3. Introduction Narrative -->
+                            <!-- 3. Introduction Narrative (Required, Max 500 chars) -->
                             <div class="mb-3">
-                                <label for="createIntroduction" class="form-label small fw-bold text-dark mb-1 d-flex justify-content-between">
-                                    <span>Introduction &amp; Company Inception
-                                </label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="createIntroduction" class="form-label small fw-bold text-dark mb-0">
+                                        Introduction &amp; Company Inception <span class="text-danger">*</span>
+                                    </label>
+                                    <span class="char-counter text-muted" id="createIntroCount">0/500</span>
+                                </div>
                                 <textarea class="form-control bg-light rounded-3" 
                                           id="createIntroduction" 
                                           rows="3" 
+                                          maxlength="500"
                                           placeholder="Enter introduction narrative..." 
                                           required></textarea>
-                                <div class="invalid-feedback d-none" id="createIntroFeedback">Please enter an introduction narrative.</div>
+                                <div class="invalid-feedback d-none" id="createIntroFeedback">Please enter an introduction narrative (maximum 500 characters).</div>
                             </div>
 
-                            <!-- 4. Experience & Production Side-by-Side -->
+                            <!-- 4. Experience & Production Side-by-Side (Max 500 chars each) -->
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6">
-                                    <label for="createExperienceDescription" class="form-label small fw-bold text-dark mb-1">
-                                        Industry Experience Description
-                                    </label>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="createExperienceDescription" class="form-label small fw-bold text-dark mb-0">
+                                            Industry Experience Description
+                                        </label>
+                                        <span class="char-counter text-muted" id="createExpCount">0/500</span>
+                                    </div>
                                     <textarea class="form-control bg-light rounded-3" 
                                               id="createExperienceDescription" 
                                               rows="3" 
+                                              maxlength="500"
                                               placeholder="Enter industry experience details..."></textarea>
+                                    <div class="invalid-feedback d-none" id="createExpFeedback">Experience description cannot exceed 500 characters.</div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="createProductionDescription" class="form-label small fw-bold text-dark mb-1">
-                                        Production &amp; Machinery Description
-                                    </label>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="createProductionDescription" class="form-label small fw-bold text-dark mb-0">
+                                            Production &amp; Machinery Description
+                                        </label>
+                                        <span class="char-counter text-muted" id="createProdCount">0/500</span>
+                                    </div>
                                     <textarea class="form-control bg-light rounded-3" 
                                               id="createProductionDescription" 
                                               rows="3" 
+                                              maxlength="500"
                                               placeholder="Enter production and machinery details..."></textarea>
+                                    <div class="invalid-feedback d-none" id="createProdFeedback">Production description cannot exceed 500 characters.</div>
                                 </div>
                             </div>
 
-                            <!-- 5. Capability Section Title (Bigger & Full-Width) -->
+                            <!-- 5. Capability Section Title (Max 50 chars) -->
                             <div class="mb-3">
-                                <label for="createCapabilityTitle" class="form-label small fw-bold text-dark mb-1">
-                                    Capability Section Title
-                                </label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="createCapabilityTitle" class="form-label small fw-bold text-dark mb-0">
+                                        Capability Section Title
+                                    </label>
+                                    <span class="char-counter text-muted" id="createCapTitleCount">0/50</span>
+                                </div>
                                 <div class="input-group input-group-lg shadow-none">
                                     <span class="input-group-text bg-light border-end-0 text-muted px-3">
                                         <i class="bi bi-layers fs-5"></i>
@@ -120,19 +146,26 @@ $(function () {
                                     <input type="text" 
                                            class="form-control bg-light border-start-0 rounded-end-3 fs-6 py-2" 
                                            id="createCapabilityTitle" 
+                                           maxlength="50"
                                            placeholder="e.g. Comprehensive Product Capabilities" />
                                 </div>
+                                <div class="invalid-feedback d-none" id="createCapTitleFeedback">Capability title cannot exceed 50 characters.</div>
                             </div>
 
-                            <!-- 6. Capability Lines / Products -->
+                            <!-- 6. Capability Lines / Products (Max 250 chars) -->
                             <div class="mb-2">
-                                <label for="createCapabilityDescription" class="form-label small fw-bold text-dark mb-1">
-                                    Capability Lines / Products
-                                </label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="createCapabilityDescription" class="form-label small fw-bold text-dark mb-0">
+                                        Capability Lines / Products
+                                    </label>
+                                    <span class="char-counter text-muted" id="createCapDescCount">0/250</span>
+                                </div>
                                 <textarea class="form-control bg-light rounded-3" 
                                           id="createCapabilityDescription" 
                                           rows="2" 
+                                          maxlength="250"
                                           placeholder="Enter product lines or capabilities..."></textarea>
+                                <div class="invalid-feedback d-none" id="createCapDescFeedback">Capability description cannot exceed 250 characters.</div>
                             </div>
                         </div>
 
@@ -212,12 +245,20 @@ $(function () {
 
     // Ensure modern modals live directly under document.body (prevents container clipping or backdrop issues)
     function ensureModalsInDom() {
+        // Move #aboutUsDetailModal to document.body to prevent backdrop overlap or container clipping on mobile
+        const detailEl = document.getElementById('aboutUsDetailModal');
+        if (detailEl && detailEl.parentElement !== document.body) {
+            document.body.appendChild(detailEl);
+        }
+
         let createEl = document.getElementById('createAboutUsModal');
         if (!createEl) {
             $('body').append(modernCreateModalHtml);
+            initCharacterCounters();
         } else if (!$(createEl).find('#createAboutUsForm').length) {
             $(createEl).remove();
             $('body').append(modernCreateModalHtml);
+            initCharacterCounters();
         }
 
         let delEl = document.getElementById('deleteConfirmAboutUsModal');
@@ -295,15 +336,68 @@ $(function () {
             .replace(/'/g, '&#039;');
     }
 
+    // Helper: Character Counter Updater
+    function updateFieldCounter(inputSelector, counterSelector, maxChars) {
+        const $input = $(inputSelector);
+        const $counter = $(counterSelector);
+        if (!$input.length || !$counter.length) return;
+
+        const val = $input.val() || '';
+        const len = val.length;
+        $counter.text(`${len}/${maxChars}`);
+
+        if (len > maxChars) {
+            $counter.addClass('text-danger fw-bold').removeClass('text-muted text-warning fw-semibold');
+        } else if (len >= maxChars * 0.9) {
+            $counter.addClass('text-warning fw-semibold').removeClass('text-muted text-danger fw-bold');
+        } else {
+            $counter.addClass('text-muted').removeClass('text-warning text-danger fw-semibold fw-bold');
+        }
+    }
+
+    // Helper: Initialize real-time character counters & clear errors on typing
+    function initCharacterCounters() {
+        const fields = [
+            { input: '#createSectionLabel', counter: '#createSectionLabelCount', max: 50 },
+            { input: '#createMainHeading', counter: '#createMainHeadingCount', max: 100 },
+            { input: '#createIntroduction', counter: '#createIntroCount', max: 500 },
+            { input: '#createExperienceDescription', counter: '#createExpCount', max: 500 },
+            { input: '#createProductionDescription', counter: '#createProdCount', max: 500 },
+            { input: '#createCapabilityTitle', counter: '#createCapTitleCount', max: 50 },
+            { input: '#createCapabilityDescription', counter: '#createCapDescCount', max: 250 }
+        ];
+
+        fields.forEach(function (f) {
+            $(document).off('input', f.input).on('input', f.input, function () {
+                updateFieldCounter(f.input, f.counter, f.max);
+                const currentVal = $(this).val() || '';
+                if (currentVal.length <= f.max) {
+                    $(this).removeClass('is-invalid');
+                    $(this).closest('.mb-3, .col-md-6, .mb-2').find('.invalid-feedback').addClass('d-none');
+                }
+            });
+            updateFieldCounter(f.input, f.counter, f.max);
+        });
+    }
+
     // Helper: Reset Create Form
     function resetCreateForm() {
         const form = document.getElementById('createAboutUsForm');
         if (form) form.reset();
-        $('#createModalAlert').addClass('d-none').text('');
-        $('#createHeadingFeedback').addClass('d-none');
-        $('#createIntroFeedback').addClass('d-none');
+        $('#createModalAlert').addClass('d-none').html('');
+        $('#createAboutUsModal .invalid-feedback').addClass('d-none').text('');
+        $('#createAboutUsModal .is-invalid').removeClass('is-invalid');
         $('#btnSubmitCreateAboutUs').prop('disabled', false);
         $('#btnSubmitCreateAboutUsText').text('Save & Create');
+
+        // Reset all counters back to 0
+        updateFieldCounter('#createSectionLabel', '#createSectionLabelCount', 50);
+        updateFieldCounter('#createMainHeading', '#createMainHeadingCount', 100);
+        updateFieldCounter('#createIntroduction', '#createIntroCount', 500);
+        updateFieldCounter('#createExperienceDescription', '#createExpCount', 500);
+        updateFieldCounter('#createProductionDescription', '#createProdCount', 500);
+        updateFieldCounter('#createCapabilityTitle', '#createCapTitleCount', 50);
+        updateFieldCounter('#createCapabilityDescription', '#createCapDescCount', 250);
     }
 
     // 5. Fetch Data from API
@@ -525,6 +619,8 @@ $(function () {
 
     // 9. View Details Modal
     window.openAboutUsModal = function (id) {
+        ensureModalsInDom();
+
         const item = allAboutUsRecords.find(r => String(r.id || r.Id) === String(id));
         if (!item) return;
 
@@ -573,7 +669,7 @@ $(function () {
         }
     });
 
-    // 11. Submit Create Form & API Call
+    // 11. Submit Create Form & API Call with Character Length Validations
     $(document).on('submit', '#createAboutUsForm', function (e) {
         e.preventDefault();
 
@@ -582,25 +678,99 @@ $(function () {
         const introduction = ($('#createIntroduction').val() || '').trim();
         const experienceDescription = ($('#createExperienceDescription').val() || '').trim();
         const productionDescription = ($('#createProductionDescription').val() || '').trim();
-        const capabilityTitle = ($('#createCapabilityTitle').val() || '').trim() || 'Comprehensive Product Capabilities:';
+        const capabilityTitle = ($('#createCapabilityTitle').val() || '').trim();
         const capabilityDescription = ($('#createCapabilityDescription').val() || '').trim();
 
         let isValid = true;
+        const errorList = [];
+
+        // Reset previous validation visual states
+        $('#createAboutUsModal .invalid-feedback').addClass('d-none').text('');
+        $('#createAboutUsModal .is-invalid').removeClass('is-invalid');
+        $('#createModalAlert').addClass('d-none').html('');
+
+        // 1. Section label cannot exceed 50 characters
+        if (sectionLabel.length > 50) {
+            $('#createLabelFeedback').text(`Section label cannot exceed 50 characters. (Current: ${sectionLabel.length})`).removeClass('d-none');
+            $('#createSectionLabel').addClass('is-invalid');
+            errorList.push('Section label cannot exceed 50 characters.');
+            isValid = false;
+        }
+
+        // 2. Main heading cannot exceed 100 characters (also required)
         if (!mainHeading) {
-            $('#createHeadingFeedback').removeClass('d-none');
+            $('#createHeadingFeedback').text('Please enter a main heading.').removeClass('d-none');
+            $('#createMainHeading').addClass('is-invalid');
+            errorList.push('Main heading is required.');
             isValid = false;
-        } else {
-            $('#createHeadingFeedback').addClass('d-none');
+        } else if (mainHeading.length > 100) {
+            $('#createHeadingFeedback').text(`Main heading cannot exceed 100 characters. (Current: ${mainHeading.length})`).removeClass('d-none');
+            $('#createMainHeading').addClass('is-invalid');
+            errorList.push('Main heading cannot exceed 100 characters.');
+            isValid = false;
         }
 
+        // 3. Introduction cannot exceed 500 characters (also required)
         if (!introduction) {
-            $('#createIntroFeedback').removeClass('d-none');
+            $('#createIntroFeedback').text('Please enter an introduction narrative.').removeClass('d-none');
+            $('#createIntroduction').addClass('is-invalid');
+            errorList.push('Introduction narrative is required.');
             isValid = false;
-        } else {
-            $('#createIntroFeedback').addClass('d-none');
+        } else if (introduction.length > 500) {
+            $('#createIntroFeedback').text(`Introduction cannot exceed 500 characters. (Current: ${introduction.length})`).removeClass('d-none');
+            $('#createIntroduction').addClass('is-invalid');
+            errorList.push('Introduction cannot exceed 500 characters.');
+            isValid = false;
         }
 
-        if (!isValid) return;
+        // 4. Experience description cannot exceed 500 characters
+        if (experienceDescription.length > 500) {
+            $('#createExpFeedback').text(`Experience description cannot exceed 500 characters. (Current: ${experienceDescription.length})`).removeClass('d-none');
+            $('#createExperienceDescription').addClass('is-invalid');
+            errorList.push('Experience description cannot exceed 500 characters.');
+            isValid = false;
+        }
+
+        // 5. Production description cannot exceed 500 characters
+        if (productionDescription.length > 500) {
+            $('#createProdFeedback').text(`Production description cannot exceed 500 characters. (Current: ${productionDescription.length})`).removeClass('d-none');
+            $('#createProductionDescription').addClass('is-invalid');
+            errorList.push('Production description cannot exceed 500 characters.');
+            isValid = false;
+        }
+
+        // 6. Capability title cannot exceed 50 characters
+        if (capabilityTitle.length > 50) {
+            $('#createCapTitleFeedback').text(`Capability title cannot exceed 50 characters. (Current: ${capabilityTitle.length})`).removeClass('d-none');
+            $('#createCapabilityTitle').addClass('is-invalid');
+            errorList.push('Capability title cannot exceed 50 characters.');
+            isValid = false;
+        }
+
+        // 7. Capability description cannot exceed 250 characters
+        if (capabilityDescription.length > 250) {
+            $('#createCapDescFeedback').text(`Capability description cannot exceed 250 characters. (Current: ${capabilityDescription.length})`).removeClass('d-none');
+            $('#createCapabilityDescription').addClass('is-invalid');
+            errorList.push('Capability description cannot exceed 250 characters.');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            const errorHtml = `
+                <div class="d-flex align-items-start gap-2">
+                    <i class="bi bi-exclamation-octagon-fill fs-5 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <div class="fw-bold mb-1">Please fix the following validation errors:</div>
+                        <ul class="mb-0 ps-3">
+                            ${errorList.map(err => `<li>${escapeHtml(err)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            $('#createModalAlert').removeClass('d-none').html(errorHtml);
+            $('#createAboutUsModal .modal-body').animate({ scrollTop: 0 }, 250);
+            return;
+        }
 
         // Build Payload matching the sample API specification
         const payload = {
@@ -610,7 +780,7 @@ $(function () {
             introduction: introduction,
             experienceDescription: experienceDescription,
             productionDescription: productionDescription,
-            capabilityTitle: capabilityTitle,
+            capabilityTitle: capabilityTitle || 'Comprehensive Product Capabilities:',
             capabilityDescription: capabilityDescription
         };
 
@@ -788,6 +958,26 @@ $(function () {
         }
     });
 
+    // Explicit close handlers for About Us Detail modal (ensures 100% reliability on responsive & mobile touch screens)
+    $(document).on('click', '#aboutUsDetailModal [data-bs-dismiss="modal"], #btnCloseAboutUsDetails, #btnCloseAboutUsDetailsHeader', function (e) {
+        e.preventDefault();
+        const modalEl = document.getElementById('aboutUsDetailModal');
+        if (modalEl) {
+            const inst = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
+            if (inst) inst.hide();
+        }
+    });
+
+    $(document).on('touchend', '#btnCloseAboutUsDetails, #btnCloseAboutUsDetailsHeader', function (e) {
+        e.preventDefault();
+        const modalEl = document.getElementById('aboutUsDetailModal');
+        if (modalEl) {
+            const inst = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
+            if (inst) inst.hide();
+        }
+    });
+
     // Initial Load
     fetchAboutUsData();
 });
+
