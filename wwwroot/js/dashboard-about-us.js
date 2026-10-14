@@ -38,42 +38,41 @@ $(function () {
                         <div class="modal-body px-4 py-3" style="max-height: 70vh; overflow-y: auto;">
                             <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="createModalAlert" role="alert"></div>
 
-                            <!-- 1. Section Label & Main Heading -->
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-5">
-                                    <label for="createSectionLabel" class="form-label small fw-bold text-dark mb-1">
-                                        Section Tagline / Label
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0 text-muted">
-                                            <i class="bi bi-tag"></i>
-                                        </span>
-                                        <input type="text" 
-                                               class="form-control bg-light border-start-0 rounded-end-3" 
-                                               id="createSectionLabel" 
-                                               placeholder="e.g. Our Story &amp; Heritage" />
-                                    </div>
-                                </div>
-
-                                <div class="col-md-7">
-                                    <label for="createMainHeading" class="form-label small fw-bold text-dark mb-1">
-                                        Main Heading <span class="text-danger">*</span>
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0 text-muted">
-                                            <i class="bi bi-type-h1"></i>
-                                        </span>
-                                        <input type="text" 
-                                               class="form-control bg-light border-start-0 rounded-end-3" 
-                                               id="createMainHeading" 
-                                               placeholder="e.g. Built on Trust &amp; Precision Engineering" 
-                                               required />
-                                    </div>
-                                    <div class="invalid-feedback d-none" id="createHeadingFeedback">Please enter a main heading.</div>
+                            <!-- 1. Section Tagline / Label (Bigger & Full-Width) -->
+                            <div class="mb-3">
+                                <label for="createSectionLabel" class="form-label small fw-bold text-dark mb-1">
+                                    Section Tagline / Label
+                                </label>
+                                <div class="input-group input-group-lg shadow-none">
+                                    <span class="input-group-text bg-light border-end-0 text-muted px-3">
+                                        <i class="bi bi-tag fs-5"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control bg-light border-start-0 rounded-end-3 fs-6 py-2" 
+                                           id="createSectionLabel" 
+                                           placeholder="e.g. Our Story &amp; Heritage" />
                                 </div>
                             </div>
 
-                            <!-- 2. Introduction Narrative -->
+                            <!-- 2. Main Heading -->
+                            <div class="mb-3">
+                                <label for="createMainHeading" class="form-label small fw-bold text-dark mb-1">
+                                    Main Heading <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-type-h1"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control bg-light border-start-0 rounded-end-3" 
+                                           id="createMainHeading" 
+                                           placeholder="e.g. Built on Trust &amp; Precision Engineering" 
+                                           required />
+                                </div>
+                                <div class="invalid-feedback d-none" id="createHeadingFeedback">Please enter a main heading.</div>
+                            </div>
+
+                            <!-- 3. Introduction Narrative -->
                             <div class="mb-3">
                                 <label for="createIntroduction" class="form-label small fw-bold text-dark mb-1 d-flex justify-content-between">
                                     <span>Introduction &amp; Company Inception <span class="text-danger">*</span></span>
@@ -86,7 +85,7 @@ $(function () {
                                 <div class="invalid-feedback d-none" id="createIntroFeedback">Please enter an introduction narrative.</div>
                             </div>
 
-                            <!-- 3. Experience & Production Side-by-Side -->
+                            <!-- 4. Experience & Production Side-by-Side -->
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6">
                                     <label for="createExperienceDescription" class="form-label small fw-bold text-dark mb-1">
@@ -109,32 +108,31 @@ $(function () {
                                 </div>
                             </div>
 
-                            <!-- 4. Product Capabilities -->
-                            <div class="row g-3 mb-2">
-                                <div class="col-md-5">
-                                    <label for="createCapabilityTitle" class="form-label small fw-bold text-dark mb-1">
-                                        Capability Section Title
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0 text-muted">
-                                            <i class="bi bi-layers"></i>
-                                        </span>
-                                        <input type="text" 
-                                               class="form-control bg-light border-start-0 rounded-end-3" 
-                                               id="createCapabilityTitle" 
-                                               placeholder="e.g. Comprehensive Product Capabilities" />
-                                    </div>
+                            <!-- 5. Capability Section Title (Bigger & Full-Width) -->
+                            <div class="mb-3">
+                                <label for="createCapabilityTitle" class="form-label small fw-bold text-dark mb-1">
+                                    Capability Section Title
+                                </label>
+                                <div class="input-group input-group-lg shadow-none">
+                                    <span class="input-group-text bg-light border-end-0 text-muted px-3">
+                                        <i class="bi bi-layers fs-5"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control bg-light border-start-0 rounded-end-3 fs-6 py-2" 
+                                           id="createCapabilityTitle" 
+                                           placeholder="e.g. Comprehensive Product Capabilities" />
                                 </div>
+                            </div>
 
-                                <div class="col-md-7">
-                                    <label for="createCapabilityDescription" class="form-label small fw-bold text-dark mb-1">
-                                        Capability Lines / Products
-                                    </label>
-                                    <textarea class="form-control bg-light rounded-3" 
-                                              id="createCapabilityDescription" 
-                                              rows="2" 
-                                              placeholder="Enter product lines or capabilities..."></textarea>
-                                </div>
+                            <!-- 6. Capability Lines / Products -->
+                            <div class="mb-2">
+                                <label for="createCapabilityDescription" class="form-label small fw-bold text-dark mb-1">
+                                    Capability Lines / Products
+                                </label>
+                                <textarea class="form-control bg-light rounded-3" 
+                                          id="createCapabilityDescription" 
+                                          rows="2" 
+                                          placeholder="Enter product lines or capabilities..."></textarea>
                             </div>
                         </div>
 
