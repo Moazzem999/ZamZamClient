@@ -1,8 +1,9 @@
 /**
  * ZamZam Trims (BD) Limited - About Us Manager (dashboard-about-us.js)
  * -------------------------------------------------------------------
- * Fetches and displays About Us section data from:
+ * Fetches, previews, and deletes About Us section data from:
  * {ApiBaseUrl}/api/AboutUs/GetAll
+ * {ApiBaseUrl}/api/AboutUs/{id} (DELETE)
  */
 
 $(function () {
@@ -27,15 +28,13 @@ $(function () {
     const $refreshBtn = $('#btnRefreshAboutUs');
     const $retryBtn = $('#btnRetryAboutUs');
 
-    const $detailModal = $('#aboutUsDetailModal');
-    const detailModalInstance = $detailModal.length ? new bootstrap.Modal($detailModal[0]) : null;
-
     const $toast = $('#dashToast');
     const $toastMessage = $('#dashToastMessage');
 
     let allAboutUsRecords = [];
     let isFetching = false;
     let selectedRecordForModal = null;
+    let pendingDeleteId = null;
 
     // Helper: JWT Token extraction
     function getAuthToken() {
@@ -77,25 +76,6 @@ $(function () {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
-    }
-
-    // Helper: Date Formatting
-    function formatDate(dateStr) {
-        if (!dateStr) return '—';
-        try {
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return dateStr;
-            return date.toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-        } catch (e) {
-            return dateStr;
-        }
     }
 
     // 2. Fetch Data from API
@@ -287,13 +267,13 @@ $(function () {
                                     class="dash-action-btn btn-view btn-view-about" 
                                     data-id="${id}" 
                                     title="View complete details">
-                                <i class="bi bi-eye"></i>
+                                <i class="bi bi-eye" style="pointer-events: none;"></i>
                             </button>
                             <button type="button" 
-                                    class="dash-action-btn btn-copy btn-copy-about" 
+                                    class="dash-action-btn btn-delete btn-delete-about" 
                                     data-id="${id}" 
-                                    title="Copy heading text">
-                                <i class="bi bi-clipboard"></i>
+                                    title="Delete this record">
+                                <i class="bi bi-trash3" style="pointer-events: none;"></i>
                             </button>
                         </div>
                     </td>
@@ -317,7 +297,7 @@ $(function () {
 
     // 6. View Details Modal
     function openDetailModal(id) {
-        const item = allAboutUsRecords.find(r => (r.id || r.Id) == id);
+        const item = allAboutUsRecords.find(r => String(r.id || r.Id) === String(id));
         if (!item) return;
 
         selectedRecordForModal = item;
@@ -347,38 +327,145 @@ $(function () {
         $statusBadge.attr('class', `dash-status-badge ${isActive ? 'status-active' : 'status-inactive'}`);
         $statusBadge.html(`<span class="status-dot"></span><span>${isActive ? 'Active' : 'Inactive'}</span>`);
 
-        if (detailModalInstance) {
-            detailModalInstance.show();
+        const modalEl = document.getElementById('aboutUsDetailModal');
+        if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modalInstance.show();
         }
     }
 
-    // 7. Event Handlers
-    // Row click & View button click
-    $tableBody.on('click', '.btn-view-about', function (e) {
-        e.stopPropagation();
-        const id = $(this).data('id');
-        openDetailModal(id);
-    });
+    // 7. Delete Prompt & Execution
+    function promptDeleteAboutUs(id) {
+        pendingDeleteId = id;
+        const item = allAboutUsRecords.find(r => String(r.id || r.Id) === String(id)) || {};
 
-    $tableBody.on('click', 'tr.about-row-clickable', function (e) {
-        if ($(e.target).closest('.dash-action-btn').length) return;
-        const id = $(this).data('record-id');
+        const sectionLabel = item.sectionLabel || item.SectionLabel || '—';
+        const mainHeading = item.mainHeading || item.MainHeading || `Record #${id}`;
+        const intro = item.introduction || item.Introduction || '—';
+
+        $('#deleteTargetId').text(`#${id}`);
+        $('#deleteTargetLabel').text(sectionLabel);
+        $('#deleteTargetHeading').text(mainHeading);
+        $('#deleteTargetIntro').text(intro);
+
+        const modalEl = document.getElementById('deleteAboutUsModal');
+        if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+            try {
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modalInstance.show();
+                return;
+            } catch (err) {
+                console.warn('[AboutUs] Error opening modal with Bootstrap, falling back to confirm dialog:', err);
+            }
+        }
+
+        // Direct fallback if Bootstrap modal instance is not available
+        if (window.confirm(`Are you sure you want to permanently delete About Us record #${id}?`)) {
+            executeDeleteAboutUs(id);
+        }
+    }
+
+    function executeDeleteAboutUs(id) {
+        if (!id) return;
+
+        const token = getAuthToken();
+        const ajaxHeaders = {
+            'Accept': 'application/json'
+        };
+        if (token) {
+            ajaxHeaders['Authorization'] = `Bearer ${token}`;
+        }
+
+        const $btn = $('#btnConfirmDeleteAboutUs');
+        const $btnText = $('#btnConfirmDeleteText');
+        $btn.prop('disabled', true);
+        $btnText.text('Deleting...');
+
+        const deleteApiUrl = `${apiBaseUrl}/api/AboutUs/${id}`;
+        console.log(`[AboutUs] Executing DELETE to: ${deleteApiUrl}`);
+
+        $.ajax({
+            url: deleteApiUrl,
+            type: 'DELETE',
+            headers: ajaxHeaders,
+            success: function (res) {
+                console.log('[AboutUs] Delete API response:', res);
+
+                // Hide modal if open
+                const modalEl = document.getElementById('deleteAboutUsModal');
+                if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+                    try {
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) modalInstance.hide();
+                    } catch (e) {}
+                }
+
+                // Check for failure message in response
+                if (res && res.succeeded === false) {
+                    const msg = res.message || 'Server rejected delete operation.';
+                    showToast(msg, 'bi bi-exclamation-triangle-fill text-warning');
+                    return;
+                }
+
+                // Update state & re-render
+                allAboutUsRecords = allAboutUsRecords.filter(r => String(r.id || r.Id) !== String(id));
+                applyFilterAndRender();
+                showToast('About Us record deleted successfully!', 'bi bi-trash3-fill text-danger');
+            },
+            error: function (xhr, status, error) {
+                console.error('[AboutUs] Delete failed:', xhr, status, error);
+
+                let msg = 'Failed to delete About Us record. Please check server status.';
+                if (xhr.status === 401) {
+                    msg = 'Unauthorized. Please sign in again.';
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                } else if (xhr.statusText && xhr.statusText !== 'error') {
+                    msg = `Error (${xhr.status}): ${xhr.statusText}`;
+                }
+
+                showToast(msg, 'bi bi-exclamation-triangle-fill text-warning');
+            },
+            complete: function () {
+                $btn.prop('disabled', false);
+                $btnText.text('Delete Record');
+                pendingDeleteId = null;
+            }
+        });
+    }
+
+    // 8. Event Handlers (using document delegation to guarantee all dynamically rendered elements work)
+    // View details button click
+    $(document).on('click', '.btn-view-about', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const $btn = $(this).closest('.btn-view-about');
+        const id = $btn.attr('data-id') || $btn.data('id');
         if (id) openDetailModal(id);
     });
 
-    // Copy Heading button click
-    $tableBody.on('click', '.btn-copy-about', function (e) {
+    // Row click
+    $(document).on('click', 'tr.about-row-clickable', function (e) {
+        if ($(e.target).closest('.dash-action-btn').length) return;
+        const id = $(this).attr('data-record-id') || $(this).data('record-id');
+        if (id) openDetailModal(id);
+    });
+
+    // Row Delete button click
+    $(document).on('click', '.btn-delete-about', function (e) {
+        e.preventDefault();
         e.stopPropagation();
-        const id = $(this).data('id');
-        const item = allAboutUsRecords.find(r => (r.id || r.Id) == id);
-        if (item) {
-            const textToCopy = item.mainHeading || item.MainHeading || '';
-            navigator.clipboard.writeText(textToCopy).then(function () {
-                showToast('Main heading copied to clipboard!');
-            }).catch(function () {
-                showToast('Failed to copy to clipboard', 'bi bi-x-circle-fill text-danger');
-            });
-        }
+        const $btn = $(this).closest('.btn-delete-about');
+        const id = $btn.attr('data-id') || $btn.data('id');
+        console.log('[AboutUs] Delete clicked for ID:', id);
+        if (id) promptDeleteAboutUs(id);
+    });
+
+    // Confirm Delete button click in modal
+    $(document).on('click', '#btnConfirmDeleteAboutUs', function (e) {
+        e.preventDefault();
+        if (!pendingDeleteId) return;
+        executeDeleteAboutUs(pendingDeleteId);
     });
 
     // Search events
