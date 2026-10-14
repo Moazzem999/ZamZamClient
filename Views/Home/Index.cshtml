@@ -1,12 +1,14 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @model ZamZamClient.Models.HomeViewModel
 @{
     ViewData["Title"] = "";
+    var apiBaseUrl = Configuration["ApiBaseUrl"] ?? ViewBag.ApiBaseUrl ?? "https://localhost:7148";
 }
 
 <!-- =========================================================
      GIANT FACTORY HERO CAROUSEL (Eye-Catching Showcase for Global Buyers)
      ========================================================= -->
-<section class="factory-hero-section">
+<section class="factory-hero-section" id="factoryHeroSection" data-api-base-url="@apiBaseUrl">
     <div class="container-xl">
         <div class="factory-carousel-wrapper position-relative">
             <!-- Dynamic Top Slide Progress Bar -->
@@ -17,7 +19,7 @@
             <!-- Floating Top-Right HUD Navigation Controls -->
             <div class="factory-carousel-hud">
                 <div class="factory-hud-counter">
-                    <span class="cur-slide">01</span><span class="text-white-50 mx-1">/</span><span class="total-slide">05</span>
+                    <span class="cur-slide">01</span><span class="text-white-50 mx-1">/</span><span class="total-slide">01</span>
                 </div>
                 <button type="button" class="factory-hud-btn" id="factoryCarouselPlayPause" title="Pause Slideshow" aria-label="Pause slideshow">
                     <i class="bi bi-pause-fill"></i>
@@ -32,59 +34,12 @@
 
             <!-- Giant Bootstrap Carousel -->
             <div id="factoryHeroCarousel" class="carousel slide factory-carousel" data-bs-ride="carousel" data-bs-interval="6500" data-bs-pause="hover">
-                <div class="carousel-inner">
-                    <!-- Slide 1: Automated Weaving & Narrow Fabric Plant -->
+                <div class="carousel-inner" id="factoryCarouselInner">
+                    <!-- Dynamic Brand Images populated via /api/Global/GetAllBrandImages -->
+                    <!-- Initial Fallback Slide -->
                     <div class="carousel-item active factory-slide-item">
                         <div class="factory-slide-bg">
-                            <img src="~/images/factory/weaving-floor.jpg" alt="Jacquard Weaving Facility" class="factory-slide-img" onerror="this.src='/images/slider/slide-1.jpg';" />
-                        </div>
-                        <div class="factory-slide-overlay"></div>
-                        <div class="container h-100 position-relative">
-                            <div class="factory-slide-content-wrap">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 2: German Heidelberg Offset Printing & Hang Tags -->
-                    <div class="carousel-item factory-slide-item">
-                        <div class="factory-slide-bg">
-                            <img src="~/images/factory/printing-press.jpg" alt="Heidelberg Offset Printing" class="factory-slide-img" onerror="this.src='/images/machineries/gto.jpg';" />
-                        </div>
-                        <div class="factory-slide-overlay"></div>
-                        <div class="container h-100 position-relative">
-                            <div class="factory-slide-content-wrap">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 3: Accredited In-House Testing Laboratory -->
-                    <div class="carousel-item factory-slide-item">
-                        <div class="factory-slide-bg">
-                            <img src="~/images/factory/qa-laboratory.jpg" alt="In-House Testing Laboratory" class="factory-slide-img" onerror="this.src='/images/about-s3-pic.jpg';" />
-                        </div>
-                        <div class="factory-slide-overlay"></div>
-                        <div class="container h-100 position-relative">
-                            <div class="factory-slide-content-wrap">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 4: Automated Metal Trims & Zipper Workshop -->
-                    <div class="carousel-item factory-slide-item">
-                        <div class="factory-slide-bg">
-                            <img src="~/images/factory/metal-trims.jpg" alt="Metal Trims & Zipper Workshop" class="factory-slide-img" onerror="this.src='/images/products/Zippers.jpg';" />
-                        </div>
-                        <div class="factory-slide-overlay"></div>
-                        <div class="container h-100 position-relative">
-                            <div class="factory-slide-content-wrap">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 5: 45,000 Sq. Ft. Integrated Manufacturing Floor -->
-                    <div class="carousel-item factory-slide-item">
-                        <div class="factory-slide-bg">
-                            <img src="~/images/slider/slide-2.jpg" alt="Manufacturing Campus" class="factory-slide-img" onerror="this.src='/images/slider/slide-1.jpg';" />
+                            <img src="~/images/factory/weaving-floor.jpg" alt="ZamZam Factory Showcase" class="factory-slide-img" onerror="this.onerror=null; this.src='/images/slider/slide-1.jpg';" />
                         </div>
                         <div class="factory-slide-overlay"></div>
                         <div class="container h-100 position-relative">

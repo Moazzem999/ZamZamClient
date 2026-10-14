@@ -9,29 +9,48 @@ document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
     // =============================================================
-    // 1. Giant Factory Carousel Interactive Controller
+    // 1. Giant Factory Carousel Dynamic API Loader & Interactive Controller
     // =============================================================
     const factoryCarouselEl = document.getElementById('factoryHeroCarousel');
-    if (factoryCarouselEl) {
-        const carouselInstance = bootstrap.Carousel.getOrCreateInstance(factoryCarouselEl, {
-            interval: 6500,
-            ride: 'carousel',
-            pause: 'hover',
-            wrap: true,
-            touch: true
-        });
+    const heroSectionEl = document.getElementById('factoryHeroSection') || document.querySelector('.factory-hero-section');
 
-        const thumbCards = document.querySelectorAll('.factory-thumb-card');
+    if (factoryCarouselEl) {
+        // Read API base URL from section container data attribute or default to https://localhost:7148
+        const configuredApiBaseUrl = (heroSectionEl?.getAttribute('data-api-base-url') || 'https://localhost:7148').trim();
+        const apiBaseUrl = configuredApiBaseUrl.replace(/\/+$/, '');
+        const BRAND_IMAGES_API_URL = `${apiBaseUrl}/api/Global/GetAllBrandImages`;
+
         const hudCounterCur = document.querySelector('.factory-hud-counter .cur-slide');
+        const hudCounterTotal = document.querySelector('.factory-hud-counter .total-slide');
         const playPauseBtn = document.getElementById('factoryCarouselPlayPause');
         const prevBtn = document.getElementById('factoryCarouselPrev');
         const nextBtn = document.getElementById('factoryCarouselNext');
         const progressBarFill = document.getElementById('factoryProgressBarFill');
 
+        let carouselInstance = null;
         let isPlaying = true;
         let progressAnimFrame = null;
         let slideStartTime = performance.now();
         const slideDuration = 6500;
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Construct absolute URL for images returned from the API
+        function getFullImageUrl(imagePath) {
+            if (!imagePath) return '/images/slider/slide-1.jpg';
+            if (/^https?:\/\//i.test(imagePath)) {
+                return imagePath;
+            }
+            const normalized = imagePath.replace(/\\/g, '/');
+            const cleanPath = normalized.startsWith('/') ? normalized : `/${normalized}`;
+            return `${apiBaseUrl}${cleanPath}`;
+        }
 
         function updateProgress() {
             if (!isPlaying) return;
@@ -56,45 +75,52 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Handle slide change event
-        factoryCarouselEl.addEventListener('slide.bs.carousel', function (e) {
-            const nextIdx = e.to;
-            // Update active thumbnail
-            thumbCards.forEach((card, idx) => {
-                if (idx === nextIdx) {
-                    card.classList.add('active');
-                    // Scroll into view on mobile if needed
-                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                } else {
-                    card.classList.remove('active');
+        // Initialize or reinitialize Bootstrap Carousel instance
+        function initCarouselInstance() {
+            if (carouselInstance) {
+                try {
+                    carouselInstance.dispose();
+                } catch (e) {
+                    console.warn('[HomeCarousel] Error disposing old carousel instance:', e);
                 }
+                carouselInstance = null;
+            }
+
+            carouselInstance = new bootstrap.Carousel(factoryCarouselEl, {
+                interval: slideDuration,
+                ride: 'carousel',
+                pause: 'hover',
+                wrap: true,
+                touch: true
             });
 
-            // Update HUD counter
-            if (hudCounterCur) {
-                hudCounterCur.textContent = String(nextIdx + 1).padStart(2, '0');
+            if (isPlaying) {
+                carouselInstance.cycle();
+            } else {
+                carouselInstance.pause();
             }
 
             resetProgress();
+        }
+
+        // Handle slide change event
+        factoryCarouselEl.addEventListener('slide.bs.carousel', function (e) {
+            const nextIdx = e.to;
+            if (hudCounterCur) {
+                hudCounterCur.textContent = String(nextIdx + 1).padStart(2, '0');
+            }
+            resetProgress();
         });
 
-        // Thumbnail clicks
-        thumbCards.forEach(card => {
-            card.addEventListener('click', function () {
-                const targetIdx = parseInt(this.getAttribute('data-bs-slide-to') || '0', 10);
-                carouselInstance.to(targetIdx);
-            });
-        });
-
-        // Prev & Next buttons
+        // Prev & Next navigation buttons
         if (prevBtn) {
             prevBtn.addEventListener('click', function () {
-                carouselInstance.prev();
+                if (carouselInstance) carouselInstance.prev();
             });
         }
         if (nextBtn) {
             nextBtn.addEventListener('click', function () {
-                carouselInstance.next();
+                if (carouselInstance) carouselInstance.next();
             });
         }
 
@@ -103,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
             playPauseBtn.addEventListener('click', function () {
                 const icon = playPauseBtn.querySelector('i');
                 if (isPlaying) {
-                    carouselInstance.pause();
+                    if (carouselInstance) carouselInstance.pause();
                     isPlaying = false;
                     if (icon) {
                         icon.className = 'bi bi-play-fill';
@@ -111,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     playPauseBtn.title = 'Play Slideshow';
                     if (progressAnimFrame) cancelAnimationFrame(progressAnimFrame);
                 } else {
-                    carouselInstance.cycle();
+                    if (carouselInstance) carouselInstance.cycle();
                     isPlaying = true;
                     if (icon) {
                         icon.className = 'bi bi-pause-fill';
@@ -127,14 +153,120 @@ document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('keydown', function (e) {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (e.key === 'ArrowLeft') {
-                carouselInstance.prev();
+                if (carouselInstance) carouselInstance.prev();
             } else if (e.key === 'ArrowRight') {
-                carouselInstance.next();
+                if (carouselInstance) carouselInstance.next();
             }
         });
 
-        // Start initial progress bar
-        resetProgress();
+        // Render dynamic slides from API data
+        function populateCarouselSlides(brandImages) {
+            const carouselInner = document.getElementById('factoryCarouselInner') || factoryCarouselEl.querySelector('.carousel-inner');
+            if (!carouselInner || !Array.isArray(brandImages) || brandImages.length === 0) return;
+
+            // Filter active items with valid imagePath
+            const validImages = brandImages.filter(item => item && item.imagePath && (item.status === undefined || item.status === 1 || item.status === true));
+            if (validImages.length === 0) return;
+
+            // Update HUD counter
+            if (hudCounterTotal) {
+                hudCounterTotal.textContent = String(validImages.length).padStart(2, '0');
+            }
+            if (hudCounterCur) {
+                hudCounterCur.textContent = '01';
+            }
+
+            // Build slide items HTML
+            const slidesHtml = validImages.map((item, idx) => {
+                const fullUrl = getFullImageUrl(item.imagePath);
+                const name = escapeHtml(item.name || `Facility Image ${idx + 1}`);
+                const remarks = escapeHtml(item.remarks || '');
+                const activeClass = idx === 0 ? 'active' : '';
+
+                return `
+                    <div class="carousel-item ${activeClass} factory-slide-item" data-id="${item.id ?? idx}">
+                        <div class="factory-slide-bg">
+                            <img src="${fullUrl}" 
+                                 alt="${name}" 
+                                 title="${name}${remarks ? ' - ' + remarks : ''}"
+                                 class="factory-slide-img" 
+                                 loading="${idx === 0 ? 'eager' : 'lazy'}" 
+                                 onerror="this.onerror=null; this.src='/images/slider/slide-1.jpg';" />
+                        </div>
+                        <div class="factory-slide-overlay"></div>
+                        <div class="container h-100 position-relative">
+                            <div class="factory-slide-content-wrap">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            carouselInner.innerHTML = slidesHtml;
+            initCarouselInstance();
+            console.log(`[HomeCarousel] Successfully loaded ${validImages.length} brand images into carousel.`);
+        }
+
+        // Fetch brand images from API
+        function loadBrandImagesFromApi() {
+            console.log(`[HomeCarousel] Requesting brand images from: ${BRAND_IMAGES_API_URL}`);
+
+            fetch(BRAND_IMAGES_API_URL, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                cache: 'no-cache'
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`API request failed with status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log('[HomeCarousel] API response received:', data);
+                if (data && (data.succeeded === true || data.statusCode === 200 || Array.isArray(data.data))) {
+                    const images = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
+                    if (images.length > 0) {
+                        populateCarouselSlides(images);
+                    } else {
+                        console.warn('[HomeCarousel] No brand images found in API response.');
+                    }
+                } else {
+                    console.warn('[HomeCarousel] Unexpected API response payload:', data);
+                }
+            })
+            .catch(err => {
+                console.warn('[HomeCarousel] Primary fetch error, attempting jQuery fallback:', err);
+                if (window.jQuery) {
+                    window.jQuery.ajax({
+                        url: BRAND_IMAGES_API_URL,
+                        type: 'GET',
+                        dataType: 'json',
+                        cache: false,
+                        timeout: 10000,
+                        success: function (res) {
+                            if (res && (res.succeeded === true || Array.isArray(res.data))) {
+                                const images = Array.isArray(res.data) ? res.data : [];
+                                if (images.length > 0) {
+                                    populateCarouselSlides(images);
+                                }
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('[HomeCarousel] Failed to retrieve brand images from API:', status, error);
+                        }
+                    });
+                }
+            });
+        }
+
+        // Initial carousel boot with fallback slide
+        initCarouselInstance();
+
+        // Fetch dynamic brand images to populate carousel
+        loadBrandImagesFromApi();
     }
 
     // =============================================================
