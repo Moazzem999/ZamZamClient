@@ -1,15 +1,160 @@
 /**
  * ZamZam Trims (BD) Limited - About Us Manager (dashboard-about-us.js)
  * -------------------------------------------------------------------
- * Fetches, previews, and deletes About Us section data from:
- * {ApiBaseUrl}/api/AboutUs/GetAll
+ * Fetches, previews, creates, and deletes About Us section data from:
+ * {ApiBaseUrl}/api/AboutUs/GetAll (GET)
+ * {ApiBaseUrl}/api/AboutUs (POST)
  * {ApiBaseUrl}/api/AboutUs/{id} (DELETE)
  */
 
 $(function () {
     'use strict';
 
-    // Modern Delete Modal HTML template (styled identical to brand-images delete modal)
+    // 1. Base URL & API Endpoints
+    const $pageContainer = $('#aboutUsPageContainer');
+    const apiBaseUrl = ($pageContainer.data('api-base-url') || 'https://localhost:7148').toString().replace(/\/+$/, '');
+    const GET_ALL_API_URL = `${apiBaseUrl}/api/AboutUs/GetAll`;
+    const CREATE_API_URL = `${apiBaseUrl}/api/AboutUs`;
+
+    // 2. Modern Create Modal HTML Template
+    const modernCreateModalHtml = `
+        <div class="modal fade" id="createAboutUsModal" tabindex="-1" aria-labelledby="createAboutUsModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" style="max-width: 720px;">
+                <div class="modal-content modern-create-modal-content border-0">
+                    <div class="modal-header border-bottom px-4 py-3 align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="create-modal-icon-badge">
+                                <i class="bi bi-file-earmark-plus-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title fw-bold text-dark m-0" id="createAboutUsModalTitle">Create About Us Section</h5>
+                                <small class="text-muted">Add company story, heritage, production details, and capabilities</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form id="createAboutUsForm" novalidate>
+                        <div class="modal-body px-4 py-3" style="max-height: 70vh; overflow-y: auto;">
+                            <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="createModalAlert" role="alert"></div>
+
+                            <!-- 1. Section Label & Main Heading -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-5">
+                                    <label for="createSectionLabel" class="form-label small fw-bold text-dark mb-1">
+                                        Section Tagline / Label
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted">
+                                            <i class="bi bi-tag"></i>
+                                        </span>
+                                        <input type="text" 
+                                               class="form-control bg-light border-start-0 rounded-end-3" 
+                                               id="createSectionLabel" 
+                                               placeholder="e.g. Our Story &amp; Heritage" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7">
+                                    <label for="createMainHeading" class="form-label small fw-bold text-dark mb-1">
+                                        Main Heading <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted">
+                                            <i class="bi bi-type-h1"></i>
+                                        </span>
+                                        <input type="text" 
+                                               class="form-control bg-light border-start-0 rounded-end-3" 
+                                               id="createMainHeading" 
+                                               placeholder="e.g. Built on Trust &amp; Precision Engineering" 
+                                               required />
+                                    </div>
+                                    <div class="invalid-feedback d-none" id="createHeadingFeedback">Please enter a main heading.</div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Introduction Narrative -->
+                            <div class="mb-3">
+                                <label for="createIntroduction" class="form-label small fw-bold text-dark mb-1 d-flex justify-content-between">
+                                    <span>Introduction &amp; Company Inception <span class="text-danger">*</span></span>
+                                </label>
+                                <textarea class="form-control bg-light rounded-3" 
+                                          id="createIntroduction" 
+                                          rows="3" 
+                                          placeholder="Enter introduction narrative..." 
+                                          required></textarea>
+                                <div class="invalid-feedback d-none" id="createIntroFeedback">Please enter an introduction narrative.</div>
+                            </div>
+
+                            <!-- 3. Experience & Production Side-by-Side -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="createExperienceDescription" class="form-label small fw-bold text-dark mb-1">
+                                        Industry Experience Description
+                                    </label>
+                                    <textarea class="form-control bg-light rounded-3" 
+                                              id="createExperienceDescription" 
+                                              rows="3" 
+                                              placeholder="Enter industry experience details..."></textarea>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="createProductionDescription" class="form-label small fw-bold text-dark mb-1">
+                                        Production &amp; Machinery Description
+                                    </label>
+                                    <textarea class="form-control bg-light rounded-3" 
+                                              id="createProductionDescription" 
+                                              rows="3" 
+                                              placeholder="Enter production and machinery details..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 4. Product Capabilities -->
+                            <div class="row g-3 mb-2">
+                                <div class="col-md-5">
+                                    <label for="createCapabilityTitle" class="form-label small fw-bold text-dark mb-1">
+                                        Capability Section Title
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted">
+                                            <i class="bi bi-layers"></i>
+                                        </span>
+                                        <input type="text" 
+                                               class="form-control bg-light border-start-0 rounded-end-3" 
+                                               id="createCapabilityTitle" 
+                                               placeholder="e.g. Comprehensive Product Capabilities" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7">
+                                    <label for="createCapabilityDescription" class="form-label small fw-bold text-dark mb-1">
+                                        Capability Lines / Products
+                                    </label>
+                                    <textarea class="form-control bg-light rounded-3" 
+                                              id="createCapabilityDescription" 
+                                              rows="2" 
+                                              placeholder="Enter product lines or capabilities..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-3" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3 px-4 py-2 d-inline-flex align-items-center gap-2 shadow-sm" id="btnSubmitCreateAboutUs">
+                                <i class="bi bi-check-lg"></i>
+                                <span id="btnSubmitCreateAboutUsText">Save &amp; Create</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 3. Modern Delete Modal HTML Template (styled identical to brand-images delete modal)
     const modernDeleteModalHtml = `
         <div class="modal fade" id="deleteConfirmAboutUsModal" tabindex="-1" aria-labelledby="deleteModalTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
@@ -67,8 +212,16 @@ $(function () {
         </div>
     `;
 
-    // Ensure the modern modal is at body root level (prevents any container stacking/overflow issues)
+    // Ensure modern modals live directly under document.body (prevents container clipping or backdrop issues)
     function ensureModalsInDom() {
+        let createEl = document.getElementById('createAboutUsModal');
+        if (!createEl) {
+            $('body').append(modernCreateModalHtml);
+        } else if (!$(createEl).find('#createAboutUsForm').length) {
+            $(createEl).remove();
+            $('body').append(modernCreateModalHtml);
+        }
+
         let delEl = document.getElementById('deleteConfirmAboutUsModal');
         if (!delEl) {
             $('body').append(modernDeleteModalHtml);
@@ -79,11 +232,7 @@ $(function () {
     }
     ensureModalsInDom();
 
-    // 1. Elements & Variables
-    const $pageContainer = $('#aboutUsPageContainer');
-    const apiBaseUrl = ($pageContainer.data('api-base-url') || 'https://localhost:7148').toString().replace(/\/+$/, '');
-    const GET_ALL_API_URL = `${apiBaseUrl}/api/AboutUs/GetAll`;
-
+    // 4. Elements & State Variables
     const $table = $('#aboutUsTable');
     const $tableBody = $('#aboutUsTableBody');
     const $loadingState = $('#tableLoadingState');
@@ -148,7 +297,18 @@ $(function () {
             .replace(/'/g, '&#039;');
     }
 
-    // 2. Fetch Data from API
+    // Helper: Reset Create Form
+    function resetCreateForm() {
+        const form = document.getElementById('createAboutUsForm');
+        if (form) form.reset();
+        $('#createModalAlert').addClass('d-none').text('');
+        $('#createHeadingFeedback').addClass('d-none');
+        $('#createIntroFeedback').addClass('d-none');
+        $('#btnSubmitCreateAboutUs').prop('disabled', false);
+        $('#btnSubmitCreateAboutUsText').text('Save & Create');
+    }
+
+    // 5. Fetch Data from API
     function fetchAboutUsData() {
         if (isFetching) return;
         isFetching = true;
@@ -220,7 +380,7 @@ $(function () {
         });
     }
 
-    // 3. Error Handling State
+    // 6. Error Handling State
     function showErrorState(message) {
         $loadingState.addClass('d-none');
         $emptyState.addClass('d-none');
@@ -232,7 +392,7 @@ $(function () {
         $errorState.removeClass('d-none');
     }
 
-    // 4. Filter and Render
+    // 7. Filter and Render
     function applyFilterAndRender() {
         const query = ($searchInput.val() || '').trim().toLowerCase();
         $searchClearBtn.toggle(query.length > 0);
@@ -282,7 +442,7 @@ $(function () {
         renderTableRows(filtered);
     }
 
-    // 5. Render Table Rows
+    // 8. Render Table Rows
     function renderTableRows(records) {
         let html = '';
 
@@ -365,7 +525,7 @@ $(function () {
         }
     }
 
-    // 6. View Details Modal
+    // 9. View Details Modal
     window.openAboutUsModal = function (id) {
         const item = allAboutUsRecords.find(r => String(r.id || r.Id) === String(id));
         if (!item) return;
@@ -404,7 +564,118 @@ $(function () {
         }
     };
 
-    // 7. Ultra-Modern Delete Confirmation Modal (matching Brand Images)
+    // 10. Open Create Modal
+    $(document).on('click', '#btnOpenCreateModal', function () {
+        ensureModalsInDom();
+        resetCreateForm();
+        const createModalEl = document.getElementById('createAboutUsModal');
+        if (createModalEl) {
+            const createModalInstance = bootstrap.Modal.getOrCreateInstance(createModalEl);
+            createModalInstance.show();
+        }
+    });
+
+    // 11. Submit Create Form & API Call
+    $(document).on('submit', '#createAboutUsForm', function (e) {
+        e.preventDefault();
+
+        const sectionLabel = ($('#createSectionLabel').val() || '').trim();
+        const mainHeading = ($('#createMainHeading').val() || '').trim();
+        const introduction = ($('#createIntroduction').val() || '').trim();
+        const experienceDescription = ($('#createExperienceDescription').val() || '').trim();
+        const productionDescription = ($('#createProductionDescription').val() || '').trim();
+        const capabilityTitle = ($('#createCapabilityTitle').val() || '').trim() || 'Comprehensive Product Capabilities:';
+        const capabilityDescription = ($('#createCapabilityDescription').val() || '').trim();
+
+        let isValid = true;
+        if (!mainHeading) {
+            $('#createHeadingFeedback').removeClass('d-none');
+            isValid = false;
+        } else {
+            $('#createHeadingFeedback').addClass('d-none');
+        }
+
+        if (!introduction) {
+            $('#createIntroFeedback').removeClass('d-none');
+            isValid = false;
+        } else {
+            $('#createIntroFeedback').addClass('d-none');
+        }
+
+        if (!isValid) return;
+
+        // Build Payload matching the sample API specification
+        const payload = {
+            id: 0,
+            sectionLabel: sectionLabel,
+            mainHeading: mainHeading,
+            introduction: introduction,
+            experienceDescription: experienceDescription,
+            productionDescription: productionDescription,
+            capabilityTitle: capabilityTitle,
+            capabilityDescription: capabilityDescription
+        };
+
+        const token = getAuthToken();
+        const ajaxHeaders = {
+            'Accept': 'application/json, */*',
+            'Content-Type': 'application/json'
+        };
+        if (token) {
+            ajaxHeaders['Authorization'] = `Bearer ${token}`;
+        }
+
+        const $submitBtn = $('#btnSubmitCreateAboutUs');
+        const $submitBtnText = $('#btnSubmitCreateAboutUsText');
+        $submitBtn.prop('disabled', true);
+        $submitBtnText.html('<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving...');
+        $('#createModalAlert').addClass('d-none').text('');
+
+        console.log(`[AboutUs] Submitting Create to: ${CREATE_API_URL}`, payload);
+
+        $.ajax({
+            url: CREATE_API_URL,
+            type: 'POST',
+            data: JSON.stringify(payload),
+            headers: ajaxHeaders,
+            success: function (res) {
+                console.log('[AboutUs] Create Success Response:', res);
+                const createModalEl = document.getElementById('createAboutUsModal');
+                if (createModalEl) {
+                    const inst = bootstrap.Modal.getInstance(createModalEl);
+                    if (inst) inst.hide();
+                }
+
+                resetCreateForm();
+                const successMsg = res && res.message ? res.message : 'About Us section created successfully!';
+                showToast(successMsg, 'bi bi-check-circle-fill text-success');
+
+                // Reload data from API to display newly created record
+                fetchAboutUsData();
+            },
+            error: function (xhr, status, error) {
+                console.error('[AboutUs] Create Error:', xhr, status, error);
+
+                let errorMsg = 'Failed to create About Us section. Please try again.';
+                if (xhr.status === 401) {
+                    errorMsg = 'Session expired or unauthorized (401). Please sign in again.';
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                } else if (xhr.statusText && xhr.statusText !== 'error') {
+                    errorMsg = `Error (${xhr.status}): ${xhr.statusText}`;
+                }
+
+                $('#createModalAlert').removeClass('d-none').text(errorMsg);
+                showToast(errorMsg, 'bi bi-exclamation-triangle-fill text-warning');
+            },
+            complete: function () {
+                $submitBtn.prop('disabled', false);
+                $submitBtnText.html('<i class="bi bi-check-lg"></i> Save &amp; Create');
+            }
+        });
+    });
+
+    // 12. Ultra-Modern Delete Confirmation Modal (matching Brand Images)
     window.confirmDeleteAboutUs = function (id) {
         ensureModalsInDom();
         pendingDeleteId = id;
@@ -485,7 +756,7 @@ $(function () {
         });
     }
 
-    // 8. Event Handlers
+    // 13. Event Handlers
     // Row click opens details
     $(document).on('click', 'tr.about-row-clickable', function (e) {
         if ($(e.target).closest('.dash-action-btn').length) return;

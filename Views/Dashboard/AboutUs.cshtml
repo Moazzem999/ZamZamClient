@@ -23,6 +23,12 @@
             <p class="dashboard-subtitle">Manage company heritage, story, production facilities, and capabilities.</p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- Create About Us Button -->
+            <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnOpenCreateModal" title="Create new About Us section">
+                <i class="bi bi-plus-lg"></i>
+                <span class="fw-semibold">Create About Us</span>
+            </button>
+
             <!-- Refresh Button -->
             <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnRefreshAboutUs" title="Reload from API">
                 <i class="bi bi-arrow-clockwise refresh-icon"></i>
@@ -54,7 +60,7 @@
                     <input type="text" 
                            id="searchAboutUsInput" 
                            class="dash-search-input" 
-                           placeholder="Search by heading, label, text, or ID..." 
+                           placeholder="Search records..." 
                            autocomplete="off" />
                     <button type="button" class="dash-search-clear" id="searchClearBtn" title="Clear search" style="display: none;">
                         <i class="bi bi-x"></i>
@@ -113,6 +119,9 @@
                 </div>
                 <h3 class="dash-state-title">No About Us Records Found</h3>
                 <p class="dash-state-desc">There are currently no About Us section records stored in the database.</p>
+                <button type="button" class="btn btn-primary btn-sm px-4 py-2 rounded-3 mt-2" onclick="$('#btnOpenCreateModal').trigger('click');">
+                    <i class="bi bi-plus-lg me-1"></i> Create First About Us Record
+                </button>
             </div>
 
             <!-- No Search Results State -->
