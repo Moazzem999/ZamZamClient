@@ -243,7 +243,6 @@ $(function () {
             const intro = item.introduction || item.Introduction || '—';
             const status = item.status !== undefined ? item.status : (item.Status !== undefined ? item.Status : 1);
             const isActive = status === 1;
-            const updatedOn = item.updatedOn || item.UpdatedOn || item.createdOn || item.CreatedOn;
 
             html += `
                 <tr data-record-id="${id}" class="about-row-clickable">
@@ -279,11 +278,6 @@ $(function () {
                             <span class="status-dot"></span>
                             <span>${isActive ? 'Active' : 'Inactive'}</span>
                         </span>
-                    </td>
-
-                    <!-- Updated Date Column -->
-                    <td class="text-nowrap small text-muted">
-                        <i class="bi bi-clock me-1"></i>${formatDate(updatedOn)}
                     </td>
 
                     <!-- Actions Column -->
@@ -338,10 +332,6 @@ $(function () {
         const capDesc = item.capabilityDescription || item.CapabilityDescription || '—';
         const status = item.status !== undefined ? item.status : (item.Status !== undefined ? item.Status : 1);
         const isActive = status === 1;
-        const createdOn = item.createdOn || item.CreatedOn;
-        const updatedOn = item.updatedOn || item.UpdatedOn;
-        const createdBy = item.createdBy !== undefined ? item.createdBy : (item.CreatedBy !== undefined ? item.CreatedBy : '—');
-        const updatedBy = item.updatedBy !== undefined ? item.updatedBy : (item.UpdatedBy !== undefined ? item.UpdatedBy : '—');
 
         $('#modalRecordId').text(`#${recordId}`);
         $('#modalSectionLabel').text(sectionLabel);
@@ -356,12 +346,6 @@ $(function () {
         const $statusBadge = $('#modalStatusBadge');
         $statusBadge.attr('class', `dash-status-badge ${isActive ? 'status-active' : 'status-inactive'}`);
         $statusBadge.html(`<span class="status-dot"></span><span>${isActive ? 'Active' : 'Inactive'}</span>`);
-
-        // Metadata
-        $('#modalCreatedOn').text(formatDate(createdOn));
-        $('#modalUpdatedOn').text(formatDate(updatedOn));
-        $('#modalCreatedBy').text(`User #${createdBy}`);
-        $('#modalUpdatedBy').text(`User #${updatedBy}`);
 
         if (detailModalInstance) {
             detailModalInstance.show();
@@ -395,17 +379,6 @@ $(function () {
                 showToast('Failed to copy to clipboard', 'bi bi-x-circle-fill text-danger');
             });
         }
-    });
-
-    // Modal Copy Summary JSON button
-    $('#btnCopyModalJson').on('click', function () {
-        if (!selectedRecordForModal) return;
-        const jsonText = JSON.stringify(selectedRecordForModal, null, 2);
-        navigator.clipboard.writeText(jsonText).then(function () {
-            showToast('Complete record JSON copied to clipboard!');
-        }).catch(function () {
-            showToast('Failed to copy to clipboard', 'bi bi-x-circle-fill text-danger');
-        });
     });
 
     // Search events

@@ -73,7 +73,6 @@
                         <th style="width: 26%;">Main Heading</th>
                         <th>Introduction Preview</th>
                         <th style="width: 105px;" class="text-center">Status</th>
-                        <th style="width: 160px;">Updated On</th>
                         <th style="width: 100px;" class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -209,49 +208,17 @@
                 </div>
 
                 <!-- 3. Product Capabilities Card -->
-                <div class="about-detail-card">
+                <div class="about-detail-card mb-0">
                     <div class="about-detail-card-title">
                         <i class="bi bi-layers-fill"></i>
                         <span id="modalCapabilityTitle">Comprehensive Product Capabilities:</span>
                     </div>
                     <p class="about-detail-card-text" id="modalCapabilityDescription">—</p>
                 </div>
-
-                <!-- 4. System Audit Metadata Box -->
-                <div class="row g-2">
-                    <div class="col-6 col-md-3">
-                        <div class="about-meta-box">
-                            <div class="about-meta-label">Created On</div>
-                            <div class="about-meta-value text-truncate" id="modalCreatedOn">—</div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="about-meta-box">
-                            <div class="about-meta-label">Updated On</div>
-                            <div class="about-meta-value text-truncate" id="modalUpdatedOn">—</div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="about-meta-box">
-                            <div class="about-meta-label">Created By</div>
-                            <div class="about-meta-value text-truncate" id="modalCreatedBy">—</div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="about-meta-box">
-                            <div class="about-meta-label">Updated By</div>
-                            <div class="about-meta-value text-truncate" id="modalUpdatedBy">—</div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Modal Footer -->
-            <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
-                <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-3 d-inline-flex align-items-center gap-2" id="btnCopyModalJson">
-                    <i class="bi bi-code-slash"></i>
-                    <span>Copy JSON Data</span>
-                </button>
+            <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-end">
                 <button type="button" class="btn btn-primary btn-sm rounded-3 px-4 py-2" data-bs-dismiss="modal">
                     Close Details
                 </button>
