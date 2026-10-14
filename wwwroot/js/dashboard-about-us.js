@@ -41,7 +41,7 @@ $(function () {
                             <!-- 1. Section Tagline / Label (Bigger & Full-Width) -->
                             <div class="mb-3">
                                 <label for="createSectionLabel" class="form-label small fw-bold text-dark mb-1">
-                                    Section Tagline / Label
+                                    Section Tagline / Label <span class="text-danger">*</span></span>
                                 </label>
                                 <div class="input-group input-group-lg shadow-none">
                                     <span class="input-group-text bg-light border-end-0 text-muted px-3">
@@ -75,7 +75,7 @@ $(function () {
                             <!-- 3. Introduction Narrative -->
                             <div class="mb-3">
                                 <label for="createIntroduction" class="form-label small fw-bold text-dark mb-1 d-flex justify-content-between">
-                                    <span>Introduction &amp; Company Inception <span class="text-danger">*</span></span>
+                                    <span>Introduction &amp; Company Inception
                                 </label>
                                 <textarea class="form-control bg-light rounded-3" 
                                           id="createIntroduction" 
