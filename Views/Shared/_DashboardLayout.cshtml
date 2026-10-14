@@ -59,21 +59,31 @@
                 </a>
             </li>
 
-            <!-- Manage Site Item with Brand Image Submenu -->
-            <li class="menu-item has-submenu @(ViewContext.RouteData.Values["Action"]?.ToString() == "BrandImages" ? "active" : "")">
-                <a href="#manageSiteSubmenu" class="menu-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "BrandImages" ? "" : "collapsed")" data-bs-toggle="collapse" role="button" aria-expanded="@(ViewContext.RouteData.Values["Action"]?.ToString() == "BrandImages" ? "true" : "false")" aria-controls="manageSiteSubmenu">
+            <!-- Manage Site Item with Submenus -->
+            @{
+                var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+                var isManageSiteActive = currentAction == "BrandImages" || currentAction == "AboutUs";
+            }
+            <li class="menu-item has-submenu @(isManageSiteActive ? "active" : "")">
+                <a href="#manageSiteSubmenu" class="menu-link @(isManageSiteActive ? "" : "collapsed")" data-bs-toggle="collapse" role="button" aria-expanded="@(isManageSiteActive ? "true" : "false")" aria-controls="manageSiteSubmenu">
                     <span class="menu-link-inner">
                         <span class="menu-icon"><i class="bi bi-gear"></i></span>
                         <span>Manage Site</span>
                     </span>
                     <i class="bi bi-chevron-down chevron-icon"></i>
                 </a>
-                <div class="collapse submenu-collapse @(ViewContext.RouteData.Values["Action"]?.ToString() == "BrandImages" ? "show" : "")" id="manageSiteSubmenu">
+                <div class="collapse submenu-collapse @(isManageSiteActive ? "show" : "")" id="manageSiteSubmenu">
                     <ul class="submenu-list">
-                        <li class="submenu-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "BrandImages" ? "active" : "")">
+                        <li class="submenu-item @(currentAction == "BrandImages" ? "active" : "")">
                             <a asp-controller="Dashboard" asp-action="BrandImages" class="submenu-link">
                                 <i class="bi bi-image submenu-icon"></i>
                                 <span>Brand Image</span>
+                            </a>
+                        </li>
+                        <li class="submenu-item @(currentAction == "AboutUs" ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="AboutUs" class="submenu-link">
+                                <i class="bi bi-info-circle submenu-icon"></i>
+                                <span>About Us</span>
                             </a>
                         </li>
                     </ul>

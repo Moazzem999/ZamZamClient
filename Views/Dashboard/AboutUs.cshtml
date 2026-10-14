@@ -1,0 +1,40 @@
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "About Us - Manage Site";
+    var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
+}
+
+<!-- Page Root Container -->
+<div class="about-us-page-wrapper" id="aboutUsPageContainer" data-api-base-url="@apiBaseUrl">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="dash-breadcrumb">
+        <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span>Manage Site</span>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span class="current">About Us</span>
+    </nav>
+
+    <!-- Page Heading Area -->
+    <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="dashboard-title">About Us</h1>
+            <p class="dashboard-subtitle">Manage company overview, story, mission, and vision content.</p>
+        </div>
+    </div>
+
+    <!-- Empty State Content Card -->
+    <div class="dash-table-card p-5 text-center">
+        <div class="py-5">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary mb-3" style="width: 72px; height: 72px;">
+                <i class="bi bi-info-circle fs-1"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-2">About Us Content</h3>
+            <p class="text-muted mx-auto mb-0" style="max-width: 480px;">
+                This page is ready for your About Us management controls, sections, and configuration.
+            </p>
+        </div>
+    </div>
+
+</div>
