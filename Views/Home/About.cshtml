@@ -1,7 +1,9 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{
     ViewData["Title"] = "About Us - Company History, Mission & Leadership";
     var team = ViewBag.Team as List<ZamZamClient.Models.TeamMember> ?? new();
     var processSteps = ViewBag.ProcessSteps as List<ZamZamClient.Models.ProcessStep> ?? new();
+    var apiBaseUrl = Configuration["ApiBaseUrl"] ?? ViewBag.ApiBaseUrl ?? "https://localhost:7148";
 }
 
 <!-- Page Header Banner -->
@@ -16,26 +18,26 @@
 </section>
 
 <!-- Detailed Company Story -->
-<section class="section-padding bg-white">
+<section class="section-padding bg-white" id="aboutStorySection" data-api-base-url="@apiBaseUrl">
     <div class="container">
         <div class="row align-items-center g-5">
-            <div class="col-lg-6">
-                <span class="section-tagline"><i class="bi bi-clock-history"></i> OUR STORY & HERITAGE</span>
-                <h2 class="section-title">Built on Trust, Precision Engineering & Sustainable Growth</h2>
-                <p class="text-secondary">
+            <div class="col-lg-6" id="aboutStoryContent">
+                <span class="section-tagline" id="aboutStoryTagline"><i class="bi bi-clock-history"></i> <span id="aboutStoryLabelText">OUR STORY &amp; HERITAGE</span></span>
+                <h2 class="section-title" id="aboutStoryHeading">Built on Trust, Precision Engineering &amp; Sustainable Growth</h2>
+                <p class="text-secondary" id="aboutStoryIntro">
                     Since 2019, <strong>ZamZam Trims (BD) Limited</strong> has emerged as one of the most reliable, innovative, and quality-driven apparel accessories and trims manufacturer, importer, and supplier companies in Bangladesh.
                 </p>
-                <p class="text-secondary">
+                <p class="text-secondary" id="aboutStoryExp">
                     We established our enterprise with highly experienced and skilled industry veterans who have been engaged in the textile and RMG trade for decades. Working hand-in-hand with our clients, we meticulously understand their design specifications, cost targets, and export schedules.
                 </p>
-                <p class="text-secondary">
+                <p class="text-secondary" id="aboutStoryProd">
                     Our production started with a firm determination to manufacture international standard quality accessories and trims products. World-class machinery for trims and label manufacturing accelerates our strength, enabling us to consistently provide you with the finest finished products.
                 </p>
 
-                <div class="p-3 bg-light rounded-4 border my-4">
-                    <h6 class="fw-bold font-heading text-dark mb-2"><i class="bi bi-collection text-indigo me-2"></i> Comprehensive Product Capabilities:</h6>
-                    <p class="small text-muted mb-0">
-                        Our versatile product lines encompass Woven Belt, Twill Tape, Drawstrings, Elastic, Leather Patches, Woven & Care Labels, Hang-tags, Sewing & Cotton Threads, Gum Tape, Zippers, and Custom Buttons.
+                <div class="p-3 bg-light rounded-4 border my-4" id="aboutCapabilitiesCard">
+                    <h6 class="fw-bold font-heading text-dark mb-2"><i class="bi bi-collection text-indigo me-2"></i> <span id="aboutCapabilitiesTitle">Comprehensive Product Capabilities:</span></h6>
+                    <p class="small text-muted mb-0" id="aboutCapabilitiesDesc">
+                        Our versatile product lines encompass Woven Belt, Twill Tape, Drawstrings, Elastic, Leather Patches, Woven &amp; Care Labels, Hang-tags, Sewing &amp; Cotton Threads, Gum Tape, Zippers, and Custom Buttons.
                     </p>
                 </div>
 
