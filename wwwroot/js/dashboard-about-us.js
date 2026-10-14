@@ -15,6 +15,7 @@ $(function () {
     const apiBaseUrl = ($pageContainer.data('api-base-url') || 'https://localhost:7148').toString().replace(/\/+$/, '');
     const GET_ALL_API_URL = `${apiBaseUrl}/api/AboutUs/GetAll`;
     const CREATE_API_URL = `${apiBaseUrl}/api/AboutUs`;
+    const UPDATE_API_URL = `${apiBaseUrl}/api/AboutUs`;
 
     // 2. Modern Create Modal HTML Template
     const modernCreateModalHtml = `
@@ -38,11 +39,11 @@ $(function () {
                         <div class="modal-body px-4 py-3" style="max-height: 70vh; overflow-y: auto;">
                             <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="createModalAlert" role="alert"></div>
 
-                            <!-- 1. Section Tagline / Label (Max 50 chars) -->
+                            <!-- 1. Section Tagline / Label (Required, Max 50 chars) -->
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <label for="createSectionLabel" class="form-label small fw-bold text-dark mb-0">
-                                        Section Tagline / Label
+                                        Section Tagline / Label <span class="text-danger">*</span>
                                     </label>
                                     <span class="char-counter text-muted" id="createSectionLabelCount">0/50</span>
                                 </div>
@@ -54,9 +55,10 @@ $(function () {
                                            class="form-control bg-light border-start-0 rounded-end-3 fs-6 py-2" 
                                            id="createSectionLabel" 
                                            maxlength="50"
-                                           placeholder="e.g. Our Story &amp; Heritage" />
+                                           placeholder="e.g. Our Story &amp; Heritage" 
+                                           required />
                                 </div>
-                                <div class="invalid-feedback d-none" id="createLabelFeedback">Section label cannot exceed 50 characters.</div>
+                                <div class="invalid-feedback d-none" id="createLabelFeedback">Please enter a section tagline / label (maximum 50 characters).</div>
                             </div>
 
                             <!-- 2. Main Heading (Required, Max 100 chars) -->
@@ -81,11 +83,11 @@ $(function () {
                                 <div class="invalid-feedback d-none" id="createHeadingFeedback">Please enter a main heading (maximum 100 characters).</div>
                             </div>
 
-                            <!-- 3. Introduction Narrative (Required, Max 500 chars) -->
+                            <!-- 3. Introduction Narrative (Optional, Max 500 chars) -->
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <label for="createIntroduction" class="form-label small fw-bold text-dark mb-0">
-                                        Introduction &amp; Company Inception <span class="text-danger">*</span>
+                                        Introduction &amp; Company Inception
                                     </label>
                                     <span class="char-counter text-muted" id="createIntroCount">0/500</span>
                                 </div>
@@ -93,9 +95,8 @@ $(function () {
                                           id="createIntroduction" 
                                           rows="3" 
                                           maxlength="500"
-                                          placeholder="Enter introduction narrative..." 
-                                          required></textarea>
-                                <div class="invalid-feedback d-none" id="createIntroFeedback">Please enter an introduction narrative (maximum 500 characters).</div>
+                                          placeholder="Enter introduction narrative..."></textarea>
+                                <div class="invalid-feedback d-none" id="createIntroFeedback">Introduction narrative cannot exceed 500 characters.</div>
                             </div>
 
                             <!-- 4. Experience & Production Side-by-Side (Max 500 chars each) -->
@@ -185,6 +186,176 @@ $(function () {
         </div>
     `;
 
+    // 2b. Modern Update / Edit Modal HTML Template
+    const modernEditModalHtml = `
+        <div class="modal fade" id="editAboutUsModal" tabindex="-1" aria-labelledby="editAboutUsModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" style="max-width: 720px;">
+                <div class="modal-content modern-create-modal-content border-0">
+                    <div class="modal-header border-bottom px-4 py-3 align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="create-modal-icon-badge" style="background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); color: #4f46e5;">
+                                <i class="bi bi-pencil-square"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title fw-bold text-dark m-0" id="editAboutUsModalTitle">Update About Us Section</h5>
+                                <small class="text-muted">Modify company story, heritage, production details, and capabilities</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form id="editAboutUsForm" novalidate>
+                        <input type="hidden" id="editAboutUsId" value="0" />
+                        <div class="modal-body px-4 py-3" style="max-height: 70vh; overflow-y: auto;">
+                            <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="editModalAlert" role="alert"></div>
+
+                            <!-- 1. Section Tagline / Label (Required, Max 50 chars) -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="editSectionLabel" class="form-label small fw-bold text-dark mb-0">
+                                        Section Tagline / Label <span class="text-danger">*</span>
+                                    </label>
+                                    <span class="char-counter text-muted" id="editSectionLabelCount">0/50</span>
+                                </div>
+                                <div class="input-group input-group-lg shadow-none">
+                                    <span class="input-group-text bg-light border-end-0 text-muted px-3">
+                                        <i class="bi bi-tag fs-5"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control bg-light border-start-0 rounded-end-3 fs-6 py-2" 
+                                           id="editSectionLabel" 
+                                           maxlength="50"
+                                           placeholder="e.g. Our Story &amp; Heritage" 
+                                           required />
+                                </div>
+                                <div class="invalid-feedback d-none" id="editLabelFeedback">Please enter a section tagline / label (maximum 50 characters).</div>
+                            </div>
+
+                            <!-- 2. Main Heading (Required, Max 100 chars) -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="editMainHeading" class="form-label small fw-bold text-dark mb-0">
+                                        Main Heading <span class="text-danger">*</span>
+                                    </label>
+                                    <span class="char-counter text-muted" id="editMainHeadingCount">0/100</span>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-type-h1"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control bg-light border-start-0 rounded-end-3" 
+                                           id="editMainHeading" 
+                                           maxlength="100"
+                                           placeholder="e.g. Built on Trust &amp; Precision Engineering" 
+                                           required />
+                                </div>
+                                <div class="invalid-feedback d-none" id="editHeadingFeedback">Please enter a main heading (maximum 100 characters).</div>
+                            </div>
+
+                            <!-- 3. Introduction Narrative (Optional, Max 500 chars) -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="editIntroduction" class="form-label small fw-bold text-dark mb-0">
+                                        Introduction &amp; Company Inception
+                                    </label>
+                                    <span class="char-counter text-muted" id="editIntroCount">0/500</span>
+                                </div>
+                                <textarea class="form-control bg-light rounded-3" 
+                                          id="editIntroduction" 
+                                          rows="3" 
+                                          maxlength="500"
+                                          placeholder="Enter introduction narrative..."></textarea>
+                                <div class="invalid-feedback d-none" id="editIntroFeedback">Introduction narrative cannot exceed 500 characters.</div>
+                            </div>
+
+                            <!-- 4. Experience & Production Side-by-Side (Max 500 chars each) -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="editExperienceDescription" class="form-label small fw-bold text-dark mb-0">
+                                            Industry Experience Description
+                                        </label>
+                                        <span class="char-counter text-muted" id="editExpCount">0/500</span>
+                                    </div>
+                                    <textarea class="form-control bg-light rounded-3" 
+                                              id="editExperienceDescription" 
+                                              rows="3" 
+                                              maxlength="500"
+                                              placeholder="Enter industry experience details..."></textarea>
+                                    <div class="invalid-feedback d-none" id="editExpFeedback">Experience description cannot exceed 500 characters.</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="editProductionDescription" class="form-label small fw-bold text-dark mb-0">
+                                            Production &amp; Machinery Description
+                                        </label>
+                                        <span class="char-counter text-muted" id="editProdCount">0/500</span>
+                                    </div>
+                                    <textarea class="form-control bg-light rounded-3" 
+                                              id="editProductionDescription" 
+                                              rows="3" 
+                                              maxlength="500"
+                                              placeholder="Enter production and machinery details..."></textarea>
+                                    <div class="invalid-feedback d-none" id="editProdFeedback">Production description cannot exceed 500 characters.</div>
+                                </div>
+                            </div>
+
+                            <!-- 5. Capability Section Title (Max 50 chars) -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="editCapabilityTitle" class="form-label small fw-bold text-dark mb-0">
+                                        Capability Section Title
+                                    </label>
+                                    <span class="char-counter text-muted" id="editCapTitleCount">0/50</span>
+                                </div>
+                                <div class="input-group input-group-lg shadow-none">
+                                    <span class="input-group-text bg-light border-end-0 text-muted px-3">
+                                        <i class="bi bi-layers fs-5"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control bg-light border-start-0 rounded-end-3 fs-6 py-2" 
+                                           id="editCapabilityTitle" 
+                                           maxlength="50"
+                                           placeholder="e.g. Comprehensive Product Capabilities" />
+                                </div>
+                                <div class="invalid-feedback d-none" id="editCapTitleFeedback">Capability title cannot exceed 50 characters.</div>
+                            </div>
+
+                            <!-- 6. Capability Lines / Products (Max 250 chars) -->
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="editCapabilityDescription" class="form-label small fw-bold text-dark mb-0">
+                                        Capability Lines / Products
+                                    </label>
+                                    <span class="char-counter text-muted" id="editCapDescCount">0/250</span>
+                                </div>
+                                <textarea class="form-control bg-light rounded-3" 
+                                          id="editCapabilityDescription" 
+                                          rows="2" 
+                                          maxlength="250"
+                                          placeholder="Enter product lines or capabilities..."></textarea>
+                                <div class="invalid-feedback d-none" id="editCapDescFeedback">Capability description cannot exceed 250 characters.</div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-3" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3 px-4 py-2 d-inline-flex align-items-center gap-2 shadow-sm" id="btnSubmitEditAboutUs">
+                                <i class="bi bi-check-lg"></i>
+                                <span id="btnSubmitEditAboutUsText">Update &amp; Save</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+
     // 3. Modern Delete Modal HTML Template (styled identical to brand-images delete modal)
     const modernDeleteModalHtml = `
         <div class="modal fade" id="deleteConfirmAboutUsModal" tabindex="-1" aria-labelledby="deleteModalTitle" aria-hidden="true">
@@ -258,6 +429,16 @@ $(function () {
         } else if (!$(createEl).find('#createAboutUsForm').length) {
             $(createEl).remove();
             $('body').append(modernCreateModalHtml);
+            initCharacterCounters();
+        }
+
+        let editEl = document.getElementById('editAboutUsModal');
+        if (!editEl) {
+            $('body').append(modernEditModalHtml);
+            initCharacterCounters();
+        } else if (!$(editEl).find('#editAboutUsForm').length) {
+            $(editEl).remove();
+            $('body').append(modernEditModalHtml);
             initCharacterCounters();
         }
 
@@ -364,7 +545,14 @@ $(function () {
             { input: '#createExperienceDescription', counter: '#createExpCount', max: 500 },
             { input: '#createProductionDescription', counter: '#createProdCount', max: 500 },
             { input: '#createCapabilityTitle', counter: '#createCapTitleCount', max: 50 },
-            { input: '#createCapabilityDescription', counter: '#createCapDescCount', max: 250 }
+            { input: '#createCapabilityDescription', counter: '#createCapDescCount', max: 250 },
+            { input: '#editSectionLabel', counter: '#editSectionLabelCount', max: 50 },
+            { input: '#editMainHeading', counter: '#editMainHeadingCount', max: 100 },
+            { input: '#editIntroduction', counter: '#editIntroCount', max: 500 },
+            { input: '#editExperienceDescription', counter: '#editExpCount', max: 500 },
+            { input: '#editProductionDescription', counter: '#editProdCount', max: 500 },
+            { input: '#editCapabilityTitle', counter: '#editCapTitleCount', max: 50 },
+            { input: '#editCapabilityDescription', counter: '#editCapDescCount', max: 250 }
         ];
 
         fields.forEach(function (f) {
@@ -582,7 +770,7 @@ $(function () {
                         </span>
                     </td>
 
-                    <!-- Actions Column (View Details, Delete) -->
+                    <!-- Actions Column (View Details, Edit/Update, Delete) -->
                     <td class="dash-actions-cell">
                         <div class="dash-action-btn-group">
                             <button type="button" 
@@ -590,6 +778,12 @@ $(function () {
                                     onclick="window.openAboutUsModal(${id}); event.stopPropagation();" 
                                     title="View complete details">
                                 <i class="bi bi-eye"></i>
+                            </button>
+                            <button type="button" 
+                                    class="dash-action-btn btn-edit text-primary" 
+                                    onclick="window.openEditAboutUsModal(${id}); event.stopPropagation();" 
+                                    title="Update About Us record">
+                                <i class="bi bi-pencil-square"></i>
                             </button>
                             <button type="button" 
                                     class="dash-action-btn btn-delete text-danger" 
@@ -689,8 +883,13 @@ $(function () {
         $('#createAboutUsModal .is-invalid').removeClass('is-invalid');
         $('#createModalAlert').addClass('d-none').html('');
 
-        // 1. Section label cannot exceed 50 characters
-        if (sectionLabel.length > 50) {
+        // 1. Section label cannot exceed 50 characters (required)
+        if (!sectionLabel) {
+            $('#createLabelFeedback').text('Please enter a section tagline / label.').removeClass('d-none');
+            $('#createSectionLabel').addClass('is-invalid');
+            errorList.push('Section tagline / label is required.');
+            isValid = false;
+        } else if (sectionLabel.length > 50) {
             $('#createLabelFeedback').text(`Section label cannot exceed 50 characters. (Current: ${sectionLabel.length})`).removeClass('d-none');
             $('#createSectionLabel').addClass('is-invalid');
             errorList.push('Section label cannot exceed 50 characters.');
@@ -710,13 +909,8 @@ $(function () {
             isValid = false;
         }
 
-        // 3. Introduction cannot exceed 500 characters (also required)
-        if (!introduction) {
-            $('#createIntroFeedback').text('Please enter an introduction narrative.').removeClass('d-none');
-            $('#createIntroduction').addClass('is-invalid');
-            errorList.push('Introduction narrative is required.');
-            isValid = false;
-        } else if (introduction.length > 500) {
+        // 3. Introduction cannot exceed 500 characters (optional)
+        if (introduction.length > 500) {
             $('#createIntroFeedback').text(`Introduction cannot exceed 500 characters. (Current: ${introduction.length})`).removeClass('d-none');
             $('#createIntroduction').addClass('is-invalid');
             errorList.push('Introduction cannot exceed 500 characters.');
@@ -843,7 +1037,241 @@ $(function () {
         });
     });
 
-    // 12. Ultra-Modern Delete Confirmation Modal (matching Brand Images)
+    // 12. Open Edit / Update Modal
+    window.openEditAboutUsModal = function (id) {
+        ensureModalsInDom();
+        const item = allAboutUsRecords.find(r => String(r.id || r.Id) === String(id));
+        if (!item) return;
+
+        const recordId = item.id || item.Id || 0;
+        const sectionLabel = item.sectionLabel || item.SectionLabel || '';
+        const mainHeading = item.mainHeading || item.MainHeading || '';
+        const intro = item.introduction || item.Introduction || '';
+        const exp = item.experienceDescription || item.ExperienceDescription || '';
+        const prod = item.productionDescription || item.ProductionDescription || '';
+        const capTitle = item.capabilityTitle || item.CapabilityTitle || 'Comprehensive Product Capabilities:';
+        const capDesc = item.capabilityDescription || item.CapabilityDescription || '';
+
+        $('#editAboutUsId').val(recordId);
+        $('#editSectionLabel').val(sectionLabel);
+        $('#editMainHeading').val(mainHeading);
+        $('#editIntroduction').val(intro);
+        $('#editExperienceDescription').val(exp);
+        $('#editProductionDescription').val(prod);
+        $('#editCapabilityTitle').val(capTitle);
+        $('#editCapabilityDescription').val(capDesc);
+
+        // Reset previous validation visual states
+        $('#editAboutUsModal .invalid-feedback').addClass('d-none').text('');
+        $('#editAboutUsModal .is-invalid').removeClass('is-invalid');
+        $('#editModalAlert').addClass('d-none').html('');
+        $('#btnSubmitEditAboutUs').prop('disabled', false);
+        $('#btnSubmitEditAboutUsText').html('Update &amp; Save');
+
+        // Update all counters
+        updateFieldCounter('#editSectionLabel', '#editSectionLabelCount', 50);
+        updateFieldCounter('#editMainHeading', '#editMainHeadingCount', 100);
+        updateFieldCounter('#editIntroduction', '#editIntroCount', 500);
+        updateFieldCounter('#editExperienceDescription', '#editExpCount', 500);
+        updateFieldCounter('#editProductionDescription', '#editProdCount', 500);
+        updateFieldCounter('#editCapabilityTitle', '#editCapTitleCount', 50);
+        updateFieldCounter('#editCapabilityDescription', '#editCapDescCount', 250);
+
+        const editModalEl = document.getElementById('editAboutUsModal');
+        if (editModalEl) {
+            const editModalInstance = bootstrap.Modal.getOrCreateInstance(editModalEl);
+            editModalInstance.show();
+        }
+    };
+
+    // Open Edit modal from Detail modal
+    $(document).on('click', '#btnEditFromDetailModal', function () {
+        const modalEl = document.getElementById('aboutUsDetailModal');
+        if (modalEl) {
+            const inst = bootstrap.Modal.getInstance(modalEl);
+            if (inst) inst.hide();
+        }
+        if (selectedRecordForModal) {
+            const id = selectedRecordForModal.id || selectedRecordForModal.Id;
+            window.openEditAboutUsModal(id);
+        }
+    });
+
+    // 13. Submit Edit Form & API Call (PUT)
+    $(document).on('submit', '#editAboutUsForm', function (e) {
+        e.preventDefault();
+
+        const id = $('#editAboutUsId').val();
+        const sectionLabel = ($('#editSectionLabel').val() || '').trim();
+        const mainHeading = ($('#editMainHeading').val() || '').trim();
+        const introduction = ($('#editIntroduction').val() || '').trim();
+        const experienceDescription = ($('#editExperienceDescription').val() || '').trim();
+        const productionDescription = ($('#editProductionDescription').val() || '').trim();
+        const capabilityTitle = ($('#editCapabilityTitle').val() || '').trim();
+        const capabilityDescription = ($('#editCapabilityDescription').val() || '').trim();
+
+        let isValid = true;
+        const errorList = [];
+
+        // Reset previous validation visual states
+        $('#editAboutUsModal .invalid-feedback').addClass('d-none').text('');
+        $('#editAboutUsModal .is-invalid').removeClass('is-invalid');
+        $('#editModalAlert').addClass('d-none').html('');
+
+        // 1. Section label cannot exceed 50 characters (required)
+        if (!sectionLabel) {
+            $('#editLabelFeedback').text('Please enter a section tagline / label.').removeClass('d-none');
+            $('#editSectionLabel').addClass('is-invalid');
+            errorList.push('Section tagline / label is required.');
+            isValid = false;
+        } else if (sectionLabel.length > 50) {
+            $('#editLabelFeedback').text(`Section label cannot exceed 50 characters. (Current: ${sectionLabel.length})`).removeClass('d-none');
+            $('#editSectionLabel').addClass('is-invalid');
+            errorList.push('Section label cannot exceed 50 characters.');
+            isValid = false;
+        }
+
+        // 2. Main heading cannot exceed 100 characters (required)
+        if (!mainHeading) {
+            $('#editHeadingFeedback').text('Please enter a main heading.').removeClass('d-none');
+            $('#editMainHeading').addClass('is-invalid');
+            errorList.push('Main heading is required.');
+            isValid = false;
+        } else if (mainHeading.length > 100) {
+            $('#editHeadingFeedback').text(`Main heading cannot exceed 100 characters. (Current: ${mainHeading.length})`).removeClass('d-none');
+            $('#editMainHeading').addClass('is-invalid');
+            errorList.push('Main heading cannot exceed 100 characters.');
+            isValid = false;
+        }
+
+        // 3. Introduction cannot exceed 500 characters (optional)
+        if (introduction.length > 500) {
+            $('#editIntroFeedback').text(`Introduction cannot exceed 500 characters. (Current: ${introduction.length})`).removeClass('d-none');
+            $('#editIntroduction').addClass('is-invalid');
+            errorList.push('Introduction cannot exceed 500 characters.');
+            isValid = false;
+        }
+
+        // 4. Experience description cannot exceed 500 characters
+        if (experienceDescription.length > 500) {
+            $('#editExpFeedback').text(`Experience description cannot exceed 500 characters. (Current: ${experienceDescription.length})`).removeClass('d-none');
+            $('#editExperienceDescription').addClass('is-invalid');
+            errorList.push('Experience description cannot exceed 500 characters.');
+            isValid = false;
+        }
+
+        // 5. Production description cannot exceed 500 characters
+        if (productionDescription.length > 500) {
+            $('#editProdFeedback').text(`Production description cannot exceed 500 characters. (Current: ${productionDescription.length})`).removeClass('d-none');
+            $('#editProductionDescription').addClass('is-invalid');
+            errorList.push('Production description cannot exceed 500 characters.');
+            isValid = false;
+        }
+
+        // 6. Capability title cannot exceed 50 characters
+        if (capabilityTitle.length > 50) {
+            $('#editCapTitleFeedback').text(`Capability title cannot exceed 50 characters. (Current: ${capabilityTitle.length})`).removeClass('d-none');
+            $('#editCapabilityTitle').addClass('is-invalid');
+            errorList.push('Capability title cannot exceed 50 characters.');
+            isValid = false;
+        }
+
+        // 7. Capability description cannot exceed 250 characters
+        if (capabilityDescription.length > 250) {
+            $('#editCapDescFeedback').text(`Capability description cannot exceed 250 characters. (Current: ${capabilityDescription.length})`).removeClass('d-none');
+            $('#editCapabilityDescription').addClass('is-invalid');
+            errorList.push('Capability description cannot exceed 250 characters.');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            const errorHtml = `
+                <div class="d-flex align-items-start gap-2">
+                    <i class="bi bi-exclamation-octagon-fill fs-5 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <div class="fw-bold mb-1">Please fix the following validation errors:</div>
+                        <ul class="mb-0 ps-3">
+                            ${errorList.map(err => `<li>${escapeHtml(err)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            $('#editModalAlert').removeClass('d-none').html(errorHtml);
+            $('#editAboutUsModal .modal-body').animate({ scrollTop: 0 }, 250);
+            return;
+        }
+
+        // Build Payload matching PUT API specification
+        const payload = {
+            id: parseInt(id, 10),
+            sectionLabel: sectionLabel,
+            mainHeading: mainHeading,
+            introduction: introduction,
+            experienceDescription: experienceDescription,
+            productionDescription: productionDescription,
+            capabilityTitle: capabilityTitle || 'Comprehensive Product Capabilities:',
+            capabilityDescription: capabilityDescription
+        };
+
+        const token = getAuthToken();
+        const ajaxHeaders = {
+            'Accept': 'application/json, */*',
+            'Content-Type': 'application/json'
+        };
+        if (token) {
+            ajaxHeaders['Authorization'] = `Bearer ${token}`;
+        }
+
+        const $submitBtn = $('#btnSubmitEditAboutUs');
+        const $submitBtnText = $('#btnSubmitEditAboutUsText');
+        $submitBtn.prop('disabled', true);
+        $submitBtnText.html('<span class="spinner-border spinner-border-sm me-2" role="status"></span> Updating...');
+        $('#editModalAlert').addClass('d-none').text('');
+
+        console.log(`[AboutUs] Submitting PUT Update to: ${UPDATE_API_URL}`, payload);
+
+        $.ajax({
+            url: UPDATE_API_URL,
+            type: 'PUT',
+            data: JSON.stringify(payload),
+            headers: ajaxHeaders,
+            success: function (res) {
+                console.log('[AboutUs] Update Success Response:', res);
+                const editModalEl = document.getElementById('editAboutUsModal');
+                if (editModalEl) {
+                    const inst = bootstrap.Modal.getInstance(editModalEl);
+                    if (inst) inst.hide();
+                }
+
+                const successMsg = res && res.message ? res.message : 'About Us section updated successfully!';
+                showToast(successMsg, 'bi bi-check-circle-fill text-success');
+
+                // Reload data from API to display updated record
+                fetchAboutUsData();
+            },
+            error: function (xhr, status, error) {
+                console.error('[AboutUs] Update Error:', xhr, status, error);
+
+                let errorMsg = 'Failed to update About Us section. Please try again.';
+                if (xhr.status === 401) {
+                    errorMsg = 'Session expired or unauthorized (401). Please sign in again.';
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                } else if (xhr.statusText && xhr.statusText !== 'error') {
+                    errorMsg = `Error (${xhr.status}): ${xhr.statusText}`;
+                }
+
+                $('#editModalAlert').removeClass('d-none').text(errorMsg);
+                showToast(errorMsg, 'bi bi-exclamation-triangle-fill text-warning');
+            },
+            complete: function () {
+                $submitBtn.prop('disabled', false);
+                $submitBtnText.html('Update &amp; Save');
+            }
+        });
+    });
+
+    // 14. Ultra-Modern Delete Confirmation Modal (matching Brand Images)
     window.confirmDeleteAboutUs = function (id) {
         ensureModalsInDom();
         pendingDeleteId = id;
