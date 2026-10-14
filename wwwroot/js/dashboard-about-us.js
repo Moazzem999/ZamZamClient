@@ -9,6 +9,76 @@
 $(function () {
     'use strict';
 
+    // Modern Delete Modal HTML template (styled identical to brand-images delete modal)
+    const modernDeleteModalHtml = `
+        <div class="modal fade" id="deleteConfirmAboutUsModal" tabindex="-1" aria-labelledby="deleteModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+                <div class="modal-content modern-delete-modal-content border-0">
+                    <!-- Close Bubble -->
+                    <button type="button" class="modal-close-bubble" data-bs-dismiss="modal" aria-label="Close" title="Cancel">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+
+                    <div class="text-center">
+                        <!-- Concentric Glowing Danger Icon -->
+                        <div class="delete-icon-spotlight">
+                            <div class="delete-pulse-ring"></div>
+                            <div class="delete-pulse-ring-inner"></div>
+                            <div class="delete-icon-bubble">
+                                <i class="bi bi-trash3-fill"></i>
+                            </div>
+                        </div>
+
+                        <!-- Title & Description -->
+                        <h4 class="delete-modal-heading" id="deleteModalTitle">Delete About Us Record?</h4>
+                        <p class="delete-modal-subtext">
+                            You are about to permanently remove this About Us section from the database.
+                        </p>
+
+                        <!-- Target Item Preview Card -->
+                        <div class="delete-target-preview-card text-start">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="delete-target-badge"><span id="deleteTargetId">#01</span></div>
+                                <span class="about-section-badge py-0 px-2" style="font-size: 0.72rem;" id="deleteTargetLabel">—</span>
+                            </div>
+                            <div class="delete-target-title" id="deleteTargetHeading" style="font-size: 0.95rem; line-height: 1.35; margin-bottom: 0.35rem;">Loading...</div>
+                            <div class="delete-target-desc" id="deleteTargetIntro" style="font-size: 0.8rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">—</div>
+                        </div>
+
+                        <!-- Irreversible Warning Pill -->
+                        <div class="delete-warning-pill">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span>This action is permanent and cannot be undone</span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="delete-modal-actions">
+                            <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn-modal-delete" id="btnConfirmDeleteAboutUs">
+                                <i class="bi bi-trash3-fill"></i>
+                                <span id="btnConfirmDeleteText">Delete Record</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Ensure the modern modal is at body root level (prevents any container stacking/overflow issues)
+    function ensureModalsInDom() {
+        let delEl = document.getElementById('deleteConfirmAboutUsModal');
+        if (!delEl) {
+            $('body').append(modernDeleteModalHtml);
+        } else if (!$(delEl).find('.modern-delete-modal-content').length) {
+            $(delEl).remove();
+            $('body').append(modernDeleteModalHtml);
+        }
+    }
+    ensureModalsInDom();
+
     // 1. Elements & Variables
     const $pageContainer = $('#aboutUsPageContainer');
     const apiBaseUrl = ($pageContainer.data('api-base-url') || 'https://localhost:7148').toString().replace(/\/+$/, '');
@@ -260,20 +330,20 @@ $(function () {
                         </span>
                     </td>
 
-                    <!-- Actions Column -->
+                    <!-- Actions Column (View Details, Delete) -->
                     <td class="dash-actions-cell">
                         <div class="dash-action-btn-group">
                             <button type="button" 
-                                    class="dash-action-btn btn-view btn-view-about" 
-                                    data-id="${id}" 
+                                    class="dash-action-btn btn-view" 
+                                    onclick="window.openAboutUsModal(${id}); event.stopPropagation();" 
                                     title="View complete details">
-                                <i class="bi bi-eye" style="pointer-events: none;"></i>
+                                <i class="bi bi-eye"></i>
                             </button>
                             <button type="button" 
-                                    class="dash-action-btn btn-delete btn-delete-about" 
-                                    data-id="${id}" 
+                                    class="dash-action-btn btn-delete text-danger" 
+                                    onclick="window.confirmDeleteAboutUs(${id}); event.stopPropagation();" 
                                     title="Delete this record">
-                                <i class="bi bi-trash3" style="pointer-events: none;"></i>
+                                <i class="bi bi-trash3"></i>
                             </button>
                         </div>
                     </td>
@@ -296,7 +366,7 @@ $(function () {
     }
 
     // 6. View Details Modal
-    function openDetailModal(id) {
+    window.openAboutUsModal = function (id) {
         const item = allAboutUsRecords.find(r => String(r.id || r.Id) === String(id));
         if (!item) return;
 
@@ -328,46 +398,41 @@ $(function () {
         $statusBadge.html(`<span class="status-dot"></span><span>${isActive ? 'Active' : 'Inactive'}</span>`);
 
         const modalEl = document.getElementById('aboutUsDetailModal');
-        if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+        if (modalEl) {
             const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
             modalInstance.show();
         }
-    }
+    };
 
-    // 7. Delete Prompt & Execution
-    function promptDeleteAboutUs(id) {
+    // 7. Ultra-Modern Delete Confirmation Modal (matching Brand Images)
+    window.confirmDeleteAboutUs = function (id) {
+        ensureModalsInDom();
         pendingDeleteId = id;
-        const item = allAboutUsRecords.find(r => String(r.id || r.Id) === String(id)) || {};
 
-        const sectionLabel = item.sectionLabel || item.SectionLabel || '—';
-        const mainHeading = item.mainHeading || item.MainHeading || `Record #${id}`;
-        const intro = item.introduction || item.Introduction || '—';
+        const item = allAboutUsRecords.find(x => String(x.id || x.Id) === String(id)) || {};
+        const sectionLabel = item.sectionLabel || item.SectionLabel || 'OUR STORY';
+        const mainHeading = item.mainHeading || item.MainHeading || `About Us Record #${id}`;
+        const intro = item.introduction || item.Introduction || 'No description provided';
 
-        $('#deleteTargetId').text(`#${id}`);
+        $('#deleteTargetId').text(`#${String(id).padStart(2, '0')}`);
         $('#deleteTargetLabel').text(sectionLabel);
         $('#deleteTargetHeading').text(mainHeading);
         $('#deleteTargetIntro').text(intro);
 
-        const modalEl = document.getElementById('deleteAboutUsModal');
-        if (modalEl && window.bootstrap && window.bootstrap.Modal) {
-            try {
-                const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
-                modalInstance.show();
-                return;
-            } catch (err) {
-                console.warn('[AboutUs] Error opening modal with Bootstrap, falling back to confirm dialog:', err);
-            }
+        const modalEl = document.getElementById('deleteConfirmAboutUsModal');
+        if (modalEl) {
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modalInstance.show();
         }
+    };
 
-        // Direct fallback if Bootstrap modal instance is not available
-        if (window.confirm(`Are you sure you want to permanently delete About Us record #${id}?`)) {
-            executeDeleteAboutUs(id);
-        }
-    }
+    // Global event delegation for confirm delete button
+    $(document).on('click', '#btnConfirmDeleteAboutUs', function () {
+        if (!pendingDeleteId) return;
+        executeDeleteAboutUs(pendingDeleteId);
+    });
 
     function executeDeleteAboutUs(id) {
-        if (!id) return;
-
         const token = getAuthToken();
         const ajaxHeaders = {
             'Accept': 'application/json'
@@ -382,48 +447,34 @@ $(function () {
         $btnText.text('Deleting...');
 
         const deleteApiUrl = `${apiBaseUrl}/api/AboutUs/${id}`;
-        console.log(`[AboutUs] Executing DELETE to: ${deleteApiUrl}`);
+        console.log(`[AboutUs] Sending DELETE to: ${deleteApiUrl}`);
 
         $.ajax({
             url: deleteApiUrl,
             type: 'DELETE',
             headers: ajaxHeaders,
             success: function (res) {
-                console.log('[AboutUs] Delete API response:', res);
-
-                // Hide modal if open
-                const modalEl = document.getElementById('deleteAboutUsModal');
-                if (modalEl && window.bootstrap && window.bootstrap.Modal) {
-                    try {
-                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                        if (modalInstance) modalInstance.hide();
-                    } catch (e) {}
+                console.log('[AboutUs] Delete response:', res);
+                const modalEl = document.getElementById('deleteConfirmAboutUsModal');
+                if (modalEl) {
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) modalInstance.hide();
                 }
 
-                // Check for failure message in response
-                if (res && res.succeeded === false) {
-                    const msg = res.message || 'Server rejected delete operation.';
-                    showToast(msg, 'bi bi-exclamation-triangle-fill text-warning');
-                    return;
-                }
-
-                // Update state & re-render
-                allAboutUsRecords = allAboutUsRecords.filter(r => String(r.id || r.Id) !== String(id));
+                allAboutUsRecords = allAboutUsRecords.filter(x => String(x.id || x.Id) !== String(id));
                 applyFilterAndRender();
                 showToast('About Us record deleted successfully!', 'bi bi-trash3-fill text-danger');
             },
             error: function (xhr, status, error) {
-                console.error('[AboutUs] Delete failed:', xhr, status, error);
-
-                let msg = 'Failed to delete About Us record. Please check server status.';
+                console.error('[AboutUs] Delete error:', xhr, status, error);
+                let msg = 'Failed to delete About Us record. Please try again.';
                 if (xhr.status === 401) {
-                    msg = 'Unauthorized. Please sign in again.';
+                    msg = 'Session expired or unauthorized (401). Please sign in again.';
                 } else if (xhr.responseJSON && xhr.responseJSON.message) {
                     msg = xhr.responseJSON.message;
                 } else if (xhr.statusText && xhr.statusText !== 'error') {
                     msg = `Error (${xhr.status}): ${xhr.statusText}`;
                 }
-
                 showToast(msg, 'bi bi-exclamation-triangle-fill text-warning');
             },
             complete: function () {
@@ -434,38 +485,12 @@ $(function () {
         });
     }
 
-    // 8. Event Handlers (using document delegation to guarantee all dynamically rendered elements work)
-    // View details button click
-    $(document).on('click', '.btn-view-about', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const $btn = $(this).closest('.btn-view-about');
-        const id = $btn.attr('data-id') || $btn.data('id');
-        if (id) openDetailModal(id);
-    });
-
-    // Row click
+    // 8. Event Handlers
+    // Row click opens details
     $(document).on('click', 'tr.about-row-clickable', function (e) {
         if ($(e.target).closest('.dash-action-btn').length) return;
         const id = $(this).attr('data-record-id') || $(this).data('record-id');
-        if (id) openDetailModal(id);
-    });
-
-    // Row Delete button click
-    $(document).on('click', '.btn-delete-about', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const $btn = $(this).closest('.btn-delete-about');
-        const id = $btn.attr('data-id') || $btn.data('id');
-        console.log('[AboutUs] Delete clicked for ID:', id);
-        if (id) promptDeleteAboutUs(id);
-    });
-
-    // Confirm Delete button click in modal
-    $(document).on('click', '#btnConfirmDeleteAboutUs', function (e) {
-        e.preventDefault();
-        if (!pendingDeleteId) return;
-        executeDeleteAboutUs(pendingDeleteId);
+        if (id) window.openAboutUsModal(id);
     });
 
     // Search events
@@ -480,6 +505,7 @@ $(function () {
     // Refresh & Retry
     $refreshBtn.on('click', function () {
         fetchAboutUsData();
+        showToast('Refreshing About Us records...', 'bi bi-arrow-repeat text-primary');
     });
 
     $retryBtn.on('click', function () {
