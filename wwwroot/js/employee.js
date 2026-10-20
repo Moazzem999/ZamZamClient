@@ -481,10 +481,6 @@ $(function () {
         $('#modalEmployeeId').text(`#${emp.id}`);
         $('#modalEmployeeDesignationBadge').text(emp.designation || 'Staff');
 
-        const statusBadgeHtml = isActive
-            ? `<span class="dash-status-badge status-active"><span class="status-dot"></span><span>Active</span></span>`
-            : `<span class="dash-status-badge status-inactive"><span class="status-dot"></span><span>Inactive</span></span>`;
-        $('#modalEmployeeStatusBadge').html(statusBadgeHtml);
 
         // Profile Photo
         const $photoContainer = $('#modalEmployeePhotoContainer');
