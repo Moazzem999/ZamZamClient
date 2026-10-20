@@ -114,6 +114,12 @@
                                 <span>List</span>
                             </a>
                         </li>
+                        <li class="submenu-item @(isEmployeeActive && string.Equals(currentAction, "Create", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+                            <a asp-controller="Employee" asp-action="Create" class="submenu-link">
+                                <i class="bi bi-person-plus submenu-icon"></i>
+                                <span>Create</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </li>

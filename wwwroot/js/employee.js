@@ -610,10 +610,6 @@ $(function () {
         }
     });
 
-    // Add employee placeholder
-    $createBtn.add($btnEmptyAdd).on('click', function () {
-        showToast('Create Employee form will be integrated in the next step.', 'bi bi-info-circle-fill text-info');
-    });
 
     // 10. Initial API Call
     fetchEmployees(1);

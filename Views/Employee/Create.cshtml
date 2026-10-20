@@ -1,0 +1,558 @@
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Create Employee";
+    var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
+}
+
+<style>
+    /* Card & Section Styles */
+    .form-section-card {
+        background-color: #ffffff;
+        border: 1px solid var(--dash-card-border, #e2e8f0);
+        border-radius: var(--dash-card-radius, 14px);
+        box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+    }
+    .form-section-card:hover {
+        box-shadow: 0 6px 20px -2px rgba(15, 23, 42, 0.07);
+    }
+    .form-section-header {
+        padding: 1.15rem 1.5rem;
+        background-color: #f8fafc;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .form-section-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: var(--dash-primary-blue, #2563eb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+    .form-section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+    .form-section-desc {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin: 0;
+    }
+    .form-section-body {
+        padding: 1.5rem;
+    }
+
+    /* Form Inputs */
+    .emp-form-label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+    .emp-form-label .req {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+    .emp-form-control {
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.9rem;
+        color: #0f172a;
+        background-color: #ffffff;
+        transition: all 0.2s ease;
+    }
+    .emp-form-control:focus {
+        border-color: var(--dash-primary-blue, #2563eb);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        outline: none;
+    }
+
+    /* Dropzone Upload Styling */
+    .upload-dropzone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 1.75rem 1rem;
+        text-align: center;
+        background-color: #f8fafc;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    .upload-dropzone:hover {
+        border-color: var(--dash-primary-blue, #2563eb);
+        background-color: #eff6ff;
+    }
+    .upload-dropzone-icon {
+        font-size: 2.2rem;
+        color: #94a3b8;
+        margin-bottom: 0.5rem;
+        transition: color 0.2s ease;
+    }
+    .upload-dropzone:hover .upload-dropzone-icon {
+        color: var(--dash-primary-blue, #2563eb);
+    }
+    .upload-dropzone-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+    .upload-dropzone-desc {
+        font-size: 0.76rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    /* File Preview Container */
+    .file-preview-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+    }
+    .file-preview-thumb {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        object-fit: cover;
+        background-color: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        flex-shrink: 0;
+    }
+</style>
+
+<!-- Root Container -->
+<div class="employee-create-wrapper" id="employeeCreateContainer" data-api-base-url="@apiBaseUrl">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="dash-breadcrumb">
+        <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <a asp-controller="Employee" asp-action="List">Employee</a>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span class="current">Create</span>
+    </nav>
+
+    <!-- Page Heading Area -->
+    <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="dashboard-title">Create Employee</h1>
+            <p class="dashboard-subtitle">Register a new company personnel record with contact details, salary, and credentials.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <a asp-controller="Employee" asp-action="List" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm">
+                <i class="bi bi-arrow-left"></i>
+                <span class="fw-semibold">Back to List</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Box for Success or Error -->
+    <div id="createAlertBox" class="alert d-none rounded-3 shadow-sm mb-4" role="alert"></div>
+
+    <!-- Employee Create Form -->
+    <form id="createEmployeeForm" novalidate autocomplete="off">
+
+        <!-- 1. Personal Information Section -->
+        <div class="form-section-card">
+            <div class="form-section-header">
+                <div class="form-section-icon">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div>
+                    <h2 class="form-section-title">Personal Information</h2>
+                    <p class="form-section-desc">Full legal identity and personal profile details</p>
+                </div>
+            </div>
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <!-- Full Name -->
+                    <div class="col-md-6">
+                        <label for="empName" class="emp-form-label">
+                            Full Name <span class="req">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">
+                                <i class="bi bi-person"></i>
+                            </span>
+                            <input type="text"
+                                   class="form-control emp-form-control border-start-0"
+                                   id="empName"
+                                   placeholder="e.g. Jubayer Hossain"
+                                   required />
+                        </div>
+                    </div>
+
+                    <!-- Father's Name -->
+                    <div class="col-md-6">
+                        <label for="empFatherName" class="emp-form-label">
+                            Father's Name <span class="req">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">
+                                <i class="bi bi-person-badge"></i>
+                            </span>
+                            <input type="text"
+                                   class="form-control emp-form-control border-start-0"
+                                   id="empFatherName"
+                                   placeholder="e.g. Md Kamal Uddin"
+                                   required />
+                        </div>
+                    </div>
+
+                    <!-- NID Number -->
+                    <div class="col-md-4">
+                        <label for="empNidNo" class="emp-form-label">
+                            National ID (NID) <span class="req">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">
+                                <i class="bi bi-card-text"></i>
+                            </span>
+                            <input type="text"
+                                   class="form-control emp-form-control border-start-0"
+                                   id="empNidNo"
+                                   placeholder="e.g. 4783673396"
+                                   required />
+                        </div>
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div class="col-md-4">
+                        <label for="empDateOfBirth" class="emp-form-label">
+                            Date of Birth
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">
+                                <i class="bi bi-calendar-event"></i>
+                            </span>
+                            <input type="date"
+                                   class="form-control emp-form-control border-start-0"
+                                   id="empDateOfBirth"
+                                   value="1995-02-15" />
+                        </div>
+                    </div>
+
+                    <!-- Marital Status -->
+                    <div class="col-md-4">
+                        <label for="empMaritalStatus" class="emp-form-label">
+                            Marital Status
+                        </label>
+                        <select class="form-select emp-form-control" id="empMaritalStatus">
+                            <option value="1" selected>Married</option>
+                            <option value="2">Single</option>
+                            <option value="3">Divorced</option>
+                            <option value="4">Widowed</option>
+                        </select>
+                    </div>
+
+                    <!-- Religion -->
+                    <div class="col-md-6">
+                        <label for="empReligion" class="emp-form-label">
+                            Religion
+                        </label>
+                        <select class="form-select emp-form-control" id="empReligion">
+                            <option value="1" selected>Islam</option>
+                            <option value="2">Hinduism</option>
+                            <option value="3">Buddhism</option>
+                            <option value="4">Christianity</option>
+                            <option value="5">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Academic Qualification -->
+                    <div class="col-md-6">
+                        <label for="empAcademicQualification" class="emp-form-label">
+                            Academic Qualification
+                        </label>
+                        <input type="text"
+                               class="form-control emp-form-control"
+                               id="empAcademicQualification"
+                               placeholder="e.g. HSC, Bachelor's in Marketing, Diploma" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Employment & Salary Section -->
+        <div class="form-section-card">
+            <div class="form-section-header">
+                <div class="form-section-icon">
+                    <i class="bi bi-briefcase-fill"></i>
+                </div>
+                <div>
+                    <h2 class="form-section-title">Employment &amp; Payroll</h2>
+                    <p class="form-section-desc">Designation, official joining date, and monthly compensation</p>
+                </div>
+            </div>
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <!-- Designation -->
+                    <div class="col-md-5">
+                        <label for="empDesignation" class="emp-form-label">
+                            Designation / Job Title <span class="req">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">
+                                <i class="bi bi-award"></i>
+                            </span>
+                            <input type="text"
+                                   class="form-control emp-form-control border-start-0"
+                                   id="empDesignation"
+                                   placeholder="e.g. Sr. Sales Executive, Operator"
+                                   required />
+                        </div>
+                    </div>
+
+                    <!-- Joining Date -->
+                    <div class="col-md-4">
+                        <label for="empJoiningDate" class="emp-form-label">
+                            Joining Date <span class="req">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">
+                                <i class="bi bi-calendar3"></i>
+                            </span>
+                            <input type="date"
+                                   class="form-control emp-form-control border-start-0"
+                                   id="empJoiningDate"
+                                   required />
+                        </div>
+                    </div>
+
+                    <!-- Salary -->
+                    <div class="col-md-3">
+                        <label for="empSalary" class="emp-form-label">
+                            Monthly Salary (BDT)
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0 fw-bold">৳</span>
+                            <input type="number"
+                                   class="form-control emp-form-control border-start-0"
+                                   id="empSalary"
+                                   placeholder="0"
+                                   min="0"
+                                   step="500" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Contact & Communication Section -->
+        <div class="form-section-card">
+            <div class="form-section-header">
+                <div class="form-section-icon">
+                    <i class="bi bi-telephone-fill"></i>
+                </div>
+                <div>
+                    <h2 class="form-section-title">Contact Information</h2>
+                    <p class="form-section-desc">Communication phone and email addresses</p>
+                </div>
+            </div>
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <!-- Mobile -->
+                    <div class="col-md-6">
+                        <label for="empMobile" class="emp-form-label">
+                            Mobile Number <span class="req">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">
+                                <i class="bi bi-telephone"></i>
+                            </span>
+                            <input type="tel"
+                                   class="form-control emp-form-control border-start-0"
+                                   id="empMobile"
+                                   placeholder="e.g. 01913176712"
+                                   required />
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <label for="empEmail" class="emp-form-label">
+                            Email Address <span class="req">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">
+                                <i class="bi bi-envelope"></i>
+                            </span>
+                            <input type="email"
+                                   class="form-control emp-form-control border-start-0"
+                                   id="empEmail"
+                                   placeholder="e.g. jubayer@gmail.com"
+                                   required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Address Details Section -->
+        <div class="form-section-card">
+            <div class="form-section-header">
+                <div class="form-section-icon">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <div>
+                    <h2 class="form-section-title">Address Details</h2>
+                    <p class="form-section-desc">Current residential and permanent home addresses</p>
+                </div>
+            </div>
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <!-- Present Address -->
+                    <div class="col-md-6">
+                        <label for="empPresentAddress" class="emp-form-label">
+                            Present Address
+                        </label>
+                        <textarea class="form-control emp-form-control"
+                                  id="empPresentAddress"
+                                  rows="3"
+                                  placeholder="e.g. House 15, Road 3, Block A, Section 10, Mirpur, Dhaka-1216, Bangladesh"></textarea>
+                    </div>
+
+                    <!-- Permanent Address -->
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="empPermanentAddress" class="emp-form-label m-0">
+                                Permanent Address
+                            </label>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input" type="checkbox" id="sameAsPresentCheck" />
+                                <label class="form-check-label small text-muted" for="sameAsPresentCheck">
+                                    Same as present
+                                </label>
+                            </div>
+                        </div>
+                        <textarea class="form-control emp-form-control"
+                                  id="empPermanentAddress"
+                                  rows="3"
+                                  placeholder="e.g. Permanent village or district address"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Document & Photo Uploads Section -->
+        <div class="form-section-card">
+            <div class="form-section-header">
+                <div class="form-section-icon">
+                    <i class="bi bi-file-earmark-arrow-up-fill"></i>
+                </div>
+                <div>
+                    <h2 class="form-section-title">Documents &amp; Photo Attachments</h2>
+                    <p class="form-section-desc">Upload employee passport-size portrait and official National ID image</p>
+                </div>
+            </div>
+            <div class="form-section-body">
+                <div class="row g-3">
+                    <!-- Profile Photo (Image) -->
+                    <div class="col-md-6">
+                        <label class="emp-form-label">
+                            Employee Profile Photo
+                        </label>
+
+                        <!-- Dropzone -->
+                        <div class="upload-dropzone" id="imageDropzone" onclick="$('#empImageFile').trigger('click');">
+                            <i class="bi bi-cloud-arrow-up-fill upload-dropzone-icon"></i>
+                            <div class="upload-dropzone-title">Click or drag image to upload</div>
+                            <p class="upload-dropzone-desc">Supports PNG, JPG, JPEG, WEBP (Max 5MB)</p>
+                        </div>
+                        <input type="file" id="empImageFile" class="d-none" accept="image/*" />
+
+                        <!-- Preview Card -->
+                        <div class="file-preview-card d-none mt-2" id="imagePreviewWrapper">
+                            <img src="" alt="Photo Preview" class="file-preview-thumb" id="imagePreviewImg" />
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold text-dark small">Profile Photo Selected</div>
+                                <small class="text-muted d-block">Ready to upload</small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger rounded-2" id="btnRemoveImage" title="Remove image">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- NID Card Document (NidImage) -->
+                    <div class="col-md-6">
+                        <label class="emp-form-label">
+                            NID Document Photo / Scan
+                        </label>
+
+                        <!-- Dropzone -->
+                        <div class="upload-dropzone" id="nidDropzone" onclick="$('#empNidImageFile').trigger('click');">
+                            <i class="bi bi-card-image upload-dropzone-icon"></i>
+                            <div class="upload-dropzone-title">Click or drag NID card document</div>
+                            <p class="upload-dropzone-desc">National ID front/back copy (PNG, JPG, PDF)</p>
+                        </div>
+                        <input type="file" id="empNidImageFile" class="d-none" accept="image/*,.pdf" />
+
+                        <!-- Preview Card -->
+                        <div class="file-preview-card d-none mt-2" id="nidPreviewWrapper">
+                            <img src="" alt="NID Preview" class="file-preview-thumb" id="nidPreviewImg" />
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold text-dark small">NID Document Attached</div>
+                                <small class="text-muted d-block">Ready to upload</small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger rounded-2" id="btnRemoveNidImage" title="Remove NID document">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Submission Buttons Toolbar -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 p-3 bg-white border rounded-3 shadow-sm mb-5">
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-light border px-3 py-2 rounded-3 text-secondary" id="btnResetForm">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                </button>
+                <a asp-controller="Employee" asp-action="List" class="btn btn-outline-secondary px-3 py-2 rounded-3">
+                    Cancel
+                </a>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm" id="btnSubmitEmployee">
+                    <span id="btnSubmitText">
+                        <i class="bi bi-check2-circle me-1"></i> Save Employee
+                    </span>
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- Floating Toast Notification Container -->
+<div class="dash-toast-container">
+    <div class="dash-toast" id="dashToast" role="alert" aria-live="assertive" aria-atomic="true">
+        <i class="bi bi-check-circle-fill dash-toast-icon"></i>
+        <span id="dashToastMessage">Action completed successfully.</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/employee-create.js" asp-append-version="true"></script>
+}
