@@ -371,9 +371,6 @@ $(function () {
                     <td>
                         <span class="fw-bold text-dark">${salary}</span>
                     </td>
-                    <td>
-                        ${statusBadge}
-                    </td>
                     <td class="text-end">
                         <div class="dash-action-btn-group">
                             <button type="button" class="dash-action-btn btn-view btn-view-employee" data-employee-id="${id}" title="View Employee Profile">
