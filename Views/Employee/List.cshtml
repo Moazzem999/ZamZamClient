@@ -1,0 +1,156 @@
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Employee List";
+    var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
+}
+
+<!-- Page Root Container -->
+<div class="employee-page-wrapper" id="employeePageContainer" data-api-base-url="@apiBaseUrl">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="dash-breadcrumb">
+        <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span>Employee</span>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span class="current">List</span>
+    </nav>
+
+    <!-- Page Heading Area -->
+    <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="dashboard-title">Employee List</h1>
+            <p class="dashboard-subtitle">Manage company staff, designations, departments, and employee records.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- Add Employee Button -->
+            <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnOpenCreateEmployee" title="Add new employee">
+                <i class="bi bi-person-plus-fill"></i>
+                <span class="fw-semibold">Add Employee</span>
+            </button>
+
+            <!-- Refresh Button -->
+            <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnRefreshEmployees" title="Reload list">
+                <i class="bi bi-arrow-clockwise refresh-icon"></i>
+                <span class="fw-semibold">Refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Table Card -->
+    <div class="dash-table-card">
+
+        <!-- Card Header Toolbar -->
+        <div class="dash-card-header">
+            <div class="dash-card-header-left">
+                <div class="dash-header-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <h2 class="dash-card-title">Employees Directory</h2>
+                    <p class="dash-card-subtitle">All active and registered employee records</p>
+                </div>
+            </div>
+
+            <!-- Toolbar Controls -->
+            <div class="dash-toolbar-controls">
+                <!-- Search Input -->
+                <div class="dash-search-group">
+                    <i class="bi bi-search dash-search-icon"></i>
+                    <input type="text"
+                           class="dash-search-input"
+                           id="employeeSearchInput"
+                           placeholder="Search employees..."
+                           autocomplete="off" />
+                    <button type="button" class="dash-search-clear" id="employeeSearchClear" title="Clear search">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Responsive Container -->
+        <div class="table-responsive dash-table-responsive">
+            <table class="table dash-custom-table" id="employeeTable">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">#</th>
+                        <th>Employee</th>
+                        <th>Designation</th>
+                        <th>Department</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th class="text-end" style="width: 120px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    <!-- Populated dynamically via employee.js -->
+                </tbody>
+            </table>
+
+            <!-- Loading State Display -->
+            <div id="employeeLoadingState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <h3 class="dash-state-title">Loading Employees...</h3>
+                <p class="dash-state-desc">Fetching employee directory records.</p>
+            </div>
+
+            <!-- Empty State Display -->
+            <div id="employeeEmptyState" class="dash-table-state-box">
+                <div class="dash-state-icon-circle icon-empty">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+                <h3 class="dash-state-title">No Employees Found</h3>
+                <p class="dash-state-desc">There are currently no employee records listed. Click below to add your first employee.</p>
+                <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm mt-2" id="btnEmptyAddEmployee">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Add First Employee</span>
+                </button>
+            </div>
+
+            <!-- No Search Results State -->
+            <div id="employeeNoResultsState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-empty">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h3 class="dash-state-title">No Matching Records</h3>
+                <p class="dash-state-desc">No employees match your search criteria. Try a different keyword.</p>
+            </div>
+
+            <!-- Error State Display -->
+            <div id="employeeErrorState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-error">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h3 class="dash-state-title">Unable to Load Employees</h3>
+                <p class="dash-state-desc" id="employeeErrorMessageText">An unexpected error occurred while communicating with the server.</p>
+            </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="dash-card-footer">
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small" id="employeeTableCountSummary">Showing 0 of 0 employees</span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Floating Toast Notification Container -->
+<div class="dash-toast-container">
+    <div class="dash-toast" id="dashToast" role="alert" aria-live="assertive" aria-atomic="true">
+        <i class="bi bi-check-circle-fill dash-toast-icon"></i>
+        <span id="dashToastMessage">Action completed successfully.</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/employee.js" asp-append-version="true"></script>
+}
