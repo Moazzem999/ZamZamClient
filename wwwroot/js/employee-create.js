@@ -17,6 +17,8 @@ $(function () {
     }
 
     const CREATE_EMPLOYEE_URL = `${apiBaseUrl}/api/Employees`;
+    const GET_MARITAL_STATUS_URL = `${apiBaseUrl}/api/Dropdown/GetAllMaritalStatus`;
+    const GET_RELIGION_URL = `${apiBaseUrl}/api/Dropdown/GetAllReligion`;
 
     const $form = $('#createEmployeeForm');
     const $submitBtn = $('#btnSubmitEmployee');
@@ -117,6 +119,96 @@ $(function () {
         $alertBox.addClass('d-none').empty();
     }
 
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // 3. Dropdown Population via API
+    function loadDropdowns() {
+        const token = getAuthToken();
+        const headers = { 'Accept': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        // 3a. Marital Status Dropdown
+        $.ajax({
+            url: GET_MARITAL_STATUS_URL,
+            type: 'GET',
+            dataType: 'json',
+            headers: headers,
+            cache: true,
+            success: function (res) {
+                const list = res && Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
+                if (list.length > 0) {
+                    let html = '<option value="">-- Select Marital Status --</option>';
+                    list.forEach(item => {
+                        html += `<option value="${item.id}">${escapeHtml(item.name)}</option>`;
+                    });
+                    $maritalStatus.html(html);
+                } else {
+                    fallbackMaritalStatus();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.warn('[EmployeeCreate] Could not load marital status from API, applying fallback:', error);
+                fallbackMaritalStatus();
+            }
+        });
+
+        // 3b. Religion Dropdown
+        $.ajax({
+            url: GET_RELIGION_URL,
+            type: 'GET',
+            dataType: 'json',
+            headers: headers,
+            cache: true,
+            success: function (res) {
+                const list = res && Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
+                if (list.length > 0) {
+                    let html = '<option value="">-- Select Religion --</option>';
+                    list.forEach(item => {
+                        html += `<option value="${item.id}">${escapeHtml(item.name)}</option>`;
+                    });
+                    $religion.html(html);
+                } else {
+                    fallbackReligion();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.warn('[EmployeeCreate] Could not load religion from API, applying fallback:', error);
+                fallbackReligion();
+            }
+        });
+    }
+
+    function fallbackMaritalStatus() {
+        $maritalStatus.html(`
+            <option value="">-- Select Marital Status --</option>
+            <option value="1">Single</option>
+            <option value="2">Married</option>
+            <option value="3">Divorced</option>
+        `);
+    }
+
+    function fallbackReligion() {
+        $religion.html(`
+            <option value="">-- Select Religion --</option>
+            <option value="1">Islam</option>
+            <option value="2">Hinduism</option>
+            <option value="3">Christianity</option>
+            <option value="4">Buddhism</option>
+            <option value="5">Others</option>
+        `);
+    }
+
+    // Load dropdown options immediately
+    loadDropdowns();
+
     // 3. Address Sync Logic
     $sameAsPresentCheck.on('change', function () {
         if ($(this).is(':checked')) {
@@ -201,8 +293,8 @@ $(function () {
         const salaryVal = parseFloat($salary.val()) || 0;
         const joiningDateVal = $joiningDate.val();
         const dateOfBirthVal = $dateOfBirth.val();
-        const maritalStatusVal = parseInt($maritalStatus.val(), 10) || 1;
-        const religionVal = parseInt($religion.val(), 10) || 1;
+        const maritalStatusVal = parseInt($maritalStatus.val(), 10);
+        const religionVal = parseInt($religion.val(), 10);
         const academicQualVal = $academicQualification.val().trim();
         const presentAddrVal = $presentAddress.val().trim();
         const permanentAddrVal = $permanentAddress.val().trim();
@@ -222,6 +314,18 @@ $(function () {
         if (!nidNoVal) {
             showAlert('danger', 'Validation Error', 'National ID (NID) number is required.');
             $nidNo.focus();
+            return;
+        }
+
+        if (!maritalStatusVal) {
+            showAlert('danger', 'Validation Error', 'Please select a Marital Status.');
+            $maritalStatus.focus();
+            return;
+        }
+
+        if (!religionVal) {
+            showAlert('danger', 'Validation Error', 'Please select a Religion.');
+            $religion.focus();
             return;
         }
 

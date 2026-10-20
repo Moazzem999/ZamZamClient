@@ -103,20 +103,21 @@ $(function () {
     }
 
     function formatMaritalStatus(val) {
-        if (val === 1) return 'Married';
-        if (val === 2) return 'Single';
-        if (val === 3) return 'Divorced';
-        if (val === 4) return 'Widowed';
-        return val ? `Status #${val}` : '—';
+        const maritalStatusMap = {
+            1: 'Single',
+            2: 'Married',
+            3: 'Divorced'
+        };
+        return maritalStatusMap[val] || (val ? `Status #${val}` : '—');
     }
 
     function formatReligion(val) {
         const religionMap = {
             1: 'Islam',
             2: 'Hinduism',
-            3: 'Buddhism',
-            4: 'Christianity',
-            5: 'Other'
+            3: 'Christianity',
+            4: 'Buddhism',
+            5: 'Others'
         };
         return religionMap[val] || (val ? `Religion #${val}` : '—');
     }
