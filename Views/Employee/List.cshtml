@@ -1,8 +1,146 @@
 @{
     Layout = "_DashboardLayout";
-    ViewData["Title"] = "Employee List";
+    ViewData["Title"] = "Employee Directory";
     var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
 }
+
+<style>
+    /* Employee Avatar & Thumbnails */
+    .employee-avatar-wrapper {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        cursor: pointer;
+        border: 2px solid #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        background-color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .employee-avatar-wrapper:hover {
+        transform: scale(1.08);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+    }
+    .employee-avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .employee-avatar-fallback {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: #1d4ed8;
+        text-transform: uppercase;
+    }
+    .modal-avatar-fallback {
+        width: 120px;
+        height: 120px;
+        font-size: 2.5rem;
+        border-radius: 16px;
+    }
+    .employee-modal-photo {
+        max-height: 180px;
+        width: 100%;
+        object-fit: cover;
+    }
+    .employee-name-link:hover {
+        color: var(--dash-primary-blue) !important;
+    }
+
+    /* Info cards inside modal */
+    .emp-info-card {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem 1.15rem;
+        margin-bottom: 1rem;
+    }
+    .emp-info-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #334155;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.75rem;
+        border-bottom: 1px dashed #cbd5e1;
+        padding-bottom: 0.45rem;
+    }
+    .emp-info-card-header i {
+        color: var(--dash-primary-blue);
+        font-size: 1rem;
+    }
+    .emp-label-val {
+        margin-bottom: 0.5rem;
+    }
+    .emp-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        display: block;
+        margin-bottom: 2px;
+    }
+    .emp-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    /* NID Document Preview */
+    .nid-preview-wrapper {
+        border-radius: 12px;
+        background-color: #ffffff;
+    }
+    .nid-preview-img {
+        max-height: 160px;
+        width: 100%;
+        object-fit: contain;
+        background-color: #f8fafc;
+    }
+
+    /* Pagination controls */
+    .pagination-custom .page-link {
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 8px;
+        margin: 0 2px;
+        transition: all 0.2s ease;
+    }
+    .pagination-custom .page-link:hover {
+        background-color: #eff6ff;
+        color: var(--dash-primary-blue);
+        border-color: #bfdbfe;
+    }
+    .pagination-custom .page-item.active .page-link {
+        background-color: var(--dash-primary-blue);
+        border-color: var(--dash-primary-blue);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+    .pagination-custom .page-item.disabled .page-link {
+        color: #cbd5e1;
+        background-color: #f8fafc;
+        border-color: #f1f5f9;
+        cursor: not-allowed;
+    }
+</style>
 
 <!-- Page Root Container -->
 <div class="employee-page-wrapper" id="employeePageContainer" data-api-base-url="@apiBaseUrl">
@@ -19,18 +157,18 @@
     <!-- Page Heading Area -->
     <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
-            <h1 class="dashboard-title">Employee List</h1>
-            <p class="dashboard-subtitle">Manage company staff, designations, departments, and employee records.</p>
+            <h1 class="dashboard-title">Employee Directory</h1>
+            <p class="dashboard-subtitle">Manage company staff records, payroll salaries, designations, and NID credentials.</p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
             <!-- Add Employee Button -->
-            <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnOpenCreateEmployee" title="Add new employee">
+            <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnOpenCreateEmployee" title="Add new employee record">
                 <i class="bi bi-person-plus-fill"></i>
                 <span class="fw-semibold">Add Employee</span>
             </button>
 
             <!-- Refresh Button -->
-            <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnRefreshEmployees" title="Reload list">
+            <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnRefreshEmployees" title="Reload employee list from API">
                 <i class="bi bi-arrow-clockwise refresh-icon"></i>
                 <span class="fw-semibold">Refresh</span>
             </button>
@@ -47,24 +185,35 @@
                     <i class="bi bi-people-fill"></i>
                 </div>
                 <div>
-                    <h2 class="dash-card-title">Employees Directory</h2>
-                    <p class="dash-card-subtitle">All active and registered employee records</p>
+                    <h2 class="dash-card-title">Staff Members</h2>
+                    <p class="dash-card-subtitle">Active and registered personnel directory</p>
                 </div>
             </div>
 
-            <!-- Toolbar Controls -->
+            <!-- Toolbar Controls: Search & Page Size -->
             <div class="dash-toolbar-controls">
-                <!-- Search Input -->
+                <!-- Search Input with Clear Button -->
                 <div class="dash-search-group">
                     <i class="bi bi-search dash-search-icon"></i>
                     <input type="text"
                            class="dash-search-input"
                            id="employeeSearchInput"
-                           placeholder="Search employees..."
+                           placeholder="Search by name, mobile, email..."
                            autocomplete="off" />
                     <button type="button" class="dash-search-clear" id="employeeSearchClear" title="Clear search">
                         <i class="bi bi-x-lg"></i>
                     </button>
+                </div>
+
+                <!-- Page Size Selector -->
+                <div class="d-flex align-items-center gap-2">
+                    <label for="employeePageSizeSelect" class="small text-muted text-nowrap d-none d-sm-inline">Show:</label>
+                    <select id="employeePageSizeSelect" class="form-select form-select-sm" style="width: 80px; border-radius: 8px;">
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -74,39 +223,39 @@
             <table class="table dash-custom-table" id="employeeTable">
                 <thead>
                     <tr>
-                        <th style="width: 70px;">#</th>
-                        <th>Employee</th>
-                        <th>Designation</th>
-                        <th>Department</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th class="text-end" style="width: 120px;">Actions</th>
+                        <th style="width: 75px;"># ID</th>
+                        <th style="min-width: 240px;">Employee</th>
+                        <th style="min-width: 170px;">Designation</th>
+                        <th style="min-width: 180px;">Contact</th>
+                        <th style="min-width: 130px;">Joining Date</th>
+                        <th style="min-width: 120px;">Salary</th>
+                        <th style="min-width: 110px;">Status</th>
+                        <th class="text-end" style="width: 100px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="employeeTableBody">
-                    <!-- Populated dynamically via employee.js -->
+                    <!-- Dynamic Rows Populated via employee.js -->
                 </tbody>
             </table>
 
             <!-- Loading State Display -->
-            <div id="employeeLoadingState" class="dash-table-state-box d-none">
+            <div id="employeeLoadingState" class="dash-table-state-box">
                 <div class="dash-state-icon-circle icon-loading">
-                    <div class="spinner-border text-primary" role="status">
+                    <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
                 <h3 class="dash-state-title">Loading Employees...</h3>
-                <p class="dash-state-desc">Fetching employee directory records.</p>
+                <p class="dash-state-desc">Connecting to the server and retrieving employee records.</p>
             </div>
 
             <!-- Empty State Display -->
-            <div id="employeeEmptyState" class="dash-table-state-box">
+            <div id="employeeEmptyState" class="dash-table-state-box d-none">
                 <div class="dash-state-icon-circle icon-empty">
-                    <i class="bi bi-person-badge"></i>
+                    <i class="bi bi-people"></i>
                 </div>
                 <h3 class="dash-state-title">No Employees Found</h3>
-                <p class="dash-state-desc">There are currently no employee records listed. Click below to add your first employee.</p>
+                <p class="dash-state-desc">There are currently no employee records registered in the system database.</p>
                 <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm mt-2" id="btnEmptyAddEmployee">
                     <i class="bi bi-plus-lg"></i>
                     <span>Add First Employee</span>
@@ -118,8 +267,8 @@
                 <div class="dash-state-icon-circle icon-empty">
                     <i class="bi bi-search"></i>
                 </div>
-                <h3 class="dash-state-title">No Matching Records</h3>
-                <p class="dash-state-desc">No employees match your search criteria. Try a different keyword.</p>
+                <h3 class="dash-state-title">No Matching Employees</h3>
+                <p class="dash-state-desc">No employee records matched your search query. Try another keyword or clear search.</p>
             </div>
 
             <!-- Error State Display -->
@@ -127,20 +276,185 @@
                 <div class="dash-state-icon-circle icon-error">
                     <i class="bi bi-exclamation-triangle-fill"></i>
                 </div>
-                <h3 class="dash-state-title">Unable to Load Employees</h3>
+                <h3 class="dash-state-title">Unable to Retrieve Employees</h3>
                 <p class="dash-state-desc" id="employeeErrorMessageText">An unexpected error occurred while communicating with the server.</p>
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-3 px-3 py-2 mt-2" id="btnRetryEmployees">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Try Again
+                </button>
             </div>
         </div>
 
-        <!-- Card Footer -->
+        <!-- Card Footer Toolbar with Pagination -->
         <div class="dash-card-footer">
             <div class="d-flex align-items-center gap-2">
-                <span class="text-muted small" id="employeeTableCountSummary">Showing 0 of 0 employees</span>
+                <span id="employeeTableCountSummary" class="fw-semibold text-muted">Loading count...</span>
             </div>
+            <nav id="employeePaginationNav" aria-label="Employee navigation" class="d-none">
+                <ul class="pagination pagination-custom pagination-sm mb-0" id="employeePaginationUl">
+                    <!-- Populated via employee.js -->
+                </ul>
+            </nav>
         </div>
 
     </div>
 
+</div>
+
+<!-- Employee Details Modal -->
+<div class="modal fade" id="employeeDetailModal" tabindex="-1" aria-labelledby="modalEmployeeName" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content brand-modal-content border-0">
+            <!-- Modal Header -->
+            <div class="modal-header brand-modal-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-3 bg-primary-subtle text-primary p-2">
+                        <i class="bi bi-person-badge-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark m-0 d-flex align-items-center gap-2">
+                            <span id="modalEmployeeName">Employee Details</span>
+                            <span class="dash-id-badge" id="modalEmployeeId">#0</span>
+                        </h5>
+                        <small class="text-muted" id="modalEmployeeDesignationBadge">Staff</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div id="modalEmployeeStatusBadge"></div>
+                    <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body brand-modal-body p-4">
+                <div class="row g-3">
+                    <!-- Left Column: Photo & NID Document -->
+                    <div class="col-md-4">
+                        <!-- Profile Photo Card -->
+                        <div class="emp-info-card text-center">
+                            <div class="emp-info-card-header justify-content-center">
+                                <i class="bi bi-image"></i>
+                                <span>Profile Photo</span>
+                            </div>
+                            <div id="modalEmployeePhotoContainer" class="d-flex justify-content-center mb-2">
+                                <!-- Image injected via JS -->
+                            </div>
+                        </div>
+
+                        <!-- NID Document Card -->
+                        <div class="emp-info-card">
+                            <div class="emp-info-card-header">
+                                <i class="bi bi-card-heading"></i>
+                                <span>NID Document</span>
+                            </div>
+                            <div id="modalNidContainer">
+                                <!-- NID preview injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Personal, Contact & Job Details -->
+                    <div class="col-md-8">
+                        <!-- 1. Personal Info -->
+                        <div class="emp-info-card">
+                            <div class="emp-info-card-header">
+                                <i class="bi bi-person-fill"></i>
+                                <span>Personal Information</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-sm-6 emp-label-val">
+                                    <span class="emp-label">Full Name</span>
+                                    <span class="emp-value" id="modalFullName">—</span>
+                                </div>
+                                <div class="col-sm-6 emp-label-val">
+                                    <span class="emp-label">Father's Name</span>
+                                    <span class="emp-value" id="modalFatherName">—</span>
+                                </div>
+                                <div class="col-sm-6 emp-label-val">
+                                    <span class="emp-label">NID Number</span>
+                                    <span class="emp-value" id="modalNidNo">—</span>
+                                </div>
+                                <div class="col-sm-6 emp-label-val">
+                                    <span class="emp-label">Date of Birth</span>
+                                    <span class="emp-value" id="modalDateOfBirth">—</span>
+                                </div>
+                                <div class="col-sm-4 emp-label-val">
+                                    <span class="emp-label">Marital Status</span>
+                                    <span class="emp-value" id="modalMaritalStatus">—</span>
+                                </div>
+                                <div class="col-sm-4 emp-label-val">
+                                    <span class="emp-label">Religion</span>
+                                    <span class="emp-value" id="modalReligion">—</span>
+                                </div>
+                                <div class="col-sm-4 emp-label-val">
+                                    <span class="emp-label">Academic Qualification</span>
+                                    <span class="emp-value" id="modalAcademicQualification">—</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Contact & Employment -->
+                        <div class="emp-info-card">
+                            <div class="emp-info-card-header">
+                                <i class="bi bi-briefcase-fill"></i>
+                                <span>Employment &amp; Contact</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-sm-6 emp-label-val">
+                                    <span class="emp-label">Designation</span>
+                                    <span class="emp-value text-primary" id="modalDesignation">—</span>
+                                </div>
+                                <div class="col-sm-6 emp-label-val">
+                                    <span class="emp-label">Monthly Salary</span>
+                                    <span class="emp-value text-dark" id="modalSalary">—</span>
+                                </div>
+                                <div class="col-sm-6 emp-label-val">
+                                    <span class="emp-label">Mobile Number</span>
+                                    <span class="emp-value" id="modalMobile">—</span>
+                                </div>
+                                <div class="col-sm-6 emp-label-val">
+                                    <span class="emp-label">Email Address</span>
+                                    <span class="emp-value" id="modalEmail">—</span>
+                                </div>
+                                <div class="col-sm-6 emp-label-val">
+                                    <span class="emp-label">Joining Date</span>
+                                    <span class="emp-value" id="modalJoiningDate">—</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Address Details -->
+                        <div class="emp-info-card">
+                            <div class="emp-info-card-header">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                <span>Address Details</span>
+                            </div>
+                            <div class="emp-label-val mb-2">
+                                <span class="emp-label">Present Address</span>
+                                <span class="emp-value d-block" id="modalPresentAddress">—</span>
+                            </div>
+                            <div class="emp-label-val">
+                                <span class="emp-label">Permanent Address</span>
+                                <span class="emp-value d-block" id="modalPermanentAddress">—</span>
+                            </div>
+                        </div>
+
+                        <!-- 4. System Timestamps -->
+                        <div class="d-flex justify-content-between text-muted small px-1">
+                            <span><i class="bi bi-clock me-1"></i>Created: <strong id="modalCreatedOn">—</strong></span>
+                            <span><i class="bi bi-pencil me-1"></i>Updated: <strong id="modalUpdatedOn">—</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary btn-sm rounded-3 px-4 py-2" data-bs-dismiss="modal">
+                    Close Details
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Floating Toast Notification Container -->
