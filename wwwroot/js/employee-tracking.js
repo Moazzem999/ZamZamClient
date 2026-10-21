@@ -588,10 +588,6 @@ $(function () {
                 }
             }
 
-            // Speed & Accuracy
-            const speedHtml = item.speed != null ? `<span class="fw-semibold">${escapeHtml(item.speed)} km/h</span>` : '<span class="text-muted">—</span>';
-            const accuracyHtml = item.accuracy != null ? `<span class="fw-semibold">&plusmn;${escapeHtml(item.accuracy)} m</span>` : '<span class="text-muted">—</span>';
-
             // Google Maps Link
             let mapActionHtml = '<span class="text-muted">—</span>';
             if (lat !== '—' && lng !== '—') {
@@ -622,8 +618,6 @@ $(function () {
                         </div>
                     </td>
                     <td>${batteryHtml}</td>
-                    <td>${speedHtml}</td>
-                    <td>${accuracyHtml}</td>
                     <td class="text-end">${mapActionHtml}</td>
                 </tr>
             `);
