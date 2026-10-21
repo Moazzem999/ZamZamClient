@@ -229,7 +229,7 @@
                         <th style="min-width: 180px;">Contact</th>
                         <th style="min-width: 130px;">Joining Date</th>
                         <th style="min-width: 120px;">Salary</th>
-                        <th class="text-end" style="width: 100px;">Actions</th>
+                        <th class="text-end" style="width: 125px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="employeeTableBody">
@@ -452,6 +452,229 @@
                 </button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Employee Edit / Update Modal -->
+<div class="modal fade" id="employeeEditModal" tabindex="-1" aria-labelledby="employeeEditModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" style="max-width: 900px;">
+        <form id="editEmployeeForm" class="modal-content modern-create-modal-content border-0" novalidate autocomplete="off">
+            <input type="hidden" id="editEmpId" value="0" />
+
+            <!-- Modal Header (Pinned at top) -->
+            <div class="modal-header border-bottom px-4 py-3 align-items-center d-flex justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="create-modal-icon-badge" style="background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); color: #4f46e5;">
+                        <i class="bi bi-person-gear"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark m-0 d-flex align-items-center gap-2">
+                            <span id="employeeEditModalTitle">Update Employee</span>
+                            <span class="dash-id-badge" id="editEmpBadgeId">#0</span>
+                        </h5>
+                        <small class="text-muted">Modify employee personal credentials, contact, salary, and documents</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm rounded-3 px-3 py-1 d-inline-flex align-items-center gap-1 shadow-sm d-none d-sm-inline-flex" id="btnHeaderUpdateEmployee" title="Save changes">
+                        <i class="bi bi-check2"></i>
+                        <span>Update</span>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- Modal Body (Scrollable between fixed header and footer) -->
+            <div class="modal-body px-4 py-3" id="editEmployeeModalBody">
+                <!-- Alert notification within modal -->
+                <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="editEmpModalAlert" role="alert"></div>
+
+                <!-- 1. Personal Information Section -->
+                <div class="emp-info-card mb-3">
+                    <div class="emp-info-card-header">
+                        <i class="bi bi-person-fill"></i>
+                        <span>Personal Information</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="editEmpName" class="form-label small fw-bold text-dark mb-1">
+                                Full Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control form-control-sm rounded-3" id="editEmpName" placeholder="e.g. Jubayer Hossain" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editEmpFatherName" class="form-label small fw-bold text-dark mb-1">
+                                Father's Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control form-control-sm rounded-3" id="editEmpFatherName" placeholder="e.g. Md Kamal Uddin" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editEmpNidNo" class="form-label small fw-bold text-dark mb-1">
+                                National ID (NID) <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control form-control-sm rounded-3" id="editEmpNidNo" placeholder="e.g. 4783673396" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editEmpDateOfBirth" class="form-label small fw-bold text-dark mb-1">
+                                Date of Birth
+                            </label>
+                            <input type="date" class="form-control form-control-sm rounded-3" id="editEmpDateOfBirth" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editEmpMaritalStatus" class="form-label small fw-bold text-dark mb-1">
+                                Marital Status
+                            </label>
+                            <select class="form-select form-select-sm rounded-3" id="editEmpMaritalStatus">
+                                <option value="1">Single</option>
+                                <option value="2">Married</option>
+                                <option value="3">Divorced</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editEmpReligion" class="form-label small fw-bold text-dark mb-1">
+                                Religion
+                            </label>
+                            <select class="form-select form-select-sm rounded-3" id="editEmpReligion">
+                                <option value="1">Islam</option>
+                                <option value="2">Hinduism</option>
+                                <option value="3">Christianity</option>
+                                <option value="4">Buddhism</option>
+                                <option value="5">Others</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editEmpAcademicQualification" class="form-label small fw-bold text-dark mb-1">
+                                Academic Qualification
+                            </label>
+                            <input type="text" class="form-control form-control-sm rounded-3" id="editEmpAcademicQualification" placeholder="e.g. HSC, Bachelor's, Diploma" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Employment & Payroll Section -->
+                <div class="emp-info-card mb-3">
+                    <div class="emp-info-card-header">
+                        <i class="bi bi-briefcase-fill"></i>
+                        <span>Employment &amp; Payroll</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label for="editEmpDesignation" class="form-label small fw-bold text-dark mb-1">
+                                Designation <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control form-control-sm rounded-3" id="editEmpDesignation" placeholder="e.g. Senior Executive" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editEmpJoiningDate" class="form-label small fw-bold text-dark mb-1">
+                                Joining Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" class="form-control form-control-sm rounded-3" id="editEmpJoiningDate" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="editEmpSalary" class="form-label small fw-bold text-dark mb-1">
+                                Salary (BDT) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-muted fw-bold">৳</span>
+                                <input type="number" class="form-control form-control-sm rounded-end-3" id="editEmpSalary" min="0" step="100" placeholder="0" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Contact & Address Section -->
+                <div class="emp-info-card mb-3">
+                    <div class="emp-info-card-header">
+                        <i class="bi bi-telephone-fill"></i>
+                        <span>Contact &amp; Address</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="editEmpMobile" class="form-label small fw-bold text-dark mb-1">
+                                Mobile Number <span class="text-danger">*</span>
+                            </label>
+                            <input type="tel" class="form-control form-control-sm rounded-3" id="editEmpMobile" placeholder="e.g. 01913176712" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editEmpEmail" class="form-label small fw-bold text-dark mb-1">
+                                Email Address <span class="text-danger">*</span>
+                            </label>
+                            <input type="email" class="form-control form-control-sm rounded-3" id="editEmpEmail" placeholder="e.g. employee@zamzamtrims.com" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editEmpPresentAddress" class="form-label small fw-bold text-dark mb-1">
+                                Present Address
+                            </label>
+                            <textarea class="form-control form-control-sm rounded-3" id="editEmpPresentAddress" rows="2" placeholder="Current residential address"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="editEmpPermanentAddress" class="form-label small fw-bold text-dark m-0">
+                                    Permanent Address
+                                </label>
+                                <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input" type="checkbox" id="editSameAsPresentCheck" />
+                                    <label class="form-check-label small text-muted" for="editSameAsPresentCheck" style="font-size: 0.75rem;">
+                                        Same as present
+                                    </label>
+                                </div>
+                            </div>
+                            <textarea class="form-control form-control-sm rounded-3" id="editEmpPermanentAddress" rows="2" placeholder="Permanent home address"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Photo & NID Document Section -->
+                <div class="emp-info-card mb-1">
+                    <div class="emp-info-card-header">
+                        <i class="bi bi-card-image"></i>
+                        <span>Profile Photo &amp; NID Document</span>
+                    </div>
+                    <div class="row g-3">
+                        <!-- Profile Photo -->
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark mb-1">
+                                Profile Photo
+                            </label>
+                            <div class="p-2 border rounded-3 bg-light d-flex align-items-center gap-3">
+                                <div id="editCurrentPhotoWrapper" style="width: 54px; height: 54px; flex-shrink: 0;"></div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <input type="file" class="form-control form-control-sm" id="editEmpImageFile" accept=".jpg,.jpeg,.png,.webp" />
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Leave empty to keep existing photo (Max 2MB)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NID Document -->
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark mb-1">
+                                NID Document Photo
+                            </label>
+                            <div class="p-2 border rounded-3 bg-light d-flex align-items-center gap-3">
+                                <div id="editCurrentNidWrapper" style="width: 54px; height: 54px; flex-shrink: 0;"></div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <input type="file" class="form-control form-control-sm" id="editEmpNidImageFile" accept=".jpg,.jpeg,.png,.pdf,.webp" />
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Leave empty to keep existing NID (Max 5MB)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer (Always visible & pinned at the bottom) -->
+            <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between align-items-center" style="position: sticky; bottom: 0; z-index: 1050; box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05); background-color: #f8fafc !important;">
+                <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-3 py-2" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm rounded-3 px-4 py-2 d-inline-flex align-items-center gap-2 shadow-sm" id="btnSubmitUpdateEmployee">
+                        <i class="bi bi-check2-circle"></i>
+                        <span id="btnSubmitUpdateEmployeeText">Update Employee</span>
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
