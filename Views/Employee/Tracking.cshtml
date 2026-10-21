@@ -1,0 +1,40 @@
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Employee Tracking";
+    var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
+}
+
+<!-- Page Root Container -->
+<div class="employee-page-wrapper" id="employeeTrackingContainer" data-api-base-url="@apiBaseUrl">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="dash-breadcrumb">
+        <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span>Employee</span>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span class="current">Tracking</span>
+    </nav>
+
+    <!-- Page Heading Area -->
+    <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="dashboard-title">Employee Tracking</h1>
+            <p class="dashboard-subtitle">Monitor and track employee activities and location logs.</p>
+        </div>
+    </div>
+
+    <!-- Empty / Placeholder State Card -->
+    <div class="dash-table-card">
+        <div class="dash-table-state-box py-5 my-3">
+            <div class="dash-state-icon-circle icon-empty mx-auto mb-3" style="width: 80px; height: 80px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+            <h3 class="dash-state-title fs-4 fw-bold text-dark mb-2">Tracking Module</h3>
+            <p class="dash-state-desc text-muted mb-0 mx-auto" style="max-width: 460px;">
+                This page is ready for employee monitoring and location logs.
+            </p>
+        </div>
+    </div>
+
+</div>

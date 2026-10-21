@@ -120,6 +120,12 @@
                                 <span>Create</span>
                             </a>
                         </li>
+                        <li class="submenu-item @(isEmployeeActive && string.Equals(currentAction, "Tracking", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+                            <a asp-controller="Employee" asp-action="Tracking" class="submenu-link">
+                                <i class="bi bi-geo-alt submenu-icon"></i>
+                                <span>Tracking</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </li>
