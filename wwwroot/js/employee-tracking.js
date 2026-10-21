@@ -1,18 +1,7 @@
 /**
- * ZamZam Trims (BD) Limited - Employee Tracking & Search Module
- * -------------------------------------------------------------
- * Provides real-time employee search by name using:
- * {ApiBaseUrl}/api/Employees/GetByName/{name}
- *
- * Features:
- *  - Debounced live search with dropdown auto-suggestions
- *  - Keyboard navigation (Up/Down/Enter/Escape)
- *  - Highlighting matched keywords in suggestions
- *  - Full profile display with personal details, payroll info, addresses, and documents
- *  - Multiple search results switcher chips
- *  - Document/Photo lightbox preview modal
- *  - Clipboard copy triggers with toast notification
- *  - Ready-to-use tracking timeline & geo-location mock feed
+ * ZamZam Trims (BD) Limited - Employee Search Module (employee-tracking.js)
+ * ------------------------------------------------------------------------
+ * Endpoint: {ApiBaseUrl}/api/Employees/GetByName/{name}
  */
 
 $(function () {
@@ -22,24 +11,22 @@ $(function () {
     const $container = $('#employeeTrackingContainer');
     let apiBaseUrl = ($container.data('api-base-url') || 'https://localhost:7148').replace(/\/+$/, '');
 
-    // Protect against mixed content if client is accessed via HTTPS
     if (window.location.protocol === 'https:' && apiBaseUrl.startsWith('http://localhost:')) {
         apiBaseUrl = apiBaseUrl.replace('http://localhost:', 'https://localhost:');
     }
 
     const GET_BY_NAME_URL = `${apiBaseUrl}/api/Employees/GetByName`;
 
-    // DOM Elements
+    // Search Box Elements
     const $searchForm = $('#trackingSearchForm');
     const $searchInput = $('#trackingSearchInput');
     const $searchClearBtn = $('#trackingSearchClear');
     const $searchSpinner = $('#trackingSearchSpinner');
-    const $searchSubmitBtn = $('#trackingSearchSubmitBtn');
     const $searchSuggestions = $('#trackingSearchSuggestions');
     const $suggestionsList = $('#trackingSuggestionsList');
     const $suggestionsCount = $('#trackingSuggestionsCount');
 
-    // States & Views
+    // View States
     const $initialState = $('#trackingInitialState');
     const $loadingState = $('#trackingLoadingState');
     const $noResultsState = $('#trackingNoResultsState');
@@ -65,8 +52,6 @@ $(function () {
     let activeSuggestionIndex = -1;
     let currentSearchResults = [];
     let currentSelectedEmployee = null;
-    let currentSearchQuery = '';
-    let isRequestInProgress = false;
     let toastTimeout = null;
 
     // 2. Helper Functions
@@ -171,7 +156,7 @@ $(function () {
 
         toastTimeout = setTimeout(function () {
             $toast.removeClass('show');
-        }, 3200);
+        }, 3000);
     }
 
     function copyToClipboard(text, label) {
@@ -200,16 +185,14 @@ $(function () {
         $temp.remove();
     }
 
-    // Highlight search match in text
     function highlightMatch(text, query) {
         if (!text) return '';
         if (!query) return escapeHtml(text);
         const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`(${escapedQuery})`, 'gi');
-        return escapeHtml(text).replace(regex, '<span class="search-highlight">$1</span>');
+        return escapeHtml(text).replace(regex, '<mark class="p-0 bg-warning-subtle text-dark fw-bold">$1</mark>');
     }
 
-    // Image fallback handler
     window.handleTrackingImgError = function (imgEl, initials) {
         const $parent = $(imgEl).parent();
         $(imgEl).remove();
@@ -220,7 +203,7 @@ $(function () {
         `);
     };
 
-    // 3. UI State Management
+    // 3. View State Controller
     function setViewState(state) {
         $initialState.addClass('d-none');
         $loadingState.addClass('d-none');
@@ -254,8 +237,6 @@ $(function () {
             return;
         }
 
-        currentSearchQuery = term;
-        isRequestInProgress = true;
         $searchSpinner.removeClass('d-none');
         $searchClearBtn.hide();
 
@@ -266,7 +247,7 @@ $(function () {
         }
 
         const requestUrl = `${GET_BY_NAME_URL}/${encodeURIComponent(term)}`;
-        console.log(`[Employee Tracking] Searching: ${requestUrl}`);
+        console.log(`[Employee Search] Searching: ${requestUrl}`);
 
         $.ajax({
             url: requestUrl,
@@ -276,11 +257,10 @@ $(function () {
             cache: false,
             timeout: 12000,
             success: function (response) {
-                isRequestInProgress = false;
                 $searchSpinner.addClass('d-none');
                 if (term.length > 0) $searchClearBtn.show();
 
-                console.log('[Employee Tracking] Search Response:', response);
+                console.log('[Employee Search] Response:', response);
 
                 let employees = [];
                 if (response && response.succeeded !== false && Array.isArray(response.data)) {
@@ -301,7 +281,6 @@ $(function () {
                         selectEmployee(employees[0]);
                     } else {
                         renderSuggestions(employees, term);
-                        // If user explicitly pressed search/submit, also load the first employee in detail
                         if ($detailCard.hasClass('d-none')) {
                             selectEmployee(employees[0], false);
                         }
@@ -309,15 +288,14 @@ $(function () {
                 }
             },
             error: function (xhr, status, error) {
-                isRequestInProgress = false;
                 $searchSpinner.addClass('d-none');
                 if (term.length > 0) $searchClearBtn.show();
                 hideSuggestions();
 
-                console.error('[Employee Tracking] Error:', status, error, xhr);
+                console.error('[Employee Search] Error:', status, error, xhr);
 
                 if (xhr.status === 401) {
-                    $errorMessage.text('Authentication session expired (401). Please sign in again.');
+                    $errorMessage.text('Authentication session expired (401). Please sign in.');
                     showToast('Session expired. Please sign in.', 'bi bi-shield-lock-fill text-warning');
                     setViewState('error');
                     setTimeout(function () {
@@ -335,11 +313,10 @@ $(function () {
         });
     }
 
-    // 5. Autocomplete Suggestions Rendering
+    // 5. Suggestions Dropdown
     function renderSuggestions(employees, query) {
         $suggestionsList.empty();
         activeSuggestionIndex = -1;
-
         $suggestionsCount.text(`${employees.length} found`);
 
         employees.forEach((emp, index) => {
@@ -355,25 +332,21 @@ $(function () {
             const highlightedName = highlightMatch(emp.name, query);
             const designation = emp.designation ? escapeHtml(emp.designation) : 'Employee';
             const mobile = emp.mobile ? escapeHtml(emp.mobile) : '';
-            const email = emp.email ? escapeHtml(emp.email) : '';
 
             const $item = $(`
                 <div class="tracking-suggestion-item" data-index="${index}">
                     ${avatarHtml}
                     <div class="suggestion-info">
-                        <div class="suggestion-name-row">
-                            <span class="suggestion-name">${highlightedName}</span>
-                            <span class="suggestion-badge">ID: #${emp.id}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold text-dark fs-6">${highlightedName}</span>
+                            <span class="badge bg-light text-secondary border">#${emp.id}</span>
                         </div>
-                        <div class="suggestion-meta">
-                            <span class="suggestion-desig"><i class="bi bi-briefcase me-1"></i>${designation}</span>
-                            ${mobile ? `<span class="suggestion-contact"><i class="bi bi-telephone me-1"></i>${mobile}</span>` : ''}
-                            ${email ? `<span class="suggestion-contact d-none d-md-inline"><i class="bi bi-envelope me-1"></i>${email}</span>` : ''}
+                        <div class="text-muted small">
+                            <span class="text-primary fw-semibold me-2">${designation}</span>
+                            ${mobile ? `<span><i class="bi bi-telephone me-1"></i>${mobile}</span>` : ''}
                         </div>
                     </div>
-                    <div class="suggestion-arrow">
-                        <i class="bi bi-arrow-right-short"></i>
-                    </div>
+                    <i class="bi bi-chevron-right text-muted"></i>
                 </div>
             `);
 
@@ -398,7 +371,7 @@ $(function () {
         if (activeSuggestionIndex >= 0 && activeSuggestionIndex < items.length) {
             const $active = items.eq(activeSuggestionIndex);
             $active.addClass('active');
-            // Ensure visible in scroll view
+
             const containerTop = $suggestionsList.scrollTop();
             const containerBottom = containerTop + $suggestionsList.innerHeight();
             const elemTop = $active.position().top + containerTop;
@@ -412,7 +385,7 @@ $(function () {
         }
     }
 
-    // 6. Select Employee & Populate Detailed Tracking Card
+    // 6. Select Employee & Populate Detail Card
     function selectEmployee(emp, updateInput = true) {
         if (!emp) return;
         currentSelectedEmployee = emp;
@@ -426,8 +399,8 @@ $(function () {
         const avatarUrl = getFullImageUrl(emp.imagePath);
         const nidUrl = getFullImageUrl(emp.nidImagePath);
 
-        // Header
-        $('#detailEmpName').text(emp.name || 'Unnamed Employee');
+        // Header info
+        $('#detailEmpName').text(emp.name || '—');
         $('#detailEmpDesignation').text(emp.designation || 'Not Specified');
         $('#detailEmpId').text(`#${emp.id || '—'}`);
         $('#detailEmpStatus').html(`
@@ -446,15 +419,15 @@ $(function () {
             `);
         }
 
-        // Hero Stats
+        // Stats
         $('#detailEmpSalary').text(formatCurrency(emp.salary));
         $('#detailEmpJoiningDate').text(formatDate(emp.joiningDate));
 
         const $mobileEl = $('#detailEmpMobile');
         if (emp.mobile) {
             $mobileEl.html(`
-                <a href="tel:${escapeHtml(emp.mobile)}" class="text-decoration-none text-dark fw-semibold">${escapeHtml(emp.mobile)}</a>
-                <button type="button" class="btn-copy-small ms-1" data-copy="${escapeHtml(emp.mobile)}" data-label="Mobile number" title="Copy mobile number">
+                <a href="tel:${escapeHtml(emp.mobile)}" class="text-decoration-none text-dark fw-bold">${escapeHtml(emp.mobile)}</a>
+                <button type="button" class="btn-copy-small ms-1" data-copy="${escapeHtml(emp.mobile)}" data-label="Mobile number" title="Copy mobile">
                     <i class="bi bi-copy"></i>
                 </button>
             `);
@@ -465,8 +438,8 @@ $(function () {
         const $emailEl = $('#detailEmpEmail');
         if (emp.email) {
             $emailEl.html(`
-                <a href="mailto:${escapeHtml(emp.email)}" class="text-decoration-none text-dark fw-semibold text-truncate d-inline-block" style="max-width: 220px;" title="${escapeHtml(emp.email)}">${escapeHtml(emp.email)}</a>
-                <button type="button" class="btn-copy-small ms-1" data-copy="${escapeHtml(emp.email)}" data-label="Email address" title="Copy email address">
+                <a href="mailto:${escapeHtml(emp.email)}" class="text-decoration-none text-dark fw-bold text-truncate d-inline-block" style="max-width: 240px;" title="${escapeHtml(emp.email)}">${escapeHtml(emp.email)}</a>
+                <button type="button" class="btn-copy-small ms-1" data-copy="${escapeHtml(emp.email)}" data-label="Email address" title="Copy email">
                     <i class="bi bi-copy"></i>
                 </button>
             `);
@@ -538,25 +511,18 @@ $(function () {
             $nidBox.html(`
                 <div class="tracking-doc-empty">
                     <i class="bi bi-card-image text-muted fs-3 mb-1"></i>
-                    <span class="small text-muted">No NID copy uploaded</span>
+                    <span class="small text-muted">No NID uploaded</span>
                 </div>
             `);
         }
 
-        // Live Tracking & Activity Mock Data
-        $('#trackingTargetName').text(emp.name);
-        const randomLat = (23.8041 + (emp.id * 0.003)).toFixed(4);
-        const randomLng = (90.3667 + (emp.id * 0.002)).toFixed(4);
-        $('#trackingCoordinates').text(`${randomLat}° N, ${randomLng}° E`);
-
-        // Multi-result switcher chips
+        // Multi-result chips
         renderMultiResultsChips();
 
         setViewState('detail');
-        showToast(`Loaded details for ${emp.name}`, 'bi bi-person-check-fill text-success');
+        showToast(`Loaded ${emp.name}`, 'bi bi-person-check-fill text-success');
     }
 
-    // Render chips if multiple employees matched the search
     function renderMultiResultsChips() {
         if (!currentSearchResults || currentSearchResults.length <= 1) {
             $multiResultsBar.addClass('d-none');
@@ -586,8 +552,7 @@ $(function () {
         $multiResultsBar.removeClass('d-none');
     }
 
-    // 7. Event Listeners
-    // Live Search Input (Debounced)
+    // 7. Event Handlers
     $searchInput.on('input', function () {
         const query = $(this).val();
 
@@ -610,19 +575,15 @@ $(function () {
         }, 280);
     });
 
-    // Clear Search Input
     $searchClearBtn.on('click', function () {
         $searchInput.val('').focus();
         $searchClearBtn.hide();
         hideSuggestions();
-        if (currentSelectedEmployee) {
-            // keep current detail or reset
-        } else {
-            setViewState('initial');
-        }
+        currentSelectedEmployee = null;
+        currentSearchResults = [];
+        setViewState('initial');
     });
 
-    // Keyboard Navigation in Suggestions Dropdown
     $searchInput.on('keydown', function (e) {
         const $items = $suggestionsList.find('.tracking-suggestion-item');
         if (!$items.length || $searchSuggestions.hasClass('d-none')) {
@@ -656,7 +617,6 @@ $(function () {
         }
     });
 
-    // Submit Search Form
     $searchForm.on('submit', function (e) {
         e.preventDefault();
         const query = $searchInput.val().trim();
@@ -667,14 +627,12 @@ $(function () {
         }
     });
 
-    // Close suggestions on outside click
     $(document).on('click', function (e) {
         if (!$(e.target).closest('.tracking-search-box-wrapper').length) {
             hideSuggestions();
         }
     });
 
-    // Reopen suggestions if input clicked with text
     $searchInput.on('focus', function () {
         const query = $(this).val().trim();
         if (query && currentSearchResults.length > 0) {
@@ -682,14 +640,12 @@ $(function () {
         }
     });
 
-    // Copy to clipboard buttons
     $(document).on('click', '.btn-copy-small', function () {
         const text = $(this).data('copy');
         const label = $(this).data('label');
         copyToClipboard(text, label);
     });
 
-    // Image Zoom / Lightbox triggers
     $(document).on('click', '.btn-zoom-image', function () {
         const url = $(this).data('img-url');
         const title = $(this).data('img-title') || 'Image Preview';
@@ -703,8 +659,7 @@ $(function () {
         }
     });
 
-    // Reset / Search Another Employee button
-    $('#btnResetTrackingSearch, #btnSearchAnotherEmployee').on('click', function () {
+    $('#btnResetTrackingSearch').on('click', function () {
         $searchInput.val('').focus();
         $searchClearBtn.hide();
         hideSuggestions();
@@ -713,19 +668,6 @@ $(function () {
         setViewState('initial');
     });
 
-    // Refresh Current Employee
-    $('#btnRefreshTrackingEmployee').on('click', function () {
-        if (currentSelectedEmployee && currentSelectedEmployee.name) {
-            const $btn = $(this);
-            $btn.find('i').addClass('spin-animation');
-            searchEmployeesByName(currentSelectedEmployee.name, true);
-            setTimeout(function () {
-                $btn.find('i').removeClass('spin-animation');
-            }, 800);
-        }
-    });
-
-    // Retry on Error button
     $('#btnRetryTrackingSearch').on('click', function () {
         const query = $searchInput.val().trim();
         if (query) {
@@ -735,15 +677,6 @@ $(function () {
         }
     });
 
-    // Quick suggestion pills click in initial state
-    $(document).on('click', '.tracking-example-pill', function () {
-        const term = $(this).data('term') || $(this).text().trim();
-        $searchInput.val(term);
-        $searchClearBtn.show();
-        searchEmployeesByName(term, true);
-    });
-
-    // 8. Initialization
+    // 8. Init
     setViewState('initial');
-    console.log('[Employee Tracking] Initialized with API Base:', apiBaseUrl);
 });
