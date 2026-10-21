@@ -307,17 +307,17 @@ public class DataService : IDataService
                 Id = 1,
                 Name = "Mahadi Hasan",
                 Role = "Deputy Managing Director",
-                ImageUrl = "/images/team/Mahadi.jpg",
+                ImageUrl = "/images/team/Mahadi.jpeg",
                 Bio = "Strategic leader driving ZamZam Trims (BD) Limited toward manufacturing excellence, advanced automation, and long-term sustainable client partnerships across international garment export industries."
+            },
+            new()
+            {
+                Id = 2,
+                Name = "Asadullah Al Galib",
+                Role = "Marketing Director",
+                ImageUrl = "/images/team/Galib.jpeg",
+                Bio = "Directs operational efficiency, technology acquisition, and machinery modernization, ensuring our mechanized facilities consistently deliver precision-crafted accessories on time."
             }
-            //new()
-            //{
-            //    Id = 2,
-            //    Name = "MD. Tareq Howlader",
-            //    Role = "Director",
-            //    ImageUrl = "/images/team/Tareq.jpg",
-            //    Bio = "Directs operational efficiency, technology acquisition, and machinery modernization, ensuring our mechanized facilities consistently deliver precision-crafted accessories on time."
-            //},
             //new()
             //{
             //    Id = 3,
