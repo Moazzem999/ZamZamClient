@@ -47,6 +47,68 @@ $(function () {
         detailModalInstance = new bootstrap.Modal($detailModalEl[0]);
     }
 
+    // Ultra-Modern Delete Modal HTML template (guaranteed in DOM even without view recompile)
+    const employeeDeleteModalHtml = `
+        <div class="modal fade" id="employeeDeleteModal" tabindex="-1" aria-labelledby="employeeDeleteModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+                <div class="modal-content modern-delete-modal-content border-0">
+                    <button type="button" class="modal-close-bubble" data-bs-dismiss="modal" aria-label="Close" title="Cancel">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <div class="text-center">
+                        <div class="delete-icon-spotlight">
+                            <div class="delete-pulse-ring"></div>
+                            <div class="delete-pulse-ring-inner"></div>
+                            <div class="delete-icon-bubble">
+                                <i class="bi bi-trash3-fill"></i>
+                            </div>
+                        </div>
+                        <h4 class="delete-modal-heading" id="employeeDeleteModalTitle">Delete Employee?</h4>
+                        <p class="delete-modal-subtext">
+                            You are about to permanently remove this employee record from the directory.
+                        </p>
+                        <div class="delete-target-preview-card">
+                            <div id="deleteTargetAvatarContainer" class="d-flex align-items-center justify-content-center">
+                                <img id="deleteTargetThumb" src="" alt="Thumbnail" class="delete-target-thumb" onerror="this.src='/images/logo-icon.png'" />
+                            </div>
+                            <div class="delete-target-info">
+                                <div class="delete-target-badge"><span id="deleteTargetId">#00</span></div>
+                                <div class="delete-target-title" id="deleteTargetName">Loading...</div>
+                                <div class="delete-target-desc" id="deleteTargetDesignation">—</div>
+                            </div>
+                        </div>
+                        <div class="delete-warning-pill">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span>This action is permanent and cannot be undone</span>
+                        </div>
+                        <div class="delete-modal-actions">
+                            <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn-modal-delete" id="btnConfirmDeleteEmployee">
+                                <i class="bi bi-trash3-fill"></i>
+                                <span id="btnConfirmDeleteEmployeeText">Delete Employee</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    function ensureModalsInDom() {
+        let delEl = document.getElementById('employeeDeleteModal');
+        if (!delEl) {
+            $('body').append(employeeDeleteModalHtml);
+        } else if (!$(delEl).find('.modern-delete-modal-content').length) {
+            $(delEl).remove();
+            $('body').append(employeeDeleteModalHtml);
+        }
+    }
+    ensureModalsInDom();
+
+    let pendingDeleteEmployeeId = null;
+
     // Toast elements
     const $toast = $('#dashToast');
     const $toastMessage = $('#dashToastMessage');
@@ -376,6 +438,9 @@ $(function () {
                             <button type="button" class="dash-action-btn btn-view btn-view-employee" data-employee-id="${id}" title="View Employee Profile">
                                 <i class="bi bi-eye"></i>
                             </button>
+                            <button type="button" class="dash-action-btn btn-delete btn-delete-employee text-danger" data-employee-id="${id}" onclick="window.confirmDeleteEmployee('${id}'); if(window.event) window.event.stopPropagation();" title="Delete Employee">
+                                <i class="bi bi-trash3" style="pointer-events: none;"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -551,7 +616,112 @@ $(function () {
         }
     }
 
-    // 9. Event Listeners
+    // 9. Delete Confirmation & API Call
+    window.confirmDeleteEmployee = function (employeeId) {
+        ensureModalsInDom();
+        pendingDeleteEmployeeId = employeeId;
+
+        // Search in items with flexible key casing
+        const emp = currentEmployeesList.find(e => String(e.id ?? e.Id ?? '') === String(employeeId)) || {};
+        const idDisplay = emp.id || emp.Id || employeeId;
+        const name = escapeHtml(emp.name || emp.Name || `Employee #${idDisplay}`);
+        const designation = escapeHtml(emp.designation || emp.Designation || 'Staff');
+        const initial = (emp.name || emp.Name || 'E').trim().charAt(0).toUpperCase();
+        const photoUrl = getFullImageUrl(emp.imagePath || emp.ImagePath);
+
+        $('#deleteTargetId').text(`#${idDisplay}`);
+        $('#deleteTargetName').text(name);
+        $('#deleteTargetDesignation').text(designation);
+
+        const $avatarContainer = $('#deleteTargetAvatarContainer');
+        if (photoUrl) {
+            $avatarContainer.html(`
+                <img id="deleteTargetThumb" src="${photoUrl}" alt="${name}" class="delete-target-thumb" onerror="this.onerror=null; $(this).replaceWith('<div class=\\'employee-avatar-fallback delete-target-thumb rounded-3\\'>${initial}</div>');" />
+            `);
+        } else {
+            $avatarContainer.html(`
+                <div class="employee-avatar-fallback delete-target-thumb rounded-3" style="width: 50px; height: 50px; font-weight: 700; font-size: 1.1rem; border-radius: 12px;">
+                    ${initial}
+                </div>
+            `);
+        }
+
+        const modalEl = document.getElementById('employeeDeleteModal');
+        if (modalEl) {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modalInstance.show();
+            } else if (typeof $ !== 'undefined' && $.fn.modal) {
+                $(modalEl).modal('show');
+            }
+        } else {
+            console.error('[Employees] employeeDeleteModal element missing');
+        }
+    };
+
+    function executeDeleteEmployee(id) {
+        const token = getAuthToken();
+        const headers = {
+            'Accept': 'application/json'
+        };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const $btn = $('#btnConfirmDeleteEmployee');
+        const $btnText = $('#btnConfirmDeleteEmployeeText');
+        $btn.prop('disabled', true);
+        $btnText.text('Deleting...');
+
+        const deleteApiUrl = `${apiBaseUrl}/api/Employees/${id}`;
+        console.log(`[Employees] Sending DELETE to: ${deleteApiUrl}`);
+
+        $.ajax({
+            url: deleteApiUrl,
+            type: 'DELETE',
+            headers: headers,
+            cache: false,
+            timeout: 15000,
+            success: function (res) {
+                console.log('[Employees] Delete response:', res);
+                const modalEl = document.getElementById('employeeDeleteModal');
+                if (modalEl) {
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) modalInstance.hide();
+                    } else if (typeof $ !== 'undefined' && $.fn.modal) {
+                        $(modalEl).modal('hide');
+                    }
+                }
+
+                showToast('Employee deleted successfully!', 'bi bi-trash3-fill text-danger');
+
+                // If current page now has no items (e.g. was only 1 item on last page and page > 1), adjust page if needed
+                if (currentEmployeesList.length === 1 && currentPageNumber > 1) {
+                    fetchEmployees(currentPageNumber - 1);
+                } else {
+                    fetchEmployees(currentPageNumber);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('[Employees] Delete error:', xhr, status, error);
+                let msg = 'Failed to delete employee. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                } else if (xhr.statusText && xhr.statusText !== 'error') {
+                    msg = `Error (${xhr.status}): ${xhr.statusText}`;
+                }
+                showToast(msg, 'bi bi-exclamation-triangle-fill text-warning');
+            },
+            complete: function () {
+                $btn.prop('disabled', false);
+                $btnText.text('Delete Employee');
+                pendingDeleteEmployeeId = null;
+            }
+        });
+    }
+
+    // 10. Event Listeners
     // Search with debounce
     $searchInput.on('input', function () {
         if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
@@ -604,7 +774,22 @@ $(function () {
         }
     });
 
+    // Open delete confirmation modal clicks (delegation)
+    $tableBody.on('click', '.btn-delete-employee', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const employeeId = $(this).data('employee-id');
+        if (employeeId) {
+            window.confirmDeleteEmployee(employeeId);
+        }
+    });
 
-    // 10. Initial API Call
+    // Confirm delete button click
+    $(document).on('click', '#btnConfirmDeleteEmployee', function () {
+        if (!pendingDeleteEmployeeId) return;
+        executeDeleteEmployee(pendingDeleteEmployeeId);
+    });
+
+    // 11. Initial API Call
     fetchEmployees(1);
 });
