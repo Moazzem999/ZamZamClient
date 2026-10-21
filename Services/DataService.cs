@@ -309,23 +309,23 @@ public class DataService : IDataService
                 Role = "Deputy Managing Director",
                 ImageUrl = "/images/team/Mahadi.jpg",
                 Bio = "Strategic leader driving ZamZam Trims (BD) Limited toward manufacturing excellence, advanced automation, and long-term sustainable client partnerships across international garment export industries."
-            },
-            new()
-            {
-                Id = 2,
-                Name = "MD. Tareq Howlader",
-                Role = "Director",
-                ImageUrl = "/images/team/Tareq.jpg",
-                Bio = "Directs operational efficiency, technology acquisition, and machinery modernization, ensuring our mechanized facilities consistently deliver precision-crafted accessories on time."
-            },
-            new()
-            {
-                Id = 3,
-                Name = "Shahdat Hosen",
-                Role = "Director",
-                ImageUrl = "/images/team/Shahdat.jpg",
-                Bio = "Oversees supply chain synchronization, procurement networks, and client relationship management, providing competitive pricing, reliable stock, and 24/7 client satisfaction."
             }
+            //new()
+            //{
+            //    Id = 2,
+            //    Name = "MD. Tareq Howlader",
+            //    Role = "Director",
+            //    ImageUrl = "/images/team/Tareq.jpg",
+            //    Bio = "Directs operational efficiency, technology acquisition, and machinery modernization, ensuring our mechanized facilities consistently deliver precision-crafted accessories on time."
+            //},
+            //new()
+            //{
+            //    Id = 3,
+            //    Name = "Shahdat Hosen",
+            //    Role = "Director",
+            //    ImageUrl = "/images/team/Shahdat.jpg",
+            //    Bio = "Oversees supply chain synchronization, procurement networks, and client relationship management, providing competitive pricing, reliable stock, and 24/7 client satisfaction."
+            //}
         });
     }
 
