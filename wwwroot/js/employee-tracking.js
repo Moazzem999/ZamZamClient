@@ -110,15 +110,30 @@ $(function () {
         return name.substring(0, 2).toUpperCase();
     }
 
-    // Converts browser input date (YYYY-MM-DD) to API expected format (DD-MM-YYYY)
-    function formatApiDate(dateStr) {
+    // Normalizes input date to ISO format (YYYY-MM-DD) expected by ASP.NET Core DateTime
+    function normalizeToIsoDate(dateStr) {
         if (!dateStr) return '';
-        const parts = dateStr.trim().split('-');
-        if (parts.length === 3 && parts[0].length === 4) {
-            const [year, month, day] = parts;
-            return `${day}-${month}-${year}`; // e.g. 10-10-2026
+        const trimmed = dateStr.trim();
+
+        // If user input is DD-MM-YYYY or DD/MM/YYYY, convert to YYYY-MM-DD
+        const dmyMatch = trimmed.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+        if (dmyMatch) {
+            const day = dmyMatch[1].padStart(2, '0');
+            const month = dmyMatch[2].padStart(2, '0');
+            const year = dmyMatch[3];
+            return `${year}-${month}-${day}`;
         }
-        return dateStr;
+
+        // If already YYYY-MM-DD
+        const ymdMatch = trimmed.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+        if (ymdMatch) {
+            const year = ymdMatch[1];
+            const month = ymdMatch[2].padStart(2, '0');
+            const day = ymdMatch[3].padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        return trimmed;
     }
 
     // Formats ISO DateTime to readable string: "20 Oct 2026, 01:00:07 PM"
@@ -475,10 +490,10 @@ $(function () {
         const toDateVal = ($historyToDate.val() || '').trim();
 
         if (fromDateVal) {
-            queryParams.FromDate = formatApiDate(fromDateVal);
+            queryParams.FromDate = normalizeToIsoDate(fromDateVal);
         }
         if (toDateVal) {
-            queryParams.ToDate = formatApiDate(toDateVal);
+            queryParams.ToDate = normalizeToIsoDate(toDateVal);
         }
 
         console.log('[LocationHistory] Fetching:', GET_LOCATION_HISTORY_URL, queryParams);
@@ -534,7 +549,18 @@ $(function () {
                 $btnRefreshHistory.find('i').removeClass('spin-animation');
                 console.error('[LocationHistory] Fetch error:', status, error, xhr);
 
-                const msg = xhr.responseJSON?.message || error || 'Unable to load location logs from server.';
+                let msg = xhr.responseJSON?.message;
+                if (!msg && xhr.responseJSON?.errors) {
+                    const errList = [];
+                    for (const key in xhr.responseJSON.errors) {
+                        errList.push(...xhr.responseJSON.errors[key]);
+                    }
+                    msg = errList.join(' ');
+                }
+                if (!msg) {
+                    msg = error || 'Unable to load location logs from server.';
+                }
+
                 $historyErrorMessage.text(msg);
                 setHistoryTableState('error');
             }
