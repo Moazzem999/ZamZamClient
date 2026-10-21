@@ -81,6 +81,28 @@ $(function () {
     let currentHistoryTotalCount = 0;
     let currentHistoryTotalPages = 1;
     let isFetchingHistory = false;
+    let currentHistoryItems = [];
+
+    // Route Map Elements
+    const $btnViewRouteMap = $('#btnViewRouteMap');
+    const $routeMapModal = $('#routeMapModal');
+    const $routeMapModalTitle = $('#routeMapModalTitle');
+    const $routeModalSubtitle = $('#routeModalSubtitle');
+    const $routeModalPointCount = $('#routeModalPointCount');
+    const $routeModalDistance = $('#routeModalDistance');
+    const $routeModalStartTime = $('#routeModalStartTime');
+    const $routeModalEndTime = $('#routeModalEndTime');
+    const $btnRouteModalExternalMap = $('#btnRouteModalExternalMap');
+    const $routeMapEmptyOverlay = $('#routeMapEmptyOverlay');
+    const $btnFitRoute = $('#btnFitRoute');
+
+    // Route Map State
+    let currentRouteCoords = [];
+    let routeMap = null;
+    let routeLayers = null;
+    let currentRouteBounds = null;
+    let mapBaseLayers = {};
+    let activeMapLayerKey = 'street';
 
     // 2. Helper Functions
     function escapeHtml(text) {
@@ -567,6 +589,7 @@ $(function () {
     }
 
     function renderLocationHistoryTable(items) {
+        currentHistoryItems = items || [];
         $historyTableBody.empty();
 
         items.forEach((item) => {
@@ -602,7 +625,7 @@ $(function () {
             }
 
             const $row = $(`
-                <tr>
+                <tr data-id="${item.id}" data-lat="${item.latitude != null ? item.latitude : ''}" data-lng="${item.longitude != null ? item.longitude : ''}" data-time="${escapeHtml(recordedAtFormatted)}" data-rawtime="${escapeHtml(item.recordedAt || '')}" data-battery="${escapeHtml(item.batteryPercentage != null ? item.batteryPercentage : '')}">
                     <td class="fw-bold text-secondary">#${item.id}</td>
                     <td>
                         <div class="fw-semibold text-dark"><i class="bi bi-clock me-1 text-primary"></i>${escapeHtml(recordedAtFormatted)}</div>
@@ -830,6 +853,352 @@ $(function () {
         const coord = $(this).data('coord');
         copyToClipboard(coord, 'Coordinates');
     });
+
+    // 8. View Route Map Functionality
+    function getCoordinatesFromTable() {
+        const coords = [];
+
+        // Primary source: read directly from rendered history table rows
+        $historyTableBody.find('tr').each(function () {
+            const $tr = $(this);
+            const latStr = $tr.attr('data-lat');
+            const lngStr = $tr.attr('data-lng');
+            const id = $tr.attr('data-id');
+            const formattedTime = $tr.attr('data-time') || '';
+            const rawTime = $tr.attr('data-rawtime') || '';
+            const battery = $tr.attr('data-battery') || '';
+
+            if (latStr && lngStr) {
+                const lat = parseFloat(latStr);
+                const lng = parseFloat(lngStr);
+                if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
+                    coords.push({
+                        id: id,
+                        lat: lat,
+                        lng: lng,
+                        time: formattedTime,
+                        rawTime: rawTime,
+                        battery: battery
+                    });
+                }
+            }
+        });
+
+        // Fallback: if table rows yielded 0 items, inspect currentHistoryItems state
+        if (coords.length === 0 && Array.isArray(currentHistoryItems) && currentHistoryItems.length > 0) {
+            currentHistoryItems.forEach((item) => {
+                if (item.latitude != null && item.longitude != null) {
+                    const lat = parseFloat(item.latitude);
+                    const lng = parseFloat(item.longitude);
+                    if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
+                        coords.push({
+                            id: item.id,
+                            lat: lat,
+                            lng: lng,
+                            time: formatDateTime(item.recordedAt),
+                            rawTime: item.recordedAt || '',
+                            battery: item.batteryPercentage
+                        });
+                    }
+                }
+            });
+        }
+
+        return coords;
+    }
+
+    function sortChronologically(coords) {
+        return [...coords].sort((a, b) => {
+            const timeA = a.rawTime ? new Date(a.rawTime).getTime() : 0;
+            const timeB = b.rawTime ? new Date(b.rawTime).getTime() : 0;
+            if (timeA && timeB) return timeA - timeB;
+            return (Number(a.id) || 0) - (Number(b.id) || 0);
+        });
+    }
+
+    function haversineDistanceKm(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Earth radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    function calculateTotalDistance(coords) {
+        let dist = 0;
+        for (let i = 0; i < coords.length - 1; i++) {
+            dist += haversineDistanceKm(coords[i].lat, coords[i].lng, coords[i + 1].lat, coords[i + 1].lng);
+        }
+        return dist;
+    }
+
+    function buildGoogleMapsRouteUrl(coords) {
+        if (!coords || coords.length === 0) return 'https://www.google.com/maps';
+        if (coords.length === 1) return `https://www.google.com/maps?q=${coords[0].lat},${coords[0].lng}`;
+
+        const origin = `${coords[0].lat},${coords[0].lng}`;
+        const destination = `${coords[coords.length - 1].lat},${coords[coords.length - 1].lng}`;
+
+        let waypointsParam = '';
+        if (coords.length > 2) {
+            const intermediate = coords.slice(1, -1);
+            let selectedWaypoints = intermediate;
+            if (intermediate.length > 8) {
+                selectedWaypoints = [];
+                const step = (intermediate.length - 1) / 7;
+                for (let i = 0; i < 8; i++) {
+                    selectedWaypoints.push(intermediate[Math.round(i * step)]);
+                }
+            }
+            const wpStr = selectedWaypoints.map(p => `${p.lat},${p.lng}`).join('|');
+            waypointsParam = `&waypoints=${encodeURIComponent(wpStr)}`;
+        }
+
+        return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypointsParam}&travelmode=driving`;
+    }
+
+    function createRoutePinIcon(type, label) {
+        let className = 'route-pin route-pin-mid';
+        let size = [24, 24];
+        let anchor = [12, 12];
+
+        if (type === 'start') {
+            className = 'route-pin route-pin-start';
+            size = [32, 32];
+            anchor = [16, 16];
+        } else if (type === 'end') {
+            className = 'route-pin route-pin-end';
+            size = [34, 34];
+            anchor = [17, 17];
+        }
+
+        return L.divIcon({
+            className: 'route-marker-container',
+            html: `<div class="${className}">${label}</div>`,
+            iconSize: size,
+            iconAnchor: anchor,
+            popupAnchor: [0, -anchor[1] - 4]
+        });
+    }
+
+    function createPointPopupHtml(point, title, index, total) {
+        const latStr = Number(point.lat).toFixed(6);
+        const lngStr = Number(point.lng).toFixed(6);
+        const timeStr = point.time || '—';
+        const batteryStr = point.battery ? `${point.battery}%` : '—';
+        const singleMapsUrl = `https://www.google.com/maps?q=${latStr},${lngStr}`;
+
+        return `
+            <div class="route-popup-card">
+                <div class="route-popup-title text-primary">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>${escapeHtml(title)}</span>
+                    ${total > 1 ? `<span class="badge bg-light text-secondary border ms-auto">#${index + 1}/${total}</span>` : ''}
+                </div>
+                <div class="route-popup-line"><i class="bi bi-clock me-1 text-muted"></i><strong>Time:</strong> ${escapeHtml(timeStr)}</div>
+                <div class="route-popup-line"><i class="bi bi-compass me-1 text-muted"></i><strong>Coords:</strong> <span class="font-monospace">${latStr}, ${lngStr}</span></div>
+                ${point.battery ? `<div class="route-popup-line"><i class="bi bi-battery me-1 text-muted"></i><strong>Battery:</strong> ${escapeHtml(batteryStr)}</div>` : ''}
+                <div class="mt-2 pt-1 border-top">
+                    <a href="${singleMapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-outline-primary py-0 px-1.5 rounded text-decoration-none small" style="font-size: 0.72rem;">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>View in Google Maps
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+
+    function initRouteMapIfNeeded() {
+        if (routeMap) return;
+
+        if (typeof L === 'undefined') {
+            console.error('[RouteMap] Leaflet library is not available');
+            return;
+        }
+
+        // Google Maps Street Layer
+        mapBaseLayers.street = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            subdomains: ['0', '1', '2', '3'],
+            maxZoom: 20,
+            attribution: '&copy; <a href="https://maps.google.com" target="_blank" rel="noopener">Google Maps</a>'
+        });
+
+        // Google Maps Satellite / Hybrid Layer
+        mapBaseLayers.satellite = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            subdomains: ['0', '1', '2', '3'],
+            maxZoom: 20,
+            attribution: '&copy; <a href="https://maps.google.com" target="_blank" rel="noopener">Google Maps</a>'
+        });
+
+        // OpenStreetMap Layer
+        mapBaseLayers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+        });
+
+        routeMap = L.map('routeMapCanvas', {
+            center: [23.8103, 90.4125],
+            zoom: 13,
+            layers: [mapBaseLayers.street],
+            zoomControl: true
+        });
+
+        routeLayers = L.layerGroup().addTo(routeMap);
+
+        // Layer Switcher Buttons
+        $('.btn-map-layer').on('click', function () {
+            const layerKey = $(this).data('layer');
+            if (!mapBaseLayers[layerKey] || layerKey === activeMapLayerKey) return;
+
+            routeMap.removeLayer(mapBaseLayers[activeMapLayerKey]);
+            routeMap.addLayer(mapBaseLayers[layerKey]);
+            activeMapLayerKey = layerKey;
+
+            $('.btn-map-layer').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        // Fit Route Button
+        $btnFitRoute.on('click', function () {
+            if (currentRouteBounds && routeMap) {
+                routeMap.fitBounds(currentRouteBounds, { padding: [50, 50], maxZoom: 17 });
+            }
+        });
+    }
+
+    function renderRouteOnMap(coords) {
+        initRouteMapIfNeeded();
+        if (!routeMap || !routeLayers) return;
+
+        routeLayers.clearLayers();
+        currentRouteBounds = null;
+
+        if (!coords || coords.length === 0) {
+            $routeMapEmptyOverlay.removeClass('d-none');
+            return;
+        }
+        $routeMapEmptyOverlay.addClass('d-none');
+
+        const latLngs = coords.map(p => [p.lat, p.lng]);
+
+        if (coords.length === 1) {
+            const pt = coords[0];
+            const icon = createRoutePinIcon('end', '<i class="bi bi-geo-alt-fill"></i>');
+            const marker = L.marker([pt.lat, pt.lng], { icon: icon })
+                .bindPopup(createPointPopupHtml(pt, 'Recorded Location', 0, 1))
+                .addTo(routeLayers);
+
+            routeMap.setView([pt.lat, pt.lng], 16);
+            currentRouteBounds = L.latLngBounds([[pt.lat, pt.lng]]);
+            marker.openPopup();
+            return;
+        }
+
+        // Draw Polyline Line: Glow shadow layer + Core blue route line
+        L.polyline(latLngs, {
+            color: '#60a5fa',
+            weight: 8,
+            opacity: 0.35,
+            lineCap: 'round',
+            lineJoin: 'round'
+        }).addTo(routeLayers);
+
+        const mainPolyline = L.polyline(latLngs, {
+            color: '#2563eb',
+            weight: 4.5,
+            opacity: 0.95,
+            lineCap: 'round',
+            lineJoin: 'round'
+        }).addTo(routeLayers);
+
+        // Start Pin (A / Flag)
+        const startPt = coords[0];
+        const startIcon = createRoutePinIcon('start', '<i class="bi bi-flag-fill"></i>');
+        L.marker([startPt.lat, startPt.lng], { icon: startIcon, zIndexOffset: 1000 })
+            .bindPopup(createPointPopupHtml(startPt, 'Start Location', 0, coords.length))
+            .addTo(routeLayers);
+
+        // Latest / End Pin (B / Pin)
+        const endPt = coords[coords.length - 1];
+        const endIcon = createRoutePinIcon('end', '<i class="bi bi-geo-alt-fill"></i>');
+        L.marker([endPt.lat, endPt.lng], { icon: endIcon, zIndexOffset: 1001 })
+            .bindPopup(createPointPopupHtml(endPt, 'Latest Location', coords.length - 1, coords.length))
+            .addTo(routeLayers);
+
+        // Intermediate Waypoints
+        const intermediatePoints = coords.slice(1, -1);
+        if (intermediatePoints.length > 0) {
+            const step = intermediatePoints.length <= 40 ? 1 : Math.ceil(intermediatePoints.length / 30);
+            for (let i = 0; i < intermediatePoints.length; i += step) {
+                const pt = intermediatePoints[i];
+                const realIdx = i + 1;
+                const midIcon = createRoutePinIcon('mid', realIdx);
+                L.marker([pt.lat, pt.lng], { icon: midIcon, zIndexOffset: 500 })
+                    .bindPopup(createPointPopupHtml(pt, `Waypoint #${realIdx}`, realIdx, coords.length))
+                    .addTo(routeLayers);
+            }
+        }
+
+        currentRouteBounds = mainPolyline.getBounds();
+        routeMap.fitBounds(currentRouteBounds, { padding: [50, 50], maxZoom: 17 });
+    }
+
+    function openRouteMap() {
+        if (!currentSelectedEmployee) {
+            showToast('Please select an employee first.', 'bi bi-info-circle-fill text-primary');
+            return;
+        }
+
+        const rawCoords = getCoordinatesFromTable();
+        if (!rawCoords || rawCoords.length === 0) {
+            showToast('No location coordinates found in the table to display on route map.', 'bi bi-exclamation-triangle-fill text-warning');
+            return;
+        }
+
+        currentRouteCoords = sortChronologically(rawCoords);
+
+        // Populate modal headers and badges
+        const empName = currentSelectedEmployee.name || 'Employee';
+        $routeMapModalTitle.text(`${empName}'s Route Map`);
+        $routeModalPointCount.text(`${currentRouteCoords.length} Waypoints`);
+
+        const totalDistKm = calculateTotalDistance(currentRouteCoords);
+        const distText = totalDistKm < 1 ? `${Math.round(totalDistKm * 1000)} m` : `${totalDistKm.toFixed(2)} km`;
+        $routeModalDistance.text(distText);
+
+        $routeModalStartTime.text(currentRouteCoords[0].time || 'First record');
+        $routeModalEndTime.text(currentRouteCoords[currentRouteCoords.length - 1].time || 'Latest record');
+
+        // External Google Maps directions URL
+        const extUrl = buildGoogleMapsRouteUrl(currentRouteCoords);
+        $btnRouteModalExternalMap.attr('href', extUrl);
+
+        // Launch Bootstrap Modal
+        const modalEl = document.getElementById('routeMapModal');
+        if (modalEl) {
+            const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            bsModal.show();
+        }
+    }
+
+    // Modal shown handler: ensures Leaflet recalculates dimensions & plots route
+    $('#routeMapModal').on('shown.bs.modal', function () {
+        if (!routeMap) {
+            initRouteMapIfNeeded();
+        }
+        setTimeout(function () {
+            if (routeMap) {
+                routeMap.invalidateSize();
+                renderRouteOnMap(currentRouteCoords);
+            }
+        }, 150);
+    });
+
+    // Wire up View Route Map button
+    $btnViewRouteMap.on('click', openRouteMap);
 
     console.log('[Employee Tracking & Location History] Initialized with API Base:', apiBaseUrl);
 });

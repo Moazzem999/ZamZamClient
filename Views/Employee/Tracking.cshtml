@@ -4,6 +4,9 @@
     var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
 }
 
+<!-- Leaflet Map CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
 <style>
     /* Search Box */
     .tracking-search-card {
@@ -334,6 +337,149 @@
     @@keyframes spin {
         100% { transform: rotate(360deg); }
     }
+
+    /* View Route Map Button */
+    .btn-route-map {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        border: 1px solid #059669;
+        color: #ffffff;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+    }
+    .btn-route-map:hover,
+    .btn-route-map:focus {
+        background: linear-gradient(135deg, #047857 0%, #059669 100%);
+        border-color: #047857;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+        transform: translateY(-1px);
+    }
+    .btn-route-map:active {
+        transform: translateY(0);
+    }
+
+    /* Route Map Modal */
+    .route-modal-content {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+    .route-modal-header {
+        background: #ffffff;
+        padding: 1.15rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .route-modal-icon-badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #059669;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .route-map-toolbar {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 0.65rem 1.25rem;
+        z-index: 10;
+        position: relative;
+    }
+    .btn-map-layer.active {
+        background-color: var(--dash-primary-blue) !important;
+        border-color: var(--dash-primary-blue) !important;
+        color: #ffffff !important;
+    }
+    .route-legend-badge {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .route-legend-badge.start {
+        background: #10b981;
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+    }
+    .route-legend-badge.waypoint {
+        background: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+    }
+    .route-legend-badge.end {
+        background: #ef4444;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+    }
+    #routeMapCanvas {
+        height: 560px;
+        width: 100%;
+        background-color: #f1f5f9;
+        z-index: 1;
+    }
+
+    /* Custom Leaflet Map Pins */
+    .route-pin {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #ffffff;
+        font-weight: 700;
+        font-family: inherit;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+        cursor: pointer;
+        transition: transform 0.15s ease;
+    }
+    .route-pin:hover {
+        transform: scale(1.2);
+    }
+    .route-pin-start {
+        background: #10b981;
+        border: 3px solid #ffffff;
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+    .route-pin-end {
+        background: #ef4444;
+        border: 3px solid #ffffff;
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+        animation: route-pulse 2s infinite;
+    }
+    .route-pin-mid {
+        background: #2563eb;
+        border: 2px solid #ffffff;
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+    }
+    @@keyframes route-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .route-popup-card {
+        padding: 8px 12px;
+        min-width: 170px;
+        font-family: inherit;
+    }
+    .route-popup-title {
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .route-popup-line {
+        font-size: 0.78rem;
+        color: #475569;
+        margin-bottom: 2px;
+    }
 </style>
 
 <!-- Page Root Container -->
@@ -486,6 +632,12 @@
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="btnRefreshHistory" title="Refresh location history">
                     <i class="bi bi-arrow-clockwise"></i>
                 </button>
+
+                <!-- View Route Map Button -->
+                <button type="button" class="btn btn-route-map btn-sm d-inline-flex align-items-center gap-1.5 ms-1" id="btnViewRouteMap" title="View route on interactive Google Map">
+                    <i class="bi bi-map-fill"></i>
+                    <span>View Route Map</span>
+                </button>
             </div>
         </div>
 
@@ -557,6 +709,106 @@
 
 </div>
 
+<!-- 5. Route Map Popup Modal -->
+<div class="modal fade" id="routeMapModal" tabindex="-1" aria-labelledby="routeMapModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-lg-down">
+        <div class="modal-content border-0 shadow-lg route-modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header px-4 py-3 bg-white border-bottom d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="route-modal-icon-badge">
+                        <i class="bi bi-geo-alt-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <h5 class="modal-title fw-bold text-dark mb-0" id="routeMapModalTitle">
+                                Employee Route Map
+                            </h5>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1" id="routeModalPointCount">0 Waypoints</span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1" id="routeModalDistance">0 km</span>
+                        </div>
+                        <div class="small text-muted mt-0.5" id="routeModalSubtitle">
+                            Showing chronological movement path plotted from table records
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1 rounded-2 shadow-sm" id="btnRouteModalExternalMap" title="Open complete route in Google Maps">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        <span>Open in Google Maps</span>
+                    </a>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- Modal Body with Map Canvas -->
+            <div class="modal-body p-0 position-relative">
+                <!-- Floating Toolbar: Layer selector, fit bounds, legend -->
+                <div class="route-map-toolbar d-flex align-items-center justify-content-between px-3 py-2 bg-light border-bottom flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="small fw-semibold text-secondary">Layers:</span>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Map Style">
+                            <button type="button" class="btn btn-white border active btn-map-layer" data-layer="street" id="btnLayerStreet">
+                                <i class="bi bi-map me-1 text-primary"></i> Google Streets
+                            </button>
+                            <button type="button" class="btn btn-white border btn-map-layer" data-layer="satellite" id="btnLayerSatellite">
+                                <i class="bi bi-globe-americas me-1 text-success"></i> Satellite
+                            </button>
+                            <button type="button" class="btn btn-white border btn-map-layer" data-layer="osm" id="btnLayerOsm">
+                                <i class="bi bi-layers me-1 text-secondary"></i> OpenStreetMap
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-white border shadow-xs d-inline-flex align-items-center gap-1" id="btnFitRoute" title="Zoom & center route">
+                            <i class="bi bi-arrows-angle-contract"></i>
+                            <span>Fit Route</span>
+                        </button>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="d-flex align-items-center gap-3 small text-secondary flex-wrap">
+                        <span class="d-inline-flex align-items-center gap-1.5">
+                            <span class="route-legend-badge start"></span>
+                            <span>Start Point</span>
+                        </span>
+                        <span class="d-inline-flex align-items-center gap-1.5">
+                            <span class="route-legend-badge waypoint"></span>
+                            <span>Waypoint</span>
+                        </span>
+                        <span class="d-inline-flex align-items-center gap-1.5">
+                            <span class="route-legend-badge end"></span>
+                            <span>Latest Point</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Leaflet / Google Maps Canvas -->
+                <div id="routeMapCanvas"></div>
+
+                <!-- Empty State Overlay (if 0 valid coordinates in table) -->
+                <div id="routeMapEmptyOverlay" class="position-absolute top-0 start-0 w-100 h-100 bg-white d-none d-flex flex-column align-items-center justify-content-center p-4" style="z-index: 10;">
+                    <div class="p-3 rounded-circle bg-warning-subtle text-warning mb-3">
+                        <i class="bi bi-geo-alt fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">No Location Coordinates Available</h5>
+                    <p class="text-muted small text-center mb-0" style="max-width: 420px;">
+                        The current location history table has no valid latitude and longitude coordinates to draw a route path.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer px-4 py-2.5 bg-white border-top d-flex align-items-center justify-content-between">
+                <div class="small text-muted d-flex align-items-center gap-3 flex-wrap">
+                    <span><strong class="text-dark"><i class="bi bi-flag-fill text-success me-1"></i>Start:</strong> <span id="routeModalStartTime">—</span></span>
+                    <span class="text-muted opacity-50">•</span>
+                    <span><strong class="text-dark"><i class="bi bi-geo-alt-fill text-danger me-1"></i>Latest:</strong> <span id="routeModalEndTime">—</span></span>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm px-4 rounded-2 fw-medium" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Floating Toast Notification Container -->
 <div class="dash-toast-container">
     <div class="dash-toast" id="dashToast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -566,5 +818,6 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="~/js/employee-tracking.js" asp-append-version="true"></script>
 }
