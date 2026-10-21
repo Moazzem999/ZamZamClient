@@ -50,7 +50,6 @@ $(function () {
     const $historyFromDate = $('#historyFromDate');
     const $historyToDate = $('#historyToDate');
     const $btnFilterHistory = $('#btnFilterHistory');
-    const $btnTodayHistory = $('#btnTodayHistory');
     const $historyPageSize = $('#historyPageSize');
     const $btnRefreshHistory = $('#btnRefreshHistory');
     const $historyTable = $('#historyTable');
@@ -815,14 +814,6 @@ $(function () {
     // Filter History by Date Range
     $btnFilterHistory.on('click', function () {
         fetchLocationHistory(1);
-    });
-
-    // "Today" Button: Clears Date Filters and Fetches Today's logs
-    $btnTodayHistory.on('click', function () {
-        $historyFromDate.val('');
-        $historyToDate.val('');
-        fetchLocationHistory(1);
-        showToast('Viewing today\'s location logs', 'bi bi-calendar-event text-primary');
     });
 
     // Page Size Change
