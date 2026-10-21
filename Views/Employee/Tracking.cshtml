@@ -1,6 +1,6 @@
 @{
     Layout = "_DashboardLayout";
-    ViewData["Title"] = "Employee Search";
+    ViewData["Title"] = "Employee Tracking";
     var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
 }
 
@@ -173,48 +173,106 @@
         min-width: 0;
     }
 
-    /* Multi Results Switcher Bar */
-    .tracking-multi-bar {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 0.65rem 1rem;
-        margin-bottom: 1.25rem;
+    /* Selected Employee Summary Card */
+    .selected-emp-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #1e3a8a 100%);
+        border-radius: 16px;
+        padding: 1.25rem 1.75rem;
+        color: #ffffff;
+        margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        justify-content: space-between;
+        gap: 1.25rem;
         flex-wrap: wrap;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.12);
     }
-    .tracking-result-chip {
-        border: 1px solid #cbd5e1;
-        background: #f8fafc;
-        color: #334155;
-        font-weight: 600;
-        font-size: 0.82rem;
-        padding: 0.3rem 0.75rem;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.15s ease;
+    .selected-emp-avatar {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        background: #1e293b;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    .tracking-result-chip:hover {
-        background: #eff6ff;
-        color: var(--dash-primary-blue);
+    .selected-emp-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
-    .tracking-result-chip.active {
-        background: var(--dash-primary-blue);
-        border-color: var(--dash-primary-blue);
-        color: #ffffff;
+    .selected-emp-avatar-fallback {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #93c5fd;
     }
 
-    /* State Cards */
-    .tracking-state-card {
+    /* Location History Table Card */
+    .history-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 16px;
-        padding: 3rem 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    .history-card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #edf2f7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .history-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .history-filters {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* Table Styles */
+    .history-table th {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #64748b;
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 0.85rem 1rem;
+        white-space: nowrap;
+    }
+    .history-table td {
+        font-size: 0.88rem;
+        color: #1e293b;
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .history-table tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    /* State Boxes */
+    .tracking-state-box {
+        padding: 3.5rem 1.5rem;
         text-align: center;
     }
-    .tracking-state-icon-box {
+    .tracking-state-icon {
         width: 72px;
         height: 72px;
         border-radius: 50%;
@@ -224,178 +282,57 @@
         font-size: 2rem;
         margin: 0 auto 1rem auto;
     }
-    .tracking-state-icon-box.initial {
+    .tracking-state-icon.initial {
         background: #eff6ff;
         color: var(--dash-primary-blue);
     }
-    .tracking-state-icon-box.no-results {
+    .tracking-state-icon.empty {
+        background: #f8fafc;
+        color: #94a3b8;
+    }
+    .tracking-state-icon.error {
         background: #fef2f2;
         color: #ef4444;
     }
-    .tracking-state-icon-box.error {
-        background: #fff7ed;
-        color: #ea580c;
-    }
 
-    /* Detail Employee Card */
-    .employee-profile-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 18px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-    .employee-profile-banner {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #1e3a8a 100%);
-        padding: 1.75rem 2rem;
-        color: #ffffff;
-    }
-    .employee-profile-avatar {
-        width: 76px;
-        height: 76px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 3px solid rgba(255, 255, 255, 0.35);
-        background: #1e293b;
-        flex-shrink: 0;
+    /* Pagination */
+    .history-pagination-wrap {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #edf2f7;
+        background: #f8fafc;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
-    .tracking-hero-avatar-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .tracking-hero-avatar-fallback {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #93c5fd;
-    }
-    .status-indicator-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: #10b981;
-        display: inline-block;
-        margin-right: 4px;
-    }
-    .emp-stat-pill {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 10px;
-        padding: 0.65rem 1rem;
-    }
-    .emp-stat-pill .label {
-        font-size: 0.72rem;
-        text-transform: uppercase;
-        color: #94a3b8;
-        font-weight: 600;
-    }
-    .emp-stat-pill .val {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: #ffffff;
-    }
-    .emp-stat-pill .val a {
-        color: #ffffff !important;
-    }
-
-    /* Info Sections */
-    .emp-info-block {
-        padding: 1.75rem 2rem;
-    }
-    .emp-section-heading {
-        font-size: 0.88rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
+    .pagination-custom .page-link {
         color: #475569;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        border-bottom: 1px dashed #cbd5e1;
-        padding-bottom: 0.45rem;
-    }
-    .emp-section-heading i {
-        color: var(--dash-primary-blue);
-    }
-    .emp-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem 1.25rem;
-    }
-    .emp-field-label {
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #64748b;
-        text-transform: uppercase;
-        margin-bottom: 2px;
-        display: block;
-    }
-    .emp-field-val {
-        font-size: 0.92rem;
-        font-weight: 600;
-        color: #0f172a;
-    }
-    .btn-copy-small {
-        background: none;
-        border: none;
-        color: #94a3b8;
-        font-size: 0.8rem;
-        cursor: pointer;
-        padding: 2px 4px;
-        border-radius: 4px;
-    }
-    .btn-copy-small:hover {
-        color: var(--dash-primary-blue);
-    }
-
-    /* Document Cards */
-    .tracking-doc-card {
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        overflow: hidden;
-        background: #f8fafc;
-        position: relative;
-        aspect-ratio: 16 / 10;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        max-width: 260px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border-radius: 6px;
+        margin: 0 2px;
     }
-    .tracking-doc-thumb {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+    .pagination-custom .page-link:hover {
+        background-color: #eff6ff;
+        color: var(--dash-primary-blue);
     }
-    .tracking-doc-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.2s ease;
+    .pagination-custom .page-item.active .page-link {
+        background-color: var(--dash-primary-blue);
+        border-color: var(--dash-primary-blue);
+        color: #ffffff;
     }
-    .tracking-doc-card:hover .tracking-doc-overlay {
-        opacity: 1;
+    .pagination-custom .page-item.disabled .page-link {
+        color: #cbd5e1;
+        background-color: #f8fafc;
     }
-    .tracking-doc-empty {
-        padding: 1.5rem;
-        text-align: center;
-        border: 1px dashed #cbd5e1;
-        border-radius: 12px;
-        background: #f8fafc;
-        max-width: 260px;
-        aspect-ratio: 16 / 10;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+    .spin-animation {
+        animation: spin 0.8s linear infinite;
+    }
+    @@keyframes spin {
+        100% { transform: rotate(360deg); }
     }
 </style>
 
@@ -411,13 +348,13 @@
         <span class="current">Tracking</span>
     </nav>
 
-    <!-- Page Heading Area (Clean: No All Employees / Add Employee buttons) -->
+    <!-- Page Heading -->
     <div class="dashboard-heading-area mb-4">
-        <h1 class="dashboard-title">Employee Search</h1>
-        <p class="dashboard-subtitle">Search employee by name to view employee records and details.</p>
+        <h1 class="dashboard-title">Employee Tracking</h1>
+        <p class="dashboard-subtitle">Search and select an employee to view real-time and historical location logs.</p>
     </div>
 
-    <!-- 1. Dedicated Search Box -->
+    <!-- 1. Employee Search Box -->
     <div class="tracking-search-card">
         <form id="trackingSearchForm" class="tracking-search-box-wrapper" autocomplete="off" onsubmit="return false;">
             <div class="tracking-search-input-group">
@@ -450,77 +387,186 @@
                 </div>
             </div>
 
-            <!-- Suggestions Dropdown -->
+            <!-- Autocomplete Suggestions Dropdown -->
             <div id="trackingSearchSuggestions" class="tracking-search-suggestions">
                 <div class="suggestions-header">
                     <span><i class="bi bi-people me-1"></i> Matching Employees</span>
                     <span id="trackingSuggestionsCount" class="badge bg-primary text-white">0</span>
                 </div>
                 <div id="trackingSuggestionsList" class="suggestions-list">
-                    <!-- Dynamic Items injected by JS -->
+                    <!-- Suggestions injected by JS -->
                 </div>
             </div>
         </form>
     </div>
 
-    <!-- 2. Multiple Matches Switcher Bar -->
-    <div id="trackingMultiResultsBar" class="tracking-multi-bar d-none">
-        <div class="text-muted small fw-semibold">
-            <i class="bi bi-filter-circle text-primary me-1"></i> Matches (<span id="trackingMultiResultsCount">0</span>):
+    <!-- 2. Selected Employee Header Banner (Shown when an employee is selected) -->
+    <div id="selectedEmployeeBanner" class="selected-emp-card d-none">
+        <div class="d-flex align-items-center gap-3">
+            <div class="selected-emp-avatar" id="selectedEmpAvatarWrapper">
+                <div class="selected-emp-avatar-fallback">JH</div>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                    <h3 class="fs-4 fw-bold mb-0 text-white" id="selectedEmpName">Employee Name</h3>
+                    <span class="badge bg-primary text-white" id="selectedEmpDesignation">Designation</span>
+                    <span class="badge bg-white text-dark fw-semibold" id="selectedEmpId">#1</span>
+                </div>
+                <div class="small text-white-50 d-flex align-items-center gap-3 flex-wrap">
+                    <span id="selectedEmpMobile"><i class="bi bi-telephone me-1"></i> —</span>
+                    <span id="selectedEmpEmail"><i class="bi bi-envelope me-1"></i> —</span>
+                </div>
+            </div>
         </div>
-        <div id="trackingMultiResultsChips" class="d-flex align-items-center gap-2 flex-wrap">
-            <!-- Chips injected by JS -->
-        </div>
-    </div>
 
-    <!-- 3. VIEW STATES -->
-
-    <!-- State A: Initial Empty Prompt -->
-    <div id="trackingInitialState" class="tracking-state-card">
-        <div class="tracking-state-icon-box initial">
+        <button type="button" class="btn btn-outline-light btn-sm rounded-3 d-inline-flex align-items-center gap-1" id="btnChangeEmployee">
             <i class="bi bi-search"></i>
-        </div>
-        <h4 class="fw-bold text-dark mb-2">Search Employee by Name</h4>
-        <p class="text-muted mx-auto mb-0" style="max-width: 440px;">
-            Type an employee's name in the search box above to load their record.
-        </p>
-    </div>
-
-    <!-- State B: Loading -->
-    <div id="trackingLoadingState" class="tracking-state-card d-none">
-        <div class="spinner-border text-primary mb-3" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-        <h5 class="fw-bold text-dark mb-1">Searching Employee Records...</h5>
-        <p class="text-muted mb-0">Querying live server database.</p>
-    </div>
-
-    <!-- State C: No Results -->
-    <div id="trackingNoResultsState" class="tracking-state-card d-none">
-        <div class="tracking-state-icon-box no-results">
-            <i class="bi bi-person-x"></i>
-        </div>
-        <h4 class="fw-bold text-dark mb-2">No Employee Found</h4>
-        <p class="text-muted mx-auto mb-3" style="max-width: 440px;">
-            No employee record matching <strong id="trackingNoResultsTerm" class="text-dark">""</strong>.
-        </p>
-        <button type="button" class="btn btn-outline-primary btn-sm px-3 py-2 rounded-3" id="btnResetTrackingSearch">
-            <i class="bi bi-arrow-repeat me-1"></i> Clear &amp; Search Again
+            <span>Change Employee</span>
         </button>
     </div>
 
-    <!-- State D: Error -->
-    <div id="trackingErrorState" class="tracking-state-card d-none">
-        <div class="tracking-state-icon-box error">
-            <i class="bi bi-exclamation-triangle"></i>
+    <!-- 3. Initial Empty State (When no employee is selected yet) -->
+    <div id="trackingInitialState" class="history-card">
+        <div class="tracking-state-box">
+            <div class="tracking-state-icon initial">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">Select an Employee to View Location History</h4>
+            <p class="text-muted mx-auto mb-0" style="max-width: 480px;">
+                Use the search box above to search an employee by name. Selecting an employee will automatically load their location history table.
+            </p>
         </div>
-        <h4 class="fw-bold text-dark mb-2">Connection Error</h4>
-        <p id="trackingErrorMessage" class="text-muted mx-auto mb-3" style="max-width: 440px;">
-            Unable to connect to the employee search API.
-        </p>
-        <button type="button" class="btn btn-primary btn-sm px-3 py-2 rounded-3" id="btnRetryTrackingSearch">
-            <i class="bi bi-arrow-clockwise me-1"></i> Retry
-        </button>
+    </div>
+
+    <!-- 4. Location History Table Card (Shown when an employee is selected) -->
+    <div id="locationHistoryCard" class="history-card d-none">
+
+        <!-- Card Toolbar: Title, Date Filter & Controls -->
+        <div class="history-card-header">
+            <div class="d-flex align-items-center gap-2">
+                <div class="p-2 rounded-3 bg-danger-subtle text-danger fs-5 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <div>
+                    <h3 class="history-card-title">
+                        Location History
+                        <span class="badge bg-primary text-white fs-6 fw-semibold rounded-pill px-2 py-1 ms-1" id="historyTotalBadge">0 Logs</span>
+                    </h3>
+                    <small class="text-muted" id="historySubtitle">Location logs for selected employee</small>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="history-filters">
+                <!-- Date Filters -->
+                <div class="d-flex align-items-center gap-1">
+                    <label for="historyFromDate" class="small text-muted text-nowrap">From:</label>
+                    <input type="date" id="historyFromDate" class="form-control form-control-sm" style="width: 135px;" title="From date" />
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                    <label for="historyToDate" class="small text-muted text-nowrap">To:</label>
+                    <input type="date" id="historyToDate" class="form-control form-control-sm" style="width: 135px;" title="To date" />
+                </div>
+                <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1" id="btnFilterHistory">
+                    <i class="bi bi-funnel-fill"></i>
+                    <span>Filter</span>
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnTodayHistory" title="Reset date filters to show today's data">
+                    Today
+                </button>
+
+                <!-- Page Size -->
+                <div class="d-flex align-items-center gap-1 ms-1">
+                    <select id="historyPageSize" class="form-select form-select-sm" style="width: 75px;">
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+
+                <!-- Refresh Button -->
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnRefreshHistory" title="Refresh location history">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Responsive Container -->
+        <div class="table-responsive">
+            <table class="table history-table align-middle mb-0" id="historyTable">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;"># ID</th>
+                        <th style="min-width: 180px;">Recorded Time</th>
+                        <th style="min-width: 220px;">Coordinates (Lat, Long)</th>
+                        <th style="width: 130px;">Battery</th>
+                        <th style="width: 110px;">Speed</th>
+                        <th style="width: 110px;">Accuracy</th>
+                        <th class="text-end" style="width: 140px;">Map Action</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <!-- Dynamic Location Rows injected by JS -->
+                </tbody>
+            </table>
+
+            <!-- Table Loading State -->
+            <div id="historyLoadingState" class="tracking-state-box d-none">
+                <div class="spinner-border text-primary mb-3" style="width: 2.5rem; height: 2.5rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">Loading Location Logs...</h5>
+                <p class="text-muted small mb-0">Querying location history records from server.</p>
+            </div>
+
+            <!-- Table Empty State -->
+            <div id="historyEmptyState" class="tracking-state-box d-none">
+                <div class="tracking-state-icon empty">
+                    <i class="bi bi-geo"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-2">No Location Logs Found</h5>
+                <p class="text-muted small mx-auto mb-0" style="max-width: 440px;" id="historyEmptyText">
+                    No location history was recorded for this employee for the selected date range.
+                </p>
+            </div>
+
+            <!-- Table Error State -->
+            <div id="historyErrorState" class="tracking-state-box d-none">
+                <div class="tracking-state-icon error">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-2">Failed to Load Location History</h5>
+                <p class="text-muted small mx-auto mb-3" style="max-width: 440px;" id="historyErrorMessage">
+                    An error occurred while communicating with the LocationHistory API.
+                </p>
+                <button type="button" class="btn btn-outline-danger btn-sm px-3 py-1 rounded-2" id="btnRetryHistory">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Retry
+                </button>
+            </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="history-pagination-wrap" id="historyPaginationWrap">
+            <div class="small text-muted" id="historyCountSummary">
+                Showing 0 to 0 of 0 logs
+            </div>
+            <nav aria-label="Location history pagination">
+                <ul class="pagination pagination-sm pagination-custom mb-0" id="historyPaginationUl">
+                    <!-- Dynamic Pagination Links -->
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Floating Toast Notification Container -->
+<div class="dash-toast-container">
+    <div class="dash-toast" id="dashToast" role="alert" aria-live="assertive" aria-atomic="true">
+        <i class="bi bi-check-circle-fill dash-toast-icon"></i>
+        <span id="dashToastMessage">Action completed successfully.</span>
     </div>
 </div>
 
