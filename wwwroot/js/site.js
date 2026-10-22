@@ -147,22 +147,250 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch (e) {
         // LocalStorage access restricted or unavailable
     }
+    // =============================================================
+    // 5. Populate Service / Category Dropdown from Backend API
+    // =============================================================
+    initQuickQuoteServiceCategories();
+
+    const quoteModalEl = document.getElementById('quickQuoteModal');
+    if (quoteModalEl) {
+        quoteModalEl.addEventListener('show.bs.modal', function () {
+            if (!cachedServiceCategories) {
+                initQuickQuoteServiceCategories();
+            }
+        });
+    }
+
+    const modalServiceSelect = document.getElementById('modalServiceType');
+    if (modalServiceSelect) {
+        modalServiceSelect.addEventListener('change', function () {
+            updateCategoryIdHiddenField(modalServiceSelect);
+        });
+    }
+
+    const pageServiceSelect = document.getElementById('ServiceType');
+    if (pageServiceSelect && pageServiceSelect !== modalServiceSelect) {
+        getServiceCategories().then(categories => {
+            if (categories && categories.length > 0) {
+                renderServiceCategoryOptions(pageServiceSelect, categories, pageServiceSelect.value);
+            }
+        });
+    }
 });
 
 // =============================================================
-// 5. Global Quick Quote & Quick View Modal triggers
+// 6. Global Quick Quote Modal & Service Category API Controller
 // =============================================================
+let cachedServiceCategories = null;
+let isFetchingServiceCategories = false;
+let pendingModalServiceType = null;
+
+/**
+ * Fetches all service categories from backend API:
+ * GET https://localhost:7148/api/Global/GetAllServiceCategory
+ */
+async function getServiceCategories() {
+    if (cachedServiceCategories && cachedServiceCategories.length > 0) {
+        return cachedServiceCategories;
+    }
+    if (isFetchingServiceCategories) {
+        return new Promise((resolve) => {
+            const interval = setInterval(() => {
+                if (!isFetchingServiceCategories) {
+                    clearInterval(interval);
+                    resolve(cachedServiceCategories || []);
+                }
+            }, 50);
+        });
+    }
+
+    isFetchingServiceCategories = true;
+    try {
+        const modalEl = document.getElementById('quickQuoteModal');
+        const configuredApiBaseUrl = (
+            window.apiBaseUrl ||
+            modalEl?.getAttribute('data-api-base-url') ||
+            document.body?.getAttribute('data-api-base-url') ||
+            'https://localhost:7148'
+        ).toString().trim().replace(/\/+$/, '');
+
+        const response = await fetch(`${configuredApiBaseUrl}/api/Global/GetAllServiceCategory`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to load service categories: ${response.status}`);
+        }
+
+        const resData = await response.json();
+        let items = [];
+        if (Array.isArray(resData)) {
+            items = resData;
+        } else if (resData && Array.isArray(resData.data)) {
+            items = resData.data;
+        } else if (resData && Array.isArray(resData.result)) {
+            items = resData.result;
+        }
+
+        if (items && items.length > 0) {
+            cachedServiceCategories = items;
+        }
+    } catch (error) {
+        console.warn('Could not populate service categories from API, using default options:', error);
+    } finally {
+        isFetchingServiceCategories = false;
+    }
+
+    return cachedServiceCategories || [];
+}
+
+/**
+ * Populates a <select> element with service category options
+ */
+function renderServiceCategoryOptions(selectEl, categories, preselectedValue) {
+    if (!selectEl || !categories || categories.length === 0) return;
+
+    const targetVal = preselectedValue !== undefined && preselectedValue !== null
+        ? preselectedValue
+        : selectEl.value;
+
+    selectEl.innerHTML = '';
+
+    const placeholderOpt = document.createElement('option');
+    placeholderOpt.value = '';
+    placeholderOpt.textContent = 'Select a Service / Category';
+    placeholderOpt.disabled = true;
+    if (!targetVal) {
+        placeholderOpt.selected = true;
+    }
+    selectEl.appendChild(placeholderOpt);
+
+    categories.forEach(cat => {
+        const opt = document.createElement('option');
+        const name = cat.name || cat.serviceName || cat.categoryName || '';
+        opt.value = name;
+        opt.textContent = name;
+        if (cat.id !== undefined && cat.id !== null) {
+            opt.setAttribute('data-id', cat.id);
+        }
+        selectEl.appendChild(opt);
+    });
+
+    if (targetVal) {
+        selectCategorySmart(selectEl, targetVal);
+    }
+
+    updateCategoryIdHiddenField(selectEl);
+}
+
+/**
+ * Keeps hidden input modalServiceCategoryId in sync with selected category id
+ */
+function updateCategoryIdHiddenField(selectEl) {
+    if (!selectEl) return;
+    const hiddenInput = document.getElementById('modalServiceCategoryId');
+    if (!hiddenInput) return;
+
+    const selectedOption = selectEl.options[selectEl.selectedIndex];
+    if (selectedOption && selectedOption.dataset && selectedOption.dataset.id) {
+        hiddenInput.value = selectedOption.dataset.id;
+    } else {
+        hiddenInput.value = '';
+    }
+}
+
+/**
+ * Smart matching for service/category name or keywords
+ */
+function selectCategorySmart(selectEl, rawValue) {
+    if (!selectEl || !rawValue) return;
+    const searchVal = rawValue.toString().trim().toLowerCase();
+    if (!searchVal) return;
+
+    // 1. Exact match by value or visible text
+    for (let i = 0; i < selectEl.options.length; i++) {
+        const opt = selectEl.options[i];
+        if (opt.value.toLowerCase() === searchVal || opt.textContent.toLowerCase() === searchVal) {
+            selectEl.selectedIndex = i;
+            updateCategoryIdHiddenField(selectEl);
+            return;
+        }
+    }
+
+    // 2. Substring match
+    for (let i = 0; i < selectEl.options.length; i++) {
+        const opt = selectEl.options[i];
+        if (!opt.value) continue;
+        const optVal = opt.value.toLowerCase();
+        if (optVal.includes(searchVal) || searchVal.includes(optVal)) {
+            selectEl.selectedIndex = i;
+            updateCategoryIdHiddenField(selectEl);
+            return;
+        }
+    }
+
+    // 3. Keyword heuristic match
+    const keywords = ['label', 'button', 'zipper', 'tag', 'packag', 'print', 'emboss', 'heat', 'laminat', 'stock', 'sourc', 'trim'];
+    for (const kw of keywords) {
+        if (searchVal.includes(kw)) {
+            for (let i = 0; i < selectEl.options.length; i++) {
+                const opt = selectEl.options[i];
+                if (opt.value.toLowerCase().includes(kw)) {
+                    selectEl.selectedIndex = i;
+                    updateCategoryIdHiddenField(selectEl);
+                    return;
+                }
+            }
+        }
+    }
+
+    // 4. Custom option if not found
+    const customOpt = document.createElement('option');
+    customOpt.value = rawValue;
+    customOpt.textContent = rawValue;
+    customOpt.selected = true;
+    selectEl.appendChild(customOpt);
+    updateCategoryIdHiddenField(selectEl);
+}
+
+/**
+ * Initializes and populates the Quick Quote Modal dropdown from backend API
+ */
+async function initQuickQuoteServiceCategories(preselectVal) {
+    const modalSelect = document.getElementById('modalServiceType');
+    if (!modalSelect) return;
+
+    const categories = await getServiceCategories();
+    if (categories && categories.length > 0) {
+        const targetValue = preselectVal || pendingModalServiceType || modalSelect.value;
+        renderServiceCategoryOptions(modalSelect, categories, targetValue);
+        pendingModalServiceType = null;
+    }
+}
+
+// Global Quick Quote & Quick View Modal triggers
 window.openQuoteModal = function (productName, serviceType) {
     const quoteModalEl = document.getElementById('quickQuoteModal');
     if (quoteModalEl) {
         const serviceSelect = document.getElementById('modalServiceType');
         const productInput = document.getElementById('modalProductName');
 
-        if (serviceSelect && serviceType) {
-            serviceSelect.value = serviceType;
-        }
         if (productInput) {
             productInput.value = productName || '';
+        }
+
+        if (serviceType) {
+            pendingModalServiceType = serviceType;
+            if (serviceSelect) {
+                selectCategorySmart(serviceSelect, serviceType);
+            }
+        }
+
+        if (!cachedServiceCategories) {
+            initQuickQuoteServiceCategories(serviceType);
         }
 
         const modal = bootstrap.Modal.getOrCreateInstance(quoteModalEl);

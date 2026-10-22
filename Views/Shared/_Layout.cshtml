@@ -1,3 +1,7 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    var apiBaseUrl = (Configuration["ApiBaseUrl"] ?? ViewBag.ApiBaseUrl ?? "https://localhost:7148").TrimEnd('/');
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,6 +22,7 @@
                 document.documentElement.setAttribute('data-bs-theme', 'light');
             }
         })();
+        window.apiBaseUrl = '@apiBaseUrl';
     </script>
 
     <!-- Google Fonts -->
@@ -148,7 +153,7 @@
     </main>
 
     <!-- Global Quick Quote Modal -->
-    <div class="modal fade" id="quickQuoteModal" tabindex="-1" aria-labelledby="quickQuoteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="quickQuoteModal" tabindex="-1" aria-labelledby="quickQuoteModalLabel" aria-hidden="true" data-api-base-url="@apiBaseUrl">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="modal-header modal-header-theme text-white p-4">
@@ -185,17 +190,19 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Service / Category <span class="text-danger">*</span></label>
+                                <input type="hidden" name="ServiceCategoryId" id="modalServiceCategoryId" />
                                 <select name="ServiceType" id="modalServiceType" class="form-select rounded-3" required>
-                                    <option value="Trims & Accessories">Trims & Accessories Manufacturing</option>
-                                    <option value="Woven & Care Labels">Woven & Care Labels</option>
-                                    <option value="Hang Tags & Packaging">Hang Tags & Packaging</option>
-                                    <option value="Buttons & Zippers">Buttons & Zippers</option>
-                                    <option value="Digital Printing">Digital Printing</option>
-                                    <option value="Paper Embossing">Paper Embossing</option>
-                                    <option value="Heat Press & Lamination">Heat Press & Lamination</option>
-                                    <option value="Direct Selling (Ready Stock)">Direct Selling (Ready Stock)</option>
-                                    <option value="Global Sourcing">Global Sourcing</option>
-                                    <option value="Other">Other Specific Inquiries</option>
+                                    <option value="" disabled selected>Select a Service / Category</option>
+                                    <option value="Trims & Accessories Manufacturing" data-id="1">Trims & Accessories Manufacturing</option>
+                                    <option value="Woven & Care Labels" data-id="2">Woven & Care Labels</option>
+                                    <option value="Hang Tags & Packaging" data-id="3">Hang Tags & Packaging</option>
+                                    <option value="Buttons & Zippers" data-id="4">Buttons & Zippers</option>
+                                    <option value="Digital Printing" data-id="5">Digital Printing</option>
+                                    <option value="Paper Embossing" data-id="6">Paper Embossing</option>
+                                    <option value="Heat Press & Lamination" data-id="7">Heat Press & Lamination</option>
+                                    <option value="Direct Selling (Ready Stock)" data-id="8">Direct Selling (Ready Stock)</option>
+                                    <option value="Global Sourcing" data-id="9">Global Sourcing</option>
+                                    <option value="Other Specific Inquiries" data-id="10">Other Specific Inquiries</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
