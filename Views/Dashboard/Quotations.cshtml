@@ -1,8 +1,171 @@
 @{
     Layout = "_DashboardLayout";
-    ViewData["Title"] = "Quotations - Manage Site";
+    ViewData["Title"] = "Quotation Requests - Manage Site";
     var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
 }
+
+<style>
+    /* Page Specific Quotations Styles */
+    .quote-avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        text-transform: uppercase;
+    }
+
+    .modal-quote-avatar {
+        width: 52px;
+        height: 52px;
+        font-size: 1.35rem;
+        border-radius: 14px;
+    }
+
+    .quote-category-badge {
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.35rem 0.65rem;
+        border-radius: 6px;
+        background-color: #f1f5f9;
+        color: #334155;
+        border: 1px solid #e2e8f0;
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-word;
+        text-align: left;
+    }
+
+    .quote-detail-link {
+        transition: color 0.2s ease;
+    }
+    .quote-detail-link:hover {
+        color: var(--dash-primary-blue) !important;
+    }
+
+    /* Filter Toolbar Responsive */
+    .quotations-filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+    }
+
+    .filter-item-search {
+        flex: 1 1 240px;
+        min-width: 220px;
+    }
+
+    .filter-item-category {
+        flex: 0 1 210px;
+        min-width: 170px;
+    }
+
+    .filter-item-date {
+        flex: 0 1 150px;
+        min-width: 140px;
+    }
+
+    .filter-item-size {
+        flex: 0 0 auto;
+    }
+
+    /* Modal Cards */
+    .quote-info-card {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem 1.15rem;
+        margin-bottom: 1rem;
+    }
+
+    .quote-info-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #334155;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.75rem;
+        border-bottom: 1px dashed #cbd5e1;
+        padding-bottom: 0.45rem;
+    }
+
+    .quote-info-card-header i {
+        color: var(--dash-primary-blue);
+        font-size: 1rem;
+    }
+
+    .quote-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .quote-value {
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .quote-specs-box {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.85rem 1rem;
+        font-size: 0.9rem;
+        color: #334155;
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.5;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+
+    /* Pagination controls */
+    .pagination-custom .page-link {
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 8px;
+        margin: 0 2px;
+        transition: all 0.2s ease;
+    }
+    .pagination-custom .page-link:hover {
+        background-color: #eff6ff;
+        color: var(--dash-primary-blue);
+        border-color: #bfdbfe;
+    }
+    .pagination-custom .page-item.active .page-link {
+        background-color: var(--dash-primary-blue);
+        border-color: var(--dash-primary-blue);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+    .pagination-custom .page-item.disabled .page-link {
+        color: #cbd5e1;
+        background-color: #f8fafc;
+        border-color: #f1f5f9;
+        cursor: not-allowed;
+    }
+</style>
 
 <!-- Page Root Container -->
 <div class="quotations-page-wrapper" id="quotationsPageContainer" data-api-base-url="@apiBaseUrl">
@@ -19,19 +182,298 @@
     <!-- Page Heading Area -->
     <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
-            <h1 class="dashboard-title">Quotations</h1>
-            <p class="dashboard-subtitle">Manage, review, and track customer quotation requests.</p>
+            <div class="d-flex align-items-center gap-2">
+                <h1 class="dashboard-title m-0">Quotation Requests</h1>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-7 d-none" id="activeFiltersBadge">
+                    0 active filters
+                </span>
+            </div>
+            <p class="dashboard-subtitle mt-1">Review, filter, and respond to incoming customer quotation submissions.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- Reset Filters (Hidden by default) -->
+            <button type="button" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 px-3 py-2 rounded-3 shadow-sm d-none" id="btnResetFilters" title="Clear all search and category filters">
+                <i class="bi bi-x-circle"></i>
+                <span class="fw-semibold">Reset Filters</span>
+            </button>
+
+            <!-- Refresh Button -->
+            <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnRefreshQuotations" title="Reload quotations from API">
+                <i class="bi bi-arrow-clockwise refresh-icon"></i>
+                <span class="fw-semibold">Refresh</span>
+            </button>
         </div>
     </div>
 
-    <!-- Main Card Placeholder -->
-    <div class="dash-table-card p-4">
-        <div class="text-center py-5">
-            <div class="mb-3">
-                <i class="bi bi-chat-square-quote text-muted" style="font-size: 3rem;"></i>
+    <!-- Main Table Card -->
+    <div class="dash-table-card">
+
+        <!-- Card Header Toolbar & Filters -->
+        <div class="dash-card-header">
+            <div class="dash-card-header-left">
+                <div class="dash-header-icon">
+                    <i class="bi bi-chat-square-quote-fill"></i>
+                </div>
+                <div>
+                    <h2 class="dash-card-title">Customer Inquiries</h2>
+                    <p class="dash-card-subtitle">Real-time submissions from website instant quote requests</p>
+                </div>
             </div>
-            <h4 class="fw-bold mb-2">Quotations Management</h4>
-            <p class="text-muted mb-0">This page is ready for quotation management features.</p>
+
+            <!-- Filter Controls Toolbar -->
+            <div class="quotations-filter-bar mt-2 mt-md-0">
+                <!-- Search Input -->
+                <div class="filter-item-search">
+                    <div class="dash-search-group w-100">
+                        <i class="bi bi-search dash-search-icon"></i>
+                        <input type="text"
+                               class="dash-search-input"
+                               id="quotationsSearchInput"
+                               placeholder="Search customer, email, phone, company..."
+                               autocomplete="off" />
+                        <button type="button" class="dash-search-clear" id="quotationsSearchClear" title="Clear search">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Service Category Select -->
+                <div class="filter-item-category">
+                    <select id="quotationsCategoryFilter" class="form-select form-select-sm rounded-3">
+                        <option value="">All Categories</option>
+                        <!-- Populated dynamically via GetAllServiceCategory -->
+                    </select>
+                </div>
+
+                <!-- From Date -->
+                <div class="filter-item-date">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0 text-muted" title="From Date">
+                            <i class="bi bi-calendar-event"></i>
+                        </span>
+                        <input type="date" id="quotationsFromDate" class="form-control form-control-sm border-start-0 ps-1" title="From Date" />
+                    </div>
+                </div>
+
+                <!-- To Date -->
+                <div class="filter-item-date">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0 text-muted" title="To Date">
+                            <i class="bi bi-calendar-check"></i>
+                        </span>
+                        <input type="date" id="quotationsToDate" class="form-control form-control-sm border-start-0 ps-1" title="To Date" />
+                    </div>
+                </div>
+
+                <!-- Page Size Selector -->
+                <div class="filter-item-size d-flex align-items-center gap-1 ms-auto">
+                    <label for="quotationsPageSizeSelect" class="small text-muted text-nowrap d-none d-lg-inline">Show:</label>
+                    <select id="quotationsPageSizeSelect" class="form-select form-select-sm" style="width: 76px; border-radius: 8px;">
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Responsive Container -->
+        <div class="table-responsive dash-table-responsive">
+            <table class="table dash-custom-table" id="quotationsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 75px;"># ID</th>
+                        <th style="min-width: 220px;">Customer &amp; Company</th>
+                        <th style="min-width: 190px;">Contact</th>
+                        <th style="min-width: 180px;">Service Category</th>
+                        <th style="min-width: 140px;">Quantity &amp; Ref</th>
+                        <th style="min-width: 160px;">Submitted On</th>
+                        <th style="width: 110px;">Status</th>
+                        <th class="text-end" style="width: 90px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="quotationsTableBody">
+                    <!-- Populated dynamically via quotations.js -->
+                </tbody>
+            </table>
+
+            <!-- Loading State Display -->
+            <div id="quotationsLoadingState" class="dash-table-state-box">
+                <div class="dash-state-icon-circle icon-loading">
+                    <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <h3 class="dash-state-title">Loading Quotation Requests...</h3>
+                <p class="dash-state-desc">Fetching customer inquiries and quotation details from secure server.</p>
+            </div>
+
+            <!-- Empty State Display -->
+            <div id="quotationsEmptyState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-empty">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <h3 class="dash-state-title">No Quotation Requests Yet</h3>
+                <p class="dash-state-desc">When visitors request quotations from the website, submissions will appear here.</p>
+            </div>
+
+            <!-- No Search Results State -->
+            <div id="quotationsNoResultsState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-empty">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h3 class="dash-state-title">No Matching Quotations</h3>
+                <p class="dash-state-desc">No quotation requests matched your search criteria or date filters.</p>
+            </div>
+
+            <!-- Error State Display -->
+            <div id="quotationsErrorState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-error">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h3 class="dash-state-title">Unable to Load Quotations</h3>
+                <p class="dash-state-desc" id="quotationsErrorMessageText">An unexpected error occurred while communicating with the server.</p>
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-3 px-3 py-2 mt-2" id="btnRetryQuotations">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Try Again
+                </button>
+            </div>
+        </div>
+
+        <!-- Card Footer Toolbar with Pagination -->
+        <div class="dash-card-footer">
+            <div class="d-flex align-items-center gap-2">
+                <span id="quotationsTableCountSummary" class="fw-semibold text-muted">Loading count...</span>
+            </div>
+            <nav id="quotationsPaginationNav" aria-label="Quotations navigation" class="d-none">
+                <ul class="pagination pagination-custom pagination-sm mb-0" id="quotationsPaginationUl">
+                    <!-- Populated dynamically via quotations.js -->
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Quotation Details Modal -->
+<div class="modal fade" id="quotationDetailModal" tabindex="-1" aria-labelledby="modalCustomerName" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content brand-modal-content border-0">
+            <!-- Modal Header -->
+            <div class="modal-header brand-modal-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="quote-avatar-circle modal-quote-avatar" id="modalAvatarInitial">
+                        Q
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark m-0 d-flex align-items-center gap-2 flex-wrap">
+                            <span id="modalCustomerName">Customer Name</span>
+                            <span class="dash-id-badge" id="modalQuoteId">#0</span>
+                        </h5>
+                        <small class="text-muted d-flex align-items-center gap-1">
+                            <i class="bi bi-building"></i>
+                            <span id="modalCompanyName">Company Name</span>
+                        </small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="dash-status-badge status-active">
+                        <span class="status-dot"></span>
+                        <span>Received</span>
+                    </span>
+                    <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-4">
+                <!-- 1. Contact Information Card -->
+                <div class="quote-info-card">
+                    <div class="quote-info-card-header">
+                        <i class="bi bi-person-lines-fill"></i>
+                        <span>Contact Information</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <span class="quote-label">Email Address</span>
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+                                <span class="quote-value text-break" id="modalEmail">—</span>
+                                <a href="#" id="modalEmailLink" class="btn btn-sm btn-outline-primary px-2 py-1 rounded-2" title="Send email">
+                                    <i class="bi bi-envelope"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="quote-label">Phone Number</span>
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+                                <span class="quote-value" id="modalPhone">—</span>
+                                <a href="#" id="modalPhoneLink" class="btn btn-sm btn-outline-success px-2 py-1 rounded-2" title="Call phone">
+                                    <i class="bi bi-telephone"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Quotation Specifications Card -->
+                <div class="quote-info-card">
+                    <div class="quote-info-card-header">
+                        <i class="bi bi-box-seam-fill"></i>
+                        <span>Inquiry Specifications</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <span class="quote-label">Service / Category</span>
+                            <span class="quote-value text-primary" id="modalCategory">—</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="quote-label">Estimated Quantity</span>
+                            <span class="quote-value" id="modalQuantity">—</span>
+                        </div>
+                        <div class="col-12">
+                            <span class="quote-label">Product Reference / Notes</span>
+                            <span class="quote-value" id="modalProductRef">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Detailed Specifications -->
+                <div class="quote-info-card mb-3">
+                    <div class="quote-info-card-header">
+                        <i class="bi bi-file-text-fill"></i>
+                        <span>Detailed Customer Specifications</span>
+                    </div>
+                    <div class="quote-specs-box" id="modalSpecifications">
+                        —
+                    </div>
+                </div>
+
+                <!-- 4. System Metadata -->
+                <div class="d-flex justify-content-between text-muted small px-1 flex-wrap gap-2">
+                    <span><i class="bi bi-clock me-1"></i>Submitted: <strong id="modalCreatedOn">—</strong></span>
+                    <span><i class="bi bi-arrow-repeat me-1"></i>Updated: <strong id="modalUpdatedOn">—</strong></span>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary btn-sm rounded-3 px-4 py-2" data-bs-dismiss="modal">
+                    Close Details
+                </button>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Floating Toast Notification Container -->
+<div class="dash-toast-container">
+    <div class="dash-toast" id="dashToast" role="alert" aria-live="assertive" aria-atomic="true">
+        <i class="bi bi-check-circle-fill dash-toast-icon"></i>
+        <span id="dashToastMessage">Action completed successfully.</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/quotations.js" asp-append-version="true"></script>
+}
