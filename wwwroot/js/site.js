@@ -156,7 +156,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (quoteModalEl) {
         quoteModalEl.addEventListener('show.bs.modal', function () {
             if (!cachedServiceCategories) {
-                initQuickQuoteServiceCategories();
+                initQuickQuoteServiceCategories(pendingModalServiceType);
+            } else {
+                const modalServiceSelect = document.getElementById('modalServiceType');
+                if (modalServiceSelect && modalServiceSelect.options.length > 1) {
+                    selectCategorySmart(modalServiceSelect, pendingModalServiceType);
+                }
             }
         });
     }
@@ -481,17 +486,45 @@ function updateCategoryIdHiddenField(selectEl) {
 }
 
 /**
- * Smart matching for service/category name or keywords
+ * Smart matching for service/category name or keywords:
+ * 1. Checks exact match with existing backend category
+ * 2. Checks contains match with existing category
+ * 3. Checks keyword heuristic match (e.g. label -> Woven & Care Labels, button -> Buttons & Zippers)
+ * 4. IF NOT MATCHED: Auto-selects existing "Other Specific Inquiries"
  */
 function selectCategorySmart(selectEl, rawValue) {
-    if (!selectEl || !rawValue) return;
-    const searchVal = rawValue.toString().trim().toLowerCase();
-    if (!searchVal) return;
+    if (!selectEl || selectEl.options.length === 0) return;
+
+    function getOtherCategoryIndex() {
+        for (let i = 0; i < selectEl.options.length; i++) {
+            const opt = selectEl.options[i];
+            const text = (opt.textContent || opt.value || '').toLowerCase();
+            if (text.includes('other specific inquiries') || text.includes('other')) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    const searchVal = (rawValue || '').toString().trim().toLowerCase();
+
+    // If empty/blank, auto-select existing "Other Specific Inquiries"
+    if (!searchVal) {
+        const otherIdx = getOtherCategoryIndex();
+        if (otherIdx !== -1) {
+            selectEl.selectedIndex = otherIdx;
+            updateCategoryIdHiddenField(selectEl);
+        }
+        return;
+    }
 
     // 1. Exact match by value or visible text
     for (let i = 0; i < selectEl.options.length; i++) {
         const opt = selectEl.options[i];
-        if (opt.value.toLowerCase() === searchVal || opt.textContent.toLowerCase() === searchVal) {
+        if (!opt.value) continue;
+        const optVal = opt.value.toLowerCase();
+        const optText = opt.textContent.toLowerCase();
+        if (optVal === searchVal || optText === searchVal) {
             selectEl.selectedIndex = i;
             updateCategoryIdHiddenField(selectEl);
             return;
@@ -503,20 +536,50 @@ function selectCategorySmart(selectEl, rawValue) {
         const opt = selectEl.options[i];
         if (!opt.value) continue;
         const optVal = opt.value.toLowerCase();
-        if (optVal.includes(searchVal) || searchVal.includes(optVal)) {
+        const optText = opt.textContent.toLowerCase();
+        if (optVal.includes(searchVal) || searchVal.includes(optVal) ||
+            optText.includes(searchVal) || searchVal.includes(optText)) {
             selectEl.selectedIndex = i;
             updateCategoryIdHiddenField(selectEl);
             return;
         }
     }
 
-    // 3. Keyword heuristic match
-    const keywords = ['label', 'button', 'zipper', 'tag', 'packag', 'print', 'emboss', 'heat', 'laminat', 'stock', 'sourc', 'trim'];
-    for (const kw of keywords) {
-        if (searchVal.includes(kw)) {
+    // 3. Keyword heuristic match with existing categories
+    const keywords = [
+        { kw: 'label', target: 'woven & care labels' },
+        { kw: 'care label', target: 'woven & care labels' },
+        { kw: 'woven', target: 'woven & care labels' },
+        { kw: 'button', target: 'buttons & zippers' },
+        { kw: 'zipper', target: 'buttons & zippers' },
+        { kw: 'puller', target: 'buttons & zippers' },
+        { kw: 'hang tag', target: 'hang tags & packaging' },
+        { kw: 'tag', target: 'hang tags & packaging' },
+        { kw: 'packag', target: 'hang tags & packaging' },
+        { kw: 'digital print', target: 'digital printing' },
+        { kw: 'printing', target: 'digital printing' },
+        { kw: 'emboss', target: 'paper embossing' },
+        { kw: 'heat press', target: 'heat press & lamination' },
+        { kw: 'heat', target: 'heat press & lamination' },
+        { kw: 'laminat', target: 'heat press & lamination' },
+        { kw: 'ready stock', target: 'direct selling (ready stock)' },
+        { kw: 'direct sell', target: 'direct selling (ready stock)' },
+        { kw: 'stock', target: 'direct selling (ready stock)' },
+        { kw: 'sourcing', target: 'global sourcing' },
+        { kw: 'global', target: 'global sourcing' },
+        { kw: 'trim', target: 'trims & accessories manufacturing' },
+        { kw: 'accessories', target: 'trims & accessories manufacturing' },
+        { kw: 'thread', target: 'trims & accessories manufacturing' },
+        { kw: 'elastic', target: 'trims & accessories manufacturing' },
+        { kw: 'ribbon', target: 'trims & accessories manufacturing' }
+    ];
+
+    for (const item of keywords) {
+        if (searchVal.includes(item.kw)) {
             for (let i = 0; i < selectEl.options.length; i++) {
                 const opt = selectEl.options[i];
-                if (opt.value.toLowerCase().includes(kw)) {
+                if (!opt.value) continue;
+                if (opt.value.toLowerCase().includes(item.target)) {
                     selectEl.selectedIndex = i;
                     updateCategoryIdHiddenField(selectEl);
                     return;
@@ -525,13 +588,19 @@ function selectCategorySmart(selectEl, rawValue) {
         }
     }
 
-    // 4. Custom option if not found
-    const customOpt = document.createElement('option');
-    customOpt.value = rawValue;
-    customOpt.textContent = rawValue;
-    customOpt.selected = true;
-    selectEl.appendChild(customOpt);
-    updateCategoryIdHiddenField(selectEl);
+    // 4. If not matched, auto select the existing "Other Specific Inquiries"
+    const otherIdx = getOtherCategoryIndex();
+    if (otherIdx !== -1) {
+        selectEl.selectedIndex = otherIdx;
+        updateCategoryIdHiddenField(selectEl);
+        return;
+    }
+
+    // Fallback: first non-empty option
+    if (selectEl.options.length > 1) {
+        selectEl.selectedIndex = 1;
+        updateCategoryIdHiddenField(selectEl);
+    }
 }
 
 /**
@@ -543,7 +612,9 @@ async function initQuickQuoteServiceCategories(preselectVal) {
 
     const categories = await getServiceCategories();
     if (categories && categories.length > 0) {
-        const targetValue = preselectVal || pendingModalServiceType || modalSelect.value;
+        const targetValue = preselectVal !== undefined 
+            ? preselectVal 
+            : (pendingModalServiceType !== null ? pendingModalServiceType : (modalSelect.value || ''));
         renderServiceCategoryOptions(modalSelect, categories, targetValue);
         pendingModalServiceType = null;
     }
@@ -560,15 +631,15 @@ window.openQuoteModal = function (productName, serviceType) {
             productInput.value = productName || '';
         }
 
-        if (serviceType) {
-            pendingModalServiceType = serviceType;
-            if (serviceSelect) {
-                selectCategorySmart(serviceSelect, serviceType);
-            }
+        const categoryVal = serviceType !== undefined && serviceType !== null ? serviceType : '';
+        pendingModalServiceType = categoryVal;
+
+        if (serviceSelect && serviceSelect.options.length > 1) {
+            selectCategorySmart(serviceSelect, categoryVal);
         }
 
         if (!cachedServiceCategories) {
-            initQuickQuoteServiceCategories(serviceType);
+            initQuickQuoteServiceCategories(categoryVal);
         }
 
         const modal = bootstrap.Modal.getOrCreateInstance(quoteModalEl);
