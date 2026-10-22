@@ -456,14 +456,6 @@ $(function () {
                         </div>
                     </td>
 
-                    <!-- Status -->
-                    <td>
-                        <span class="dash-status-badge status-active">
-                            <span class="status-dot"></span>
-                            <span>Received</span>
-                        </span>
-                    </td>
-
                     <!-- Actions -->
                     <td class="text-end">
                         <div class="dash-action-btn-group">
