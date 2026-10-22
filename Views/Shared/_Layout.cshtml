@@ -168,25 +168,28 @@
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form asp-controller="Home" asp-action="SubmitQuote" method="post">
+                <form asp-controller="Home" asp-action="SubmitQuote" method="post" id="quickQuoteModalForm" novalidate>
                     @Html.AntiForgeryToken()
                     <div class="modal-body p-4 bg-light">
+                        <!-- Dynamic Alert Notification Inside Modal -->
+                        <div id="modalQuoteAlert" class="alert d-none rounded-3 mb-3 py-2 px-3 small shadow-sm" role="alert"></div>
+
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" name="FullName" class="form-control rounded-3" placeholder="e.g. John Doe" required />
+                                <input type="text" name="FullName" id="modalFullName" class="form-control rounded-3" placeholder="e.g. John Doe" required />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Email Address <span class="text-danger">*</span></label>
-                                <input type="email" name="Email" class="form-control rounded-3" placeholder="name@company.com" required />
+                                <input type="email" name="Email" id="modalEmail" class="form-control rounded-3" placeholder="name@company.com" required />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Phone / WhatsApp Number <span class="text-danger">*</span></label>
-                                <input type="text" name="Phone" class="form-control rounded-3" placeholder="+880 18XXXXXXXX" required />
+                                <input type="text" name="Phone" id="modalPhone" class="form-control rounded-3" placeholder="+880 18XXXXXXXX" required />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Company / Garments Name</label>
-                                <input type="text" name="CompanyName" class="form-control rounded-3" placeholder="Garments Ltd / Buying House" />
+                                <input type="text" name="CompanyName" id="modalCompanyName" class="form-control rounded-3" placeholder="Garments Ltd / Buying House" />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Service / Category <span class="text-danger">*</span></label>
@@ -207,7 +210,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Estimated Quantity (Units / Gross / Yards)</label>
-                                <input type="text" name="Quantity" class="form-control rounded-3" placeholder="e.g. 5,000 pcs or 50,000 yards" />
+                                <input type="text" name="Quantity" id="modalQuantity" class="form-control rounded-3" placeholder="e.g. 5,000 pcs or 50,000 yards" />
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-bold">Product Item Name / Reference</label>
@@ -215,7 +218,7 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-bold">Detailed Specifications & Delivery Schedule</label>
-                                <textarea name="Message" rows="3" class="form-control rounded-3" placeholder="Please provide dimensions, colors, base material, pantone codes, target delivery dates, or export requirements..."></textarea>
+                                <textarea name="Message" id="modalMessage" rows="3" class="form-control rounded-3" placeholder="Please provide dimensions, colors, base material, pantone codes, target delivery dates, or export requirements..."></textarea>
                             </div>
                         </div>
                     </div>
@@ -223,7 +226,7 @@
                         <span class="small text-muted"><i class="bi bi-shield-lock me-1"></i> Your information is kept strictly confidential.</span>
                         <div>
                             <button type="button" class="btn btn-light rounded-pill px-3 me-2" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-modern-indigo rounded-pill px-4">
+                            <button type="submit" id="btnSubmitQuickQuote" class="btn btn-modern-indigo rounded-pill px-4">
                                 <i class="bi bi-send-fill me-1"></i> Submit Quotation Request
                             </button>
                         </div>

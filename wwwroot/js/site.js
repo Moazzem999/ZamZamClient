@@ -176,6 +176,184 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // =============================================================
+    // 6. Handle Quick Quote Modal Form Submission to API
+    // =============================================================
+    const quickQuoteForm = document.getElementById('quickQuoteModalForm');
+    const quoteAlert = document.getElementById('modalQuoteAlert');
+    const btnSubmitQuickQuote = document.getElementById('btnSubmitQuickQuote');
+
+    function showModalAlert(type, message, icon) {
+        if (!quoteAlert) return;
+        const iconClass = icon || (type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill');
+        quoteAlert.className = `alert alert-${type} d-flex align-items-center rounded-3 mb-3 py-2 px-3 small`;
+        quoteAlert.innerHTML = `
+            <i class="bi ${iconClass} me-2 fs-5 flex-shrink-0"></i>
+            <div>${message}</div>
+        `;
+        quoteAlert.classList.remove('d-none');
+    }
+
+    function hideModalAlert() {
+        if (!quoteAlert) return;
+        quoteAlert.className = 'alert d-none rounded-3 mb-3 py-2 px-3 small';
+        quoteAlert.innerHTML = '';
+    }
+
+    if (quoteModalEl) {
+        quoteModalEl.addEventListener('hidden.bs.modal', function () {
+            hideModalAlert();
+        });
+    }
+
+    if (quickQuoteForm) {
+        quickQuoteForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hideModalAlert();
+
+            const fullName = (document.getElementById('modalFullName')?.value || '').trim();
+            const email = (document.getElementById('modalEmail')?.value || '').trim();
+            const phone = (document.getElementById('modalPhone')?.value || '').trim();
+            const companyName = (document.getElementById('modalCompanyName')?.value || '').trim();
+            const serviceSelect = document.getElementById('modalServiceType');
+            const quantity = (document.getElementById('modalQuantity')?.value || '').trim();
+            const productName = (document.getElementById('modalProductName')?.value || '').trim();
+            const message = (document.getElementById('modalMessage')?.value || '').trim();
+
+            if (!fullName) {
+                showModalAlert('danger', 'Please enter your Full Name.');
+                document.getElementById('modalFullName')?.focus();
+                return;
+            }
+            if (!email) {
+                showModalAlert('danger', 'Please enter a valid Email Address.');
+                document.getElementById('modalEmail')?.focus();
+                return;
+            }
+            if (!phone) {
+                showModalAlert('danger', 'Please enter your Phone / WhatsApp number.');
+                document.getElementById('modalPhone')?.focus();
+                return;
+            }
+            if (!serviceSelect || !serviceSelect.value) {
+                showModalAlert('danger', 'Please select a Service / Category.');
+                serviceSelect?.focus();
+                return;
+            }
+
+            // Determine integer serviceCategory (1 to 10)
+            let serviceCategoryId = 0;
+            const selectedOpt = serviceSelect.options[serviceSelect.selectedIndex];
+            if (selectedOpt && selectedOpt.dataset && selectedOpt.dataset.id) {
+                serviceCategoryId = parseInt(selectedOpt.dataset.id, 10);
+            }
+            if (!serviceCategoryId || isNaN(serviceCategoryId)) {
+                const hiddenVal = document.getElementById('modalServiceCategoryId')?.value;
+                if (hiddenVal) serviceCategoryId = parseInt(hiddenVal, 10);
+            }
+            if (!serviceCategoryId || isNaN(serviceCategoryId)) {
+                const found = (cachedServiceCategories || []).find(c => 
+                    (c.name && c.name.toLowerCase() === serviceSelect.value.toLowerCase()) ||
+                    (c.id && String(c.id) === serviceSelect.value)
+                );
+                if (found && found.id) {
+                    serviceCategoryId = parseInt(found.id, 10);
+                }
+            }
+            if (!serviceCategoryId || isNaN(serviceCategoryId)) {
+                serviceCategoryId = 1;
+            }
+
+            const payload = {
+                id: 0,
+                fullName: fullName,
+                email: email,
+                phone: phone,
+                companyName: companyName,
+                serviceCategory: serviceCategoryId,
+                estimatedQuantity: quantity,
+                productReference: productName,
+                detailedSpecifications: message
+            };
+
+            const originalBtnHtml = btnSubmitQuickQuote ? btnSubmitQuickQuote.innerHTML : '';
+            if (btnSubmitQuickQuote) {
+                btnSubmitQuickQuote.disabled = true;
+                btnSubmitQuickQuote.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Submitting...';
+            }
+
+            try {
+                const modalEl = document.getElementById('quickQuoteModal');
+                const baseUrl = (
+                    window.apiBaseUrl ||
+                    modalEl?.getAttribute('data-api-base-url') ||
+                    document.body?.getAttribute('data-api-base-url') ||
+                    'https://localhost:7148'
+                ).toString().trim().replace(/\/+$/, '');
+
+                const response = await fetch(`${baseUrl}/api/QuotationRequest`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    let errMsg = `Server returned status ${response.status}`;
+                    try {
+                        const errJson = await response.json();
+                        errMsg = errJson.message || errMsg;
+                    } catch {
+                        const errText = await response.text();
+                        if (errText) errMsg = errText;
+                    }
+                    throw new Error(errMsg);
+                }
+
+                const resData = await response.json();
+                if (resData && resData.succeeded === false) {
+                    throw new Error(resData.message || 'Quotation submission failed.');
+                }
+
+                const successMsg = resData?.message || 'Quotation request successfully created.';
+                showModalAlert('success', `<strong>Thank you!</strong> ${successMsg} Our team will contact you shortly.`);
+
+                if (btnSubmitQuickQuote) {
+                    btnSubmitQuickQuote.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Submitted!';
+                    btnSubmitQuickQuote.classList.remove('btn-modern-indigo');
+                    btnSubmitQuickQuote.classList.add('btn-success');
+                }
+
+                quickQuoteForm.reset();
+                if (document.getElementById('modalServiceCategoryId')) {
+                    document.getElementById('modalServiceCategoryId').value = '';
+                }
+
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('quickQuoteModal'));
+                    if (modal) modal.hide();
+                    hideModalAlert();
+                    if (btnSubmitQuickQuote) {
+                        btnSubmitQuickQuote.disabled = false;
+                        btnSubmitQuickQuote.innerHTML = originalBtnHtml;
+                        btnSubmitQuickQuote.classList.remove('btn-success');
+                        btnSubmitQuickQuote.classList.add('btn-modern-indigo');
+                    }
+                }, 2200);
+
+            } catch (err) {
+                console.error('Failed to submit quotation request:', err);
+                showModalAlert('danger', err.message || 'Failed to submit quotation request. Please try again.');
+                if (btnSubmitQuickQuote) {
+                    btnSubmitQuickQuote.disabled = false;
+                    btnSubmitQuickQuote.innerHTML = originalBtnHtml;
+                }
+            }
+        });
+    }
 });
 
 // =============================================================
