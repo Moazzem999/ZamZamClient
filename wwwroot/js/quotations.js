@@ -432,22 +432,6 @@ $(function () {
                         </span>
                     </td>
 
-                    <!-- Quantity & Reference -->
-                    <td>
-                        <div class="d-flex flex-column gap-1">
-                            <div>
-                                <span class="badge bg-light text-dark border px-2 py-1 fw-semibold" title="Estimated Quantity">
-                                    ${quantity}
-                                </span>
-                            </div>
-                            ${quote.productReference ? `
-                                <small class="text-muted text-truncate d-block" style="max-width: 150px;" title="${ref}">
-                                    Ref: ${ref}
-                                </small>
-                            ` : ''}
-                        </div>
-                    </td>
-
                     <!-- Submitted Date -->
                     <td class="text-nowrap">
                         <div class="d-flex align-items-center gap-1 small text-dark">
