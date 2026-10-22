@@ -19,6 +19,7 @@ $(function () {
     }
 
     const GET_QUOTATIONS_URL = `${apiBaseUrl}/api/QuotationRequest/GetAll`;
+    const QUOTATION_BASE_URL = `${apiBaseUrl}/api/QuotationRequest`;
     const GET_CATEGORIES_URL = `${apiBaseUrl}/api/Global/GetAllServiceCategory`;
 
     // Table & State containers
@@ -54,6 +55,13 @@ $(function () {
     if ($detailModalEl.length && typeof bootstrap !== 'undefined') {
         detailModalInstance = new bootstrap.Modal($detailModalEl[0]);
     }
+
+    const $deleteModalEl = $('#quotationDeleteModal');
+    let deleteModalInstance = null;
+    if ($deleteModalEl.length && typeof bootstrap !== 'undefined') {
+        deleteModalInstance = new bootstrap.Modal($deleteModalEl[0]);
+    }
+    let pendingDeleteQuoteId = null;
 
     // Toast elements
     const $toast = $('#dashToast');
@@ -450,6 +458,13 @@ $(function () {
                                     aria-label="View Details">
                                 <i class="bi bi-eye"></i>
                             </button>
+                            <button type="button" 
+                                    class="dash-action-btn btn-delete btn-delete-quote text-danger" 
+                                    data-id="${id}" 
+                                    title="Delete Quotation Request"
+                                    aria-label="Delete Quotation">
+                                <i class="bi bi-trash3"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -683,6 +698,94 @@ $(function () {
         if (id) {
             openQuotationDetails(id);
         }
+    });
+
+    // Delete button clicks (delegated) - opens confirmation modal
+    $tableBody.on('click', '.btn-delete-quote', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = parseInt($(this).data('id'), 10);
+        if (id) {
+            confirmDeleteQuotation(id);
+        }
+    });
+
+    function confirmDeleteQuotation(id) {
+        const quote = currentQuotationsList.find(q => q.id === id) || {};
+        const fullName = quote.fullName || `Quotation #${id}`;
+        const company = quote.companyName || '—';
+        const initial = (quote.fullName || 'Q').trim().charAt(0).toUpperCase();
+
+        pendingDeleteQuoteId = id;
+        $('#deleteTargetId').text(`#${id}`);
+        $('#deleteTargetName').text(fullName);
+        $('#deleteTargetCompany').text(company);
+        $('#deleteTargetAvatar').text(initial).css('background', getAvatarBg(quote.fullName));
+
+        if (deleteModalInstance) {
+            deleteModalInstance.show();
+        } else {
+            $deleteModalEl.modal('show');
+        }
+    }
+
+    // Confirm Delete Action
+    $(document).on('click', '#btnConfirmDeleteQuotation', function () {
+        if (!pendingDeleteQuoteId) return;
+
+        const id = pendingDeleteQuoteId;
+        const deleteUrl = `${QUOTATION_BASE_URL}/${id}`;
+        const token = getAuthToken();
+        const headers = { 'Accept': 'application/json' };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const $btn = $('#btnConfirmDeleteQuotation');
+        const $btnText = $('#btnConfirmDeleteQuotationText');
+        $btn.prop('disabled', true);
+        $btnText.text('Deleting...');
+
+        console.log(`[Quotations] Sending DELETE to: ${deleteUrl}`);
+
+        $.ajax({
+            url: deleteUrl,
+            type: 'DELETE',
+            headers: headers,
+            cache: false,
+            timeout: 15000,
+            success: function (res) {
+                console.log('[Quotations] Delete response:', res);
+                if (deleteModalInstance) {
+                    deleteModalInstance.hide();
+                } else {
+                    $deleteModalEl.modal('hide');
+                }
+
+                showToast('Quotation request deleted successfully.', 'bi bi-trash3-fill text-danger');
+
+                // If this was the only item on the current page (and not on page 1), move back one page
+                if (currentQuotationsList.length === 1 && currentPageNumber > 1) {
+                    currentPageNumber--;
+                }
+                loadQuotations();
+            },
+            error: function (xhr, status, error) {
+                console.error('[Quotations] Delete error:', xhr, status, error);
+                let msg = 'Failed to delete quotation request. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                } else if (xhr.statusText && xhr.statusText !== 'error') {
+                    msg = `Error (${xhr.status}): ${xhr.statusText}`;
+                }
+                showToast(msg, 'bi bi-exclamation-triangle-fill text-warning');
+            },
+            complete: function () {
+                $btn.prop('disabled', false);
+                $btnText.text('Delete Request');
+                pendingDeleteQuoteId = null;
+            }
+        });
     });
 
     // Copy to clipboard helper inside modal

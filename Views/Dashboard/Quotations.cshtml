@@ -288,7 +288,7 @@
                         <th style="min-width: 190px;">Contact</th>
                         <th style="min-width: 180px;">Service Category</th>
                         <th style="min-width: 160px;">Submitted On</th>
-                        <th class="text-end" style="width: 90px;">Actions</th>
+                        <th class="text-end" style="width: 95px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="quotationsTableBody">
@@ -459,6 +459,57 @@
                 <button type="button" class="btn btn-secondary btn-sm rounded-3 px-4 py-2" data-bs-dismiss="modal">
                     Close Details
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quotation Delete Confirmation Modal -->
+<div class="modal fade" id="quotationDeleteModal" tabindex="-1" aria-labelledby="quotationDeleteModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content modern-delete-modal-content border-0 p-4">
+            <button type="button" class="modal-close-bubble" data-bs-dismiss="modal" aria-label="Close" title="Cancel">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="text-center">
+                <div class="delete-icon-spotlight">
+                    <div class="delete-pulse-ring"></div>
+                    <div class="delete-pulse-ring-inner"></div>
+                    <div class="delete-icon-bubble">
+                        <i class="bi bi-trash3-fill"></i>
+                    </div>
+                </div>
+
+                <h4 class="delete-modal-heading" id="quotationDeleteModalTitle">Delete Quotation?</h4>
+                <p class="delete-modal-subtext">
+                    You are about to permanently remove this customer quotation request from the system.
+                </p>
+
+                <div class="delete-target-preview-card">
+                    <div id="deleteTargetAvatarContainer" class="d-flex align-items-center justify-content-center">
+                        <div class="quote-avatar-circle" id="deleteTargetAvatar" style="width: 44px; height: 44px; font-size: 1.1rem;">Q</div>
+                    </div>
+                    <div class="delete-target-info">
+                        <div class="delete-target-badge"><span id="deleteTargetId">#00</span></div>
+                        <div class="delete-target-title" id="deleteTargetName">Loading...</div>
+                        <div class="delete-target-desc" id="deleteTargetCompany">—</div>
+                    </div>
+                </div>
+
+                <div class="delete-warning-pill">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>This action is permanent and cannot be undone</span>
+                </div>
+
+                <div class="delete-modal-actions">
+                    <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn-modal-delete" id="btnConfirmDeleteQuotation">
+                        <i class="bi bi-trash3-fill"></i>
+                        <span id="btnConfirmDeleteQuotationText">Delete Request</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
