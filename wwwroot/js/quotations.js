@@ -398,19 +398,14 @@ $(function () {
 
                     <!-- Customer & Company -->
                     <td>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="quote-avatar-circle" style="background: ${avatarBg};">
-                                ${initial}
-                            </div>
-                            <div class="min-w-0">
-                                <a href="javascript:void(0)" class="fw-bold text-dark text-decoration-none quote-detail-link d-block text-truncate" data-id="${id}">
-                                    ${fullName}
-                                </a>
-                                <small class="text-muted d-flex align-items-center gap-1 text-truncate" title="${company}">
-                                    <i class="bi bi-building"></i>
-                                    <span>${company}</span>
-                                </small>
-                            </div>
+                        <div class="min-w-0">
+                            <a href="javascript:void(0)" class="fw-bold text-dark text-decoration-none quote-detail-link d-block text-truncate" data-id="${id}">
+                                ${fullName}
+                            </a>
+                            <small class="text-muted d-flex align-items-center gap-1 text-truncate" title="${company}">
+                                <i class="bi bi-building"></i>
+                                <span>${company}</span>
+                            </small>
                         </div>
                     </td>
 
