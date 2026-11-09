@@ -96,6 +96,24 @@ $(function () {
         }
     }
 
+    function formatDateTime(dateStr) {
+        if (!dateStr) return '—';
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr;
+            return date.toLocaleString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
     function getAuthToken() {
         let token = localStorage.getItem('token') || '';
         if (!token) {
@@ -129,7 +147,7 @@ $(function () {
 
         toastTimeout = setTimeout(function () {
             $toast.removeClass('show');
-        }, 3200);
+        }, 3000);
     }
 
     function showState(state) {
@@ -143,22 +161,18 @@ $(function () {
         switch (state) {
             case 'loading':
                 $table.addClass('d-none');
-                $paginationNav.addClass('d-none');
                 $loadingState.removeClass('d-none');
                 break;
             case 'empty':
                 $table.addClass('d-none');
-                $paginationNav.addClass('d-none');
                 $emptyState.removeClass('d-none');
                 break;
             case 'no-results':
                 $table.addClass('d-none');
-                $paginationNav.addClass('d-none');
                 $noResultsState.removeClass('d-none');
                 break;
             case 'error':
                 $table.addClass('d-none');
-                $paginationNav.addClass('d-none');
                 $errorState.removeClass('d-none');
                 break;
             case 'normal':
@@ -167,7 +181,7 @@ $(function () {
         }
     }
 
-    // 4. Fetch Services from API
+    // 4. Fetch Services from API endpoint (Triggered by Search, Reset, Pagination, PageSize)
     function loadServices() {
         if (isFetching) return;
         isFetching = true;
@@ -182,11 +196,18 @@ $(function () {
         }
 
         const queryParams = {
+            PageNumber: currentPageNumber,
+            PageSize: currentPageSize,
             pageNumber: currentPageNumber,
             pageSize: currentPageSize
         };
 
-        console.log(`[Services] Fetching from: ${GET_SERVICES_URL}`, queryParams);
+        if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+            queryParams.SearchTerm = currentSearchTerm.trim();
+            queryParams.searchTerm = currentSearchTerm.trim();
+        }
+
+        console.log(`[Services] Triggering API Endpoint: ${GET_SERVICES_URL}`, queryParams);
 
         $.ajax({
             url: GET_SERVICES_URL,
@@ -204,20 +225,39 @@ $(function () {
                     const items = Array.isArray(dataObj.items) ? dataObj.items : (Array.isArray(dataObj) ? dataObj : []);
 
                     allFetchedServices = items;
-                    currentTotalCount = dataObj.totalCount ?? items.length;
-                    currentTotalPages = dataObj.totalPages ?? Math.max(1, Math.ceil(currentTotalCount / currentPageSize));
-                    hasPreviousPage = Boolean(dataObj.hasPreviousPage);
-                    hasNextPage = Boolean(dataObj.hasNextPage);
+                    currentTotalCount = dataObj.totalCount != null ? dataObj.totalCount : items.length;
+                    currentTotalPages = dataObj.totalPages != null ? dataObj.totalPages : Math.max(1, Math.ceil(currentTotalCount / currentPageSize));
+                    hasPreviousPage = dataObj.hasPreviousPage != null ? Boolean(dataObj.hasPreviousPage) : (currentPageNumber > 1);
+                    hasNextPage = dataObj.hasNextPage != null ? Boolean(dataObj.hasNextPage) : (currentPageNumber < currentTotalPages);
 
-                    applyFiltersAndRender();
+                    if (items.length === 0) {
+                        if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+                            showState('no-results');
+                        } else {
+                            showState('empty');
+                        }
+                        $tableCountSummary.text('Showing 0 of 0 services');
+                        renderPaginationControls();
+                    } else {
+                        showState('normal');
+                        renderServicesTable(items);
+                        renderPaginationControls();
+                    }
                 } else if (Array.isArray(response)) {
                     allFetchedServices = response;
                     currentTotalCount = response.length;
                     currentTotalPages = Math.max(1, Math.ceil(currentTotalCount / currentPageSize));
-                    hasPreviousPage = false;
-                    hasNextPage = false;
+                    hasPreviousPage = currentPageNumber > 1;
+                    hasNextPage = currentPageNumber < currentTotalPages;
 
-                    applyFiltersAndRender();
+                    if (response.length === 0) {
+                        showState('empty');
+                        $tableCountSummary.text('Showing 0 of 0 services');
+                    } else {
+                        showState('normal');
+                        renderServicesTable(response);
+                    }
+                    renderPaginationControls();
                 } else {
                     const message = response?.message || 'Unable to retrieve services from server.';
                     showError(message);
@@ -235,7 +275,7 @@ $(function () {
                     return;
                 }
 
-                let msg = `Unable to connect to Services API (${GET_SERVICES_URL}). Please verify the backend service is running.`;
+                let msg = `Unable to connect to Services API (${GET_SERVICES_URL}). Please verify backend is running.`;
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     msg = xhr.responseJSON.message;
                 }
@@ -252,39 +292,7 @@ $(function () {
         showState('error');
     }
 
-    // 5. Search & Filter Processing
-    function applyFiltersAndRender() {
-        if (!allFetchedServices || allFetchedServices.length === 0) {
-            showState('empty');
-            $tableCountSummary.text('Showing 0 of 0 services');
-            return;
-        }
-
-        let filtered = allFetchedServices.slice();
-
-        // Search Filter (Title, Description, ID)
-        if (currentSearchTerm.trim() !== '') {
-            const term = currentSearchTerm.trim().toLowerCase();
-            filtered = filtered.filter(function (item) {
-                const titleMatch = (item.title || '').toLowerCase().includes(term);
-                const descMatch = (item.description || '').toLowerCase().includes(term);
-                const idMatch = String(item.id || '').includes(term);
-                return titleMatch || descMatch || idMatch;
-            });
-        }
-
-        if (filtered.length === 0) {
-            showState('no-results');
-            $tableCountSummary.text('Showing 0 of 0 services');
-            return;
-        }
-
-        showState('normal');
-        renderServicesTable(filtered);
-        renderPaginationControls();
-    }
-
-    // 6. Render Services Table matching the attached image design
+    // 5. Render Table Rows (Only 4 Columns: SERVICE, DESCRIPTION, DISPLAY ORDER text-only, ACTION)
     function renderServicesTable(items) {
         $tableBody.empty();
 
@@ -293,25 +301,24 @@ $(function () {
             const title = escapeHtml(service.title || 'Unnamed Service');
             const initial = (service.title || 'S').trim().charAt(0).toUpperCase();
             const description = escapeHtml(service.description || 'No description provided');
-            const displayOrder = service.displayOrder != null ? service.displayOrder : '—';
-            const createdDate = formatDate(service.createdOn);
+            const displayOrderText = service.displayOrder != null ? service.displayOrder : '—';
             const fullImageUrl = resolveImageUrl(service.imagePath);
 
-            // Circular Avatar Markup matching attached image design
+            // Circular Avatar
             const avatarMarkup = fullImageUrl
                 ? `<img src="${fullImageUrl}" alt="${title}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'service-avatar-fallback\\'>${initial}</div>';" />`
                 : `<div class="service-avatar-fallback">${initial}</div>`;
 
             const rowHtml = `
                 <tr data-service-id="${serviceId}">
-                    <!-- SERVICE COLUMN (Avatar + Title + Meta) -->
+                    <!-- 1. SERVICE COLUMN (Avatar + Title + Meta) -->
                     <td>
                         <div class="d-flex align-items-center gap-3">
                             <div class="service-avatar btn-preview-thumb" data-url="${escapeHtml(fullImageUrl)}" data-title="${title}" title="Click to view image">
                                 ${avatarMarkup}
                             </div>
                             <div class="d-flex flex-column">
-                                <span class="fw-bold text-dark fs-6 btn-view-service cursor-pointer" data-id="${serviceId}" style="cursor: pointer;">
+                                <span class="fw-bold text-dark fs-6 btn-view-service" data-id="${serviceId}" style="cursor: pointer;">
                                     ${title}
                                 </span>
                                 <span class="text-muted small">Service ID: #${serviceId}</span>
@@ -319,7 +326,7 @@ $(function () {
                         </div>
                     </td>
 
-                    <!-- DESCRIPTION COLUMN (Matching Address style in image) -->
+                    <!-- 2. DESCRIPTION COLUMN -->
                     <td>
                         <div class="d-flex align-items-center gap-2 text-secondary">
                             <i class="bi bi-geo-alt text-muted" style="font-size: 0.95rem; flex-shrink: 0;"></i>
@@ -329,30 +336,13 @@ $(function () {
                         </div>
                     </td>
 
-                    <!-- DISPLAY ORDER COLUMN (Matching Designation pill in image) -->
-                    <td>
-                        <div class="d-flex flex-column gap-1">
-                            <div>
-                                <span class="badge-designation-pill">Display Order #${displayOrder}</span>
-                            </div>
-                            <span class="text-muted small"><i class="bi bi-sort-numeric-down me-1"></i>Priority ${displayOrder}</span>
-                        </div>
+                    <!-- 3. DISPLAY ORDER COLUMN (Text only like 1, 2, 3) -->
+                    <td class="text-center align-middle">
+                        <span class="fw-bold text-dark fs-6">${displayOrderText}</span>
                     </td>
 
-                    <!-- CREATED DATE COLUMN (Matching Joining & Salary style in image) -->
-                    <td>
-                        <div class="d-flex flex-column gap-1">
-                            <span class="fw-bold" style="color: #059669 !important;">
-                                <i class="bi bi-check-circle-fill me-1" style="font-size: 0.8rem;"></i>${createdDate}
-                            </span>
-                            <span class="text-muted small">
-                                <i class="bi bi-calendar3 me-1"></i>Created Date
-                            </span>
-                        </div>
-                    </td>
-
-                    <!-- ACTION COLUMN (3 Buttons matching image: Blue Eye, Yellow Pencil, Red Trash) -->
-                    <td class="text-end">
+                    <!-- 4. ACTION COLUMN (3 Buttons matching image: Blue Eye, Yellow Pencil, Red Trash) -->
+                    <td class="text-end align-middle">
                         <div class="service-actions-group">
                             <!-- 1. Blue View Button -->
                             <button type="button" class="btn-action-icon btn-action-view btn-view-service" data-id="${serviceId}" title="View Details">
@@ -376,39 +366,44 @@ $(function () {
             $tableBody.append(rowHtml);
         });
 
-        // Summary text matching image
-        const fromCount = (currentPageNumber - 1) * currentPageSize + 1;
-        const toCount = Math.min(currentPageNumber * currentPageSize, currentTotalCount);
-        $tableCountSummary.text(`Showing ${fromCount} to ${toCount} of ${currentTotalCount} services`);
+        // Summary text in footer
+        if (currentTotalCount === 0) {
+            $tableCountSummary.text('Showing 0 of 0 services');
+        } else {
+            const fromCount = (currentPageNumber - 1) * currentPageSize + 1;
+            const toCount = Math.min(currentPageNumber * currentPageSize, currentTotalCount);
+            $tableCountSummary.text(`Showing ${fromCount} to ${toCount} of ${currentTotalCount} services`);
+        }
     }
 
-    // 7. Render Pagination Controls
+    // 6. Render Prominent Pagination in Table Footer
     function renderPaginationControls() {
-        if (currentTotalPages <= 1 && currentTotalCount <= currentPageSize) {
+        $paginationUl.empty();
+
+        if (currentTotalCount === 0) {
             $paginationNav.addClass('d-none');
             return;
         }
 
         $paginationNav.removeClass('d-none');
-        $paginationUl.empty();
 
         // Prev Button
         const prevDisabled = !hasPreviousPage && currentPageNumber <= 1;
         $paginationUl.append(`
             <li class="page-item ${prevDisabled ? 'disabled' : ''}">
                 <button type="button" class="page-link" id="btnPagePrev" ${prevDisabled ? 'disabled' : ''} aria-label="Previous">
-                    <i class="bi bi-chevron-left"></i>
-                    <span class="d-none d-sm-inline ms-1">Prev</span>
+                    <i class="bi bi-chevron-left me-1"></i>Prev
                 </button>
             </li>
         `);
 
         // Numbered Pages
-        const maxVisibleButtons = 5;
-        let startPage = Math.max(1, currentPageNumber - Math.floor(maxVisibleButtons / 2));
-        let endPage = Math.min(currentTotalPages, startPage + maxVisibleButtons - 1);
-        if (endPage - startPage + 1 < maxVisibleButtons) {
-            startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+        const maxButtons = 5;
+        let startPage = Math.max(1, currentPageNumber - Math.floor(maxButtons / 2));
+        let endPage = Math.min(currentTotalPages, startPage + maxButtons - 1);
+
+        if (endPage - startPage + 1 < maxButtons) {
+            startPage = Math.max(1, endPage - maxButtons + 1);
         }
 
         if (startPage > 1) {
@@ -443,14 +438,13 @@ $(function () {
         $paginationUl.append(`
             <li class="page-item ${nextDisabled ? 'disabled' : ''}">
                 <button type="button" class="page-link" id="btnPageNext" ${nextDisabled ? 'disabled' : ''} aria-label="Next">
-                    <span class="d-none d-sm-inline me-1">Next</span>
-                    <i class="bi bi-chevron-right"></i>
+                    Next<i class="bi bi-chevron-right ms-1"></i>
                 </button>
             </li>
         `);
     }
 
-    // 8. View Service Details Modal
+    // 7. View Service Details Modal with Highlights (Requirement #1)
     function openServiceDetails(serviceId) {
         const service = allFetchedServices.find(s => s.id == serviceId);
         if (!service) return;
@@ -461,7 +455,8 @@ $(function () {
         $('#modalServiceTitle').text(service.title || 'Untitled Service');
         $('#modalDisplayOrder').text(service.displayOrder != null ? service.displayOrder : '—');
         $('#modalServiceDescription').text(service.description || 'No description provided.');
-        $('#modalCreatedOn').text(formatDate(service.createdOn));
+        $('#modalCreatedOn').text(formatDateTime(service.createdOn));
+        $('#modalUpdatedOn').text(formatDateTime(service.updatedOn));
 
         const fullImageUrl = resolveImageUrl(service.imagePath);
         if (fullImageUrl) {
@@ -473,12 +468,48 @@ $(function () {
             $('#modalBtnPreviewImage').hide();
         }
 
+        // Highlights List in Modal (Requirement #1)
+        const $highlightsList = $('#modalHighlightsList');
+        $highlightsList.empty();
+
+        if (Array.isArray(service.highlights) && service.highlights.length > 0) {
+            $('#modalHighlightsCount').text(service.highlights.length);
+
+            // Sort highlights by displayOrder ascending
+            const sortedHighlights = service.highlights.slice().sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
+            sortedHighlights.forEach(function (h) {
+                const hText = escapeHtml(h.highlightText || 'Feature item');
+                const hOrder = h.displayOrder != null ? h.displayOrder : '—';
+                const hId = h.id ? `#${h.id}` : '';
+
+                const itemHtml = `
+                    <div class="highlight-card-item">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary text-white rounded-pill px-2 py-1 small">
+                                <i class="bi bi-check-lg"></i>
+                            </span>
+                            <span class="fw-semibold text-dark">${hText}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-light text-secondary border small">Order: ${hOrder}</span>
+                            ${hId ? `<span class="badge bg-light text-muted border small">${hId}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                $highlightsList.append(itemHtml);
+            });
+        } else {
+            $('#modalHighlightsCount').text('0');
+            $highlightsList.html('<p class="text-muted small fst-italic mb-0">No highlight features attached to this service.</p>');
+        }
+
         if (detailModalInstance) {
             detailModalInstance.show();
         }
     }
 
-    // 9. Open Lightbox Preview
+    // 8. Open Lightbox Preview
     function openLightbox(imageUrl, title) {
         if (!imageUrl) return;
         $('#lightboxImage').attr('src', imageUrl);
@@ -488,9 +519,9 @@ $(function () {
         }
     }
 
-    // 10. Event Listeners
+    // 9. Event Listeners (Requirement #5: Search box, search and reset button trigger the API endpoint)
 
-    // Search input
+    // A. Search box typing (debounced API trigger)
     $searchInput.on('input', function () {
         const val = $(this).val();
         if (val.trim()) {
@@ -501,49 +532,70 @@ $(function () {
 
         clearTimeout(searchDebounceTimer);
         searchDebounceTimer = setTimeout(function () {
-            currentSearchTerm = val;
-            applyFiltersAndRender();
-        }, 250);
+            currentSearchTerm = val.trim();
+            currentPageNumber = 1;
+            loadServices(); // Triggers API endpoint
+        }, 400);
     });
 
+    // Enter key press in search box triggers API endpoint immediately
+    $searchInput.on('keypress', function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            clearTimeout(searchDebounceTimer);
+            currentSearchTerm = $(this).val().trim();
+            currentPageNumber = 1;
+            loadServices(); // Triggers API endpoint
+        }
+    });
+
+    // Search clear button triggers API endpoint
     $searchClearBtn.on('click', function () {
         $searchInput.val('');
         currentSearchTerm = '';
         $searchClearBtn.hide();
-        applyFiltersAndRender();
+        currentPageNumber = 1;
+        loadServices(); // Triggers API endpoint
         $searchInput.focus();
     });
 
+    // B. Search button triggers API endpoint
     $btnSearchSubmit.on('click', function () {
-        currentSearchTerm = $searchInput.val();
-        applyFiltersAndRender();
+        clearTimeout(searchDebounceTimer);
+        currentSearchTerm = $searchInput.val().trim();
+        currentPageNumber = 1;
+        loadServices(); // Triggers API endpoint
     });
 
+    // C. Reset button triggers API endpoint
     $btnResetFilters.on('click', function () {
+        clearTimeout(searchDebounceTimer);
         $searchInput.val('');
         currentSearchTerm = '';
         $searchClearBtn.hide();
-        applyFiltersAndRender();
-        showToast('Filters reset.', 'bi bi-arrow-clockwise text-primary');
+        currentPageNumber = 1;
+        loadServices(); // Triggers API endpoint
+        showToast('Filters reset. Reloading services...', 'bi bi-arrow-clockwise text-primary');
     });
 
+    // Retry button on error state
     $btnRetry.on('click', function () {
         loadServices();
     });
 
-    // Page Size Filter
+    // Page size dropdown triggers API endpoint
     $pageSizeFilter.on('change', function () {
         currentPageSize = parseInt($(this).val(), 10) || 10;
         currentPageNumber = 1;
-        loadServices();
+        loadServices(); // Triggers API endpoint
     });
 
-    // Pagination
+    // D. Pagination triggers API endpoint
     $(document).on('click', '.page-num-btn', function () {
         const page = parseInt($(this).data('page'), 10);
         if (page && page !== currentPageNumber) {
             currentPageNumber = page;
-            loadServices();
+            loadServices(); // Triggers API endpoint
             $('html, body').animate({ scrollTop: $table.offset().top - 120 }, 200);
         }
     });
@@ -551,7 +603,7 @@ $(function () {
     $(document).on('click', '#btnPagePrev', function () {
         if (currentPageNumber > 1) {
             currentPageNumber--;
-            loadServices();
+            loadServices(); // Triggers API endpoint
             $('html, body').animate({ scrollTop: $table.offset().top - 120 }, 200);
         }
     });
@@ -559,19 +611,18 @@ $(function () {
     $(document).on('click', '#btnPageNext', function () {
         if (currentPageNumber < currentTotalPages) {
             currentPageNumber++;
-            loadServices();
+            loadServices(); // Triggers API endpoint
             $('html, body').animate({ scrollTop: $table.offset().top - 120 }, 200);
         }
     });
 
-    // View Action
+    // Row Actions
     $(document).on('click', '.btn-view-service', function (e) {
         e.stopPropagation();
         const serviceId = $(this).data('id');
         openServiceDetails(serviceId);
     });
 
-    // Edit Action (feedback placeholder)
     $(document).on('click', '.btn-edit-service', function (e) {
         e.stopPropagation();
         const serviceId = $(this).data('id');
@@ -579,7 +630,6 @@ $(function () {
         openServiceDetails(serviceId);
     });
 
-    // Delete Action (feedback placeholder)
     $(document).on('click', '.btn-delete-service', function (e) {
         e.stopPropagation();
         const serviceId = $(this).data('id');
@@ -601,6 +651,6 @@ $(function () {
         }
     });
 
-    // Initial Load
+    // Initial Load from API
     loadServices();
 });

@@ -40,6 +40,7 @@
         color: #0f172a;
         background-color: #ffffff;
         transition: all 0.2s ease;
+        width: 100%;
     }
 
     .service-search-box input:focus {
@@ -185,18 +186,6 @@
         text-transform: uppercase;
     }
 
-    /* Designation Pill Badge */
-    .badge-designation-pill {
-        background-color: #dbeafe;
-        color: #2563eb;
-        font-size: 0.78rem;
-        font-weight: 600;
-        padding: 0.35rem 0.75rem;
-        border-radius: 9999px;
-        display: inline-block;
-        white-space: nowrap;
-    }
-
     /* 3 Action Buttons matching image design */
     .service-actions-group {
         display: inline-flex;
@@ -257,9 +246,28 @@
         transform: translateY(-1px);
     }
 
+    /* Highlights inside modal */
+    .highlight-card-item {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        transition: all 0.2s ease;
+    }
+
+    .highlight-card-item:hover {
+        background-color: #ffffff;
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
     /* Card Footer & Pagination */
     .service-card-footer {
-        padding: 1rem 1.5rem;
+        padding: 1.1rem 1.5rem;
         background-color: #ffffff;
         border-top: 1px solid #f1f5f9;
         display: flex;
@@ -278,6 +286,8 @@
         border-radius: 8px;
         margin: 0 2px;
         transition: all 0.2s ease;
+        background-color: #ffffff;
+        cursor: pointer;
     }
 
     .pagination-custom .page-link:hover {
@@ -287,9 +297,9 @@
     }
 
     .pagination-custom .page-item.active .page-link {
-        background-color: var(--dash-primary-blue);
-        border-color: var(--dash-primary-blue);
-        color: #ffffff;
+        background-color: var(--dash-primary-blue) !important;
+        border-color: var(--dash-primary-blue) !important;
+        color: #ffffff !important;
         box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
     }
 
@@ -322,23 +332,23 @@
     <!-- Top Search & Controls Card matching attached design -->
     <div class="service-filter-card">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <!-- Left: Search Box + Search Button + Reset Button -->
+            <!-- Left: Search Box + Search Button + Reset Button (Triggers API) -->
             <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" style="max-width: 680px;">
                 <div class="service-search-box">
                     <i class="bi bi-search search-icon"></i>
                     <input type="text" 
                            id="searchServicesInput" 
-                           placeholder="Search by title, description, or id..." 
+                           placeholder="Search by name, description, or id..." 
                            autocomplete="off" />
                     <button type="button" class="service-search-clear" id="searchClearBtn" title="Clear search">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
-                <button type="button" class="btn btn-primary btn-search-action shadow-sm" id="btnSearchSubmit" title="Execute search">
+                <button type="button" class="btn btn-primary btn-search-action shadow-sm" id="btnSearchSubmit" title="Execute search via API">
                     <i class="bi bi-filter"></i>
                     <span>Search</span>
                 </button>
-                <button type="button" class="btn-reset-action" id="btnResetFilters" title="Reset all filters">
+                <button type="button" class="btn-reset-action" id="btnResetFilters" title="Reset all filters via API">
                     <i class="bi bi-arrow-clockwise"></i>
                     <span>Reset</span>
                 </button>
@@ -347,7 +357,7 @@
             <!-- Right: Rows per page Selector matching design -->
             <div class="d-flex align-items-center gap-2 ms-auto">
                 <span class="text-muted small text-nowrap">Rows per page:</span>
-                <select class="form-select form-select-sm" id="filterPageSize" style="width: 80px; height: 38px; border-radius: 8px;">
+                <select class="form-select form-select-sm" id="filterPageSize" style="width: 80px; height: 42px; border-radius: 8px;">
                     <option value="10" selected>10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -365,9 +375,8 @@
                 <thead>
                     <tr>
                         <th style="min-width: 250px;">SERVICE</th>
-                        <th style="min-width: 280px;">DESCRIPTION</th>
-                        <th style="min-width: 170px;">DISPLAY ORDER</th>
-                        <th style="min-width: 180px;">CREATED DATE</th>
+                        <th style="min-width: 320px;">DESCRIPTION</th>
+                        <th style="width: 150px;" class="text-center">DISPLAY ORDER</th>
                         <th style="width: 140px;" class="text-end">ACTION</th>
                     </tr>
                 </thead>
@@ -420,12 +429,12 @@
             </div>
         </div>
 
-        <!-- Card Footer with Pagination Controls -->
+        <!-- Card Footer with Prominent Pagination Controls -->
         <div class="service-card-footer">
             <div class="d-flex align-items-center gap-2">
                 <span id="tableCountSummary" class="text-muted fw-semibold small">Loading count...</span>
             </div>
-            <nav id="servicesPaginationNav" aria-label="Services pagination" class="d-none">
+            <nav id="servicesPaginationNav" aria-label="Services pagination">
                 <ul class="pagination pagination-custom pagination-sm mb-0" id="servicesPaginationUl">
                     <!-- Populated dynamically via dashboard-services.js -->
                 </ul>
@@ -436,7 +445,7 @@
 
 </div>
 
-<!-- Service Full Details Modal -->
+<!-- Service Full Details Modal with Highlights (Requirement #1) -->
 <div class="modal fade" id="serviceDetailModal" tabindex="-1" aria-labelledby="modalServiceTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
@@ -464,8 +473,8 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="p-3 rounded-3 bg-light border">
-                            <span class="text-muted small d-block text-uppercase fw-semibold mb-1">Created Date</span>
-                            <span class="fw-bold text-dark fs-6" id="modalCreatedOn">—</span>
+                            <span class="text-muted small d-block text-uppercase fw-semibold mb-1">Highlights Count</span>
+                            <span class="fw-bold text-primary fs-6" id="modalHighlightsCount">0</span>
                         </div>
                     </div>
                 </div>
@@ -478,6 +487,31 @@
                     </h6>
                     <div class="p-3 rounded-3 bg-light border text-secondary" id="modalServiceDescription" style="white-space: pre-wrap; line-height: 1.6;">
                         —
+                    </div>
+                </div>
+
+                <!-- Key Highlights Section (Requirement #1) -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
+                        <i class="bi bi-stars text-primary"></i>
+                        <span>Key Highlights &amp; Features</span>
+                    </h6>
+                    <div class="d-flex flex-column gap-2" id="modalHighlightsList">
+                        <!-- Populated dynamically via dashboard-services.js -->
+                    </div>
+                </div>
+
+                <!-- Audit Metadata -->
+                <div class="p-3 rounded-3 bg-light border">
+                    <div class="row g-2 text-muted small">
+                        <div class="col-sm-6">
+                            <span><i class="bi bi-calendar-plus me-1"></i> Created On:</span>
+                            <strong class="text-dark ms-1" id="modalCreatedOn">—</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span><i class="bi bi-clock-history me-1"></i> Updated On:</span>
+                            <strong class="text-dark ms-1" id="modalUpdatedOn">—</strong>
+                        </div>
                     </div>
                 </div>
             </div>
