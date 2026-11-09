@@ -5,151 +5,305 @@
 }
 
 <style>
-    /* Services Page Custom Enhancements */
-    .service-thumb-container {
-        width: 64px;
-        height: 48px;
-        border-radius: 8px;
-        overflow: hidden;
-        background-color: #f1f5f9;
+    /* Top Search & Filter Card */
+    .service-filter-card {
+        background: #ffffff;
         border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.15rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        margin-bottom: 1.5rem;
+    }
+
+    .service-search-box {
+        position: relative;
+        flex: 1 1 320px;
+    }
+
+    .service-search-box .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.95rem;
+        pointer-events: none;
+    }
+
+    .service-search-box input {
+        padding-left: 2.5rem;
+        padding-right: 2rem;
+        height: 42px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.92rem;
+        color: #0f172a;
+        background-color: #ffffff;
+        transition: all 0.2s ease;
+    }
+
+    .service-search-box input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        outline: none;
+    }
+
+    .service-search-clear {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 0;
+        display: none;
+    }
+
+    .service-search-clear:hover {
+        color: #ef4444;
+    }
+
+    .btn-search-action {
+        height: 42px;
+        padding: 0 1.25rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        position: relative;
+        gap: 0.45rem;
+    }
+
+    .btn-reset-action {
+        height: 42px;
+        padding: 0 1.15rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #475569;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: all 0.15s ease;
+    }
+
+    .btn-reset-action:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        color: #0f172a;
+    }
+
+    /* Main Table Card */
+    .service-table-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+    }
+
+    .service-custom-table {
+        width: 100%;
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .service-custom-table thead th {
+        background-color: #ffffff;
+        color: #64748b;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .service-custom-table tbody td {
+        padding: 1.05rem 1.25rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.88rem;
+        color: #334155;
+        background-color: #ffffff;
+        transition: background-color 0.15s ease;
+    }
+
+    .service-custom-table tbody tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .service-custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Circular Avatar */
+    .service-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
         cursor: pointer;
+        background-color: #eff6ff;
+        border: 2px solid #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .service-thumb-container:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+    .service-avatar:hover {
+        transform: scale(1.08);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
-    .service-thumb-img {
+
+    .service-avatar img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
     }
-    .service-thumb-fallback {
-        font-size: 1.25rem;
-        color: #94a3b8;
-    }
-    .highlight-pill-tag {
-        font-size: 0.72rem;
-        font-weight: 600;
-        padding: 0.2rem 0.5rem;
-        border-radius: 6px;
-        background-color: #eff6ff;
-        color: #1d4ed8;
-        border: 1px solid #bfdbfe;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        max-width: 180px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .highlight-more-badge {
-        font-size: 0.7rem;
+
+    .service-avatar-fallback {
         font-weight: 700;
-        padding: 0.2rem 0.45rem;
-        border-radius: 6px;
-        background-color: #f1f5f9;
-        color: #475569;
-        border: 1px solid #cbd5e1;
-        cursor: pointer;
-    }
-    .service-order-pill {
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 0.2rem 0.5rem;
-        border-radius: 6px;
-        background-color: #f8fafc;
-        color: #334155;
-        border: 1px solid #e2e8f0;
-        display: inline-block;
-    }
-    .service-title-text {
-        font-weight: 700;
-        color: #0f172a;
-        font-size: 0.92rem;
-        margin-bottom: 2px;
-    }
-    .service-desc-preview {
-        font-size: 0.82rem;
-        color: #64748b;
-        max-width: 320px;
-        line-height: 1.4;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .service-stat-card {
-        background: #ffffff;
-        border: 1px solid #edf2f7;
-        border-radius: 14px;
-        padding: 1rem 1.25rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-        flex: 1 1 200px;
-    }
-    .service-stat-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
+        font-size: 0.95rem;
+        color: #2563eb;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
-        flex-shrink: 0;
+        text-transform: uppercase;
     }
-    .service-stat-icon.primary {
-        background-color: #eff6ff;
+
+    /* Designation Pill Badge */
+    .badge-designation-pill {
+        background-color: #dbeafe;
         color: #2563eb;
-    }
-    .service-stat-icon.success {
-        background-color: #ecfdf5;
-        color: #059669;
-    }
-    .service-stat-icon.purple {
-        background-color: #f5f3ff;
-        color: #7c3aed;
-    }
-    .service-stat-value {
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1.1;
-        margin: 0;
-    }
-    .service-stat-label {
         font-size: 0.78rem;
         font-weight: 600;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        margin: 0;
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        display: inline-block;
+        white-space: nowrap;
     }
-    .highlight-card-item {
-        background-color: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
+
+    /* 3 Action Buttons matching image design */
+    .service-actions-group {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .btn-action-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        background-color: #ffffff;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        padding: 0;
+    }
+
+    /* 1. Blue Eye Button */
+    .btn-action-icon.btn-action-view {
+        border: 1.5px solid #93c5fd;
+        color: #2563eb;
+    }
+
+    .btn-action-icon.btn-action-view:hover {
+        background-color: #eff6ff;
+        border-color: #60a5fa;
+        color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    /* 2. Yellow Pencil Button */
+    .btn-action-icon.btn-action-edit {
+        border: 1.5px solid #fde047;
+        color: #ca8a04;
+    }
+
+    .btn-action-icon.btn-action-edit:hover {
+        background-color: #fefce8;
+        border-color: #eab308;
+        color: #a16207;
+        transform: translateY(-1px);
+    }
+
+    /* 3. Red Trash Button */
+    .btn-action-icon.btn-action-delete {
+        border: 1.5px solid #fca5a5;
+        color: #ef4444;
+    }
+
+    .btn-action-icon.btn-action-delete:hover {
+        background-color: #fff1f2;
+        border-color: #f87171;
+        color: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    /* Card Footer & Pagination */
+    .service-card-footer {
+        padding: 1rem 1.5rem;
+        background-color: #ffffff;
+        border-top: 1px solid #f1f5f9;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         gap: 0.75rem;
+    }
+
+    .pagination-custom .page-link {
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 8px;
+        margin: 0 2px;
         transition: all 0.2s ease;
     }
-    .highlight-card-item:hover {
-        background-color: #ffffff;
-        border-color: #cbd5e1;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+    .pagination-custom .page-link:hover {
+        background-color: #eff6ff;
+        color: var(--dash-primary-blue);
+        border-color: #bfdbfe;
+    }
+
+    .pagination-custom .page-item.active .page-link {
+        background-color: var(--dash-primary-blue);
+        border-color: var(--dash-primary-blue);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .pagination-custom .page-item.disabled .page-link {
+        color: #cbd5e1;
+        background-color: #f8fafc;
+        border-color: #f1f5f9;
+        cursor: not-allowed;
+    }
+
+    /* State box */
+    .dash-table-state-box {
+        padding: 3.5rem 1.5rem;
+        text-align: center;
     }
 </style>
 
@@ -165,121 +319,56 @@
         <span class="current">Services</span>
     </nav>
 
-    <!-- Page Heading Area -->
-    <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-        <div>
-            <h1 class="dashboard-title">Services Management</h1>
-            <p class="dashboard-subtitle">Manage, view, and organize company trims manufacturing and specialized services.</p>
-        </div>
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            <!-- Refresh Button -->
-            <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnRefreshServices" title="Reload services from API">
-                <i class="bi bi-arrow-clockwise refresh-icon"></i>
-                <span class="fw-semibold">Refresh</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Quick Statistics Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-4">
-            <div class="service-stat-card">
-                <div class="service-stat-icon primary">
-                    <i class="bi bi-gear-wide-connected"></i>
-                </div>
-                <div>
-                    <h3 class="service-stat-value" id="statTotalServices">0</h3>
-                    <p class="service-stat-label">Total Services</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-4">
-            <div class="service-stat-card">
-                <div class="service-stat-icon success">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-                <div>
-                    <h3 class="service-stat-value" id="statActiveServices">0</h3>
-                    <p class="service-stat-label">Active Services</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-4">
-            <div class="service-stat-card">
-                <div class="service-stat-icon purple">
-                    <i class="bi bi-stars"></i>
-                </div>
-                <div>
-                    <h3 class="service-stat-value" id="statTotalHighlights">0</h3>
-                    <p class="service-stat-label">Total Highlights</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Table Card -->
-    <div class="dash-table-card">
-
-        <!-- Card Header Toolbar -->
-        <div class="dash-card-header">
-            <div class="dash-card-header-left">
-                <div class="dash-header-icon">
-                    <i class="bi bi-layers-fill"></i>
-                </div>
-                <div>
-                    <h2 class="dash-card-title">All Services Directory</h2>
-                    <p class="dash-card-subtitle">Complete registry of manufacturing solutions and client offerings</p>
-                </div>
-            </div>
-
-            <!-- Toolbar Controls -->
-            <div class="dash-toolbar-controls">
-                <!-- Status Filter -->
-                <div class="dash-filter-item">
-                    <select class="form-select form-select-sm" id="filterServiceStatus" style="min-width: 130px; height: 38px; border-radius: 8px;">
-                        <option value="all">All Statuses</option>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
-
-                <!-- Live Search Box -->
-                <div class="dash-search-group" style="min-width: 280px;">
-                    <i class="bi bi-search dash-search-icon"></i>
+    <!-- Top Search & Controls Card matching attached design -->
+    <div class="service-filter-card">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <!-- Left: Search Box + Search Button + Reset Button -->
+            <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" style="max-width: 680px;">
+                <div class="service-search-box">
+                    <i class="bi bi-search search-icon"></i>
                     <input type="text" 
                            id="searchServicesInput" 
-                           class="dash-search-input" 
-                           placeholder="Search by title, description, highlight..." 
+                           placeholder="Search by title, description, or id..." 
                            autocomplete="off" />
-                    <button type="button" class="dash-search-clear" id="searchClearBtn" title="Clear search" style="display: none;">
-                        <i class="bi bi-x"></i>
+                    <button type="button" class="service-search-clear" id="searchClearBtn" title="Clear search">
+                        <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
+                <button type="button" class="btn btn-primary btn-search-action shadow-sm" id="btnSearchSubmit" title="Execute search">
+                    <i class="bi bi-filter"></i>
+                    <span>Search</span>
+                </button>
+                <button type="button" class="btn-reset-action" id="btnResetFilters" title="Reset all filters">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
 
-                <!-- Page Size Selector -->
-                <div class="dash-filter-item">
-                    <select class="form-select form-select-sm" id="filterPageSize" style="width: 85px; height: 38px; border-radius: 8px;" title="Rows per page">
-                        <option value="10">10 / pg</option>
-                        <option value="25">25 / pg</option>
-                        <option value="50">50 / pg</option>
-                    </select>
-                </div>
+            <!-- Right: Rows per page Selector matching design -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-muted small text-nowrap">Rows per page:</span>
+                <select class="form-select form-select-sm" id="filterPageSize" style="width: 80px; height: 38px; border-radius: 8px;">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
             </div>
         </div>
+    </div>
+
+    <!-- Main Table Card matching attached design -->
+    <div class="service-table-card">
 
         <!-- Table Responsive Container -->
         <div class="table-responsive">
-            <table class="dash-custom-table" id="servicesTable">
+            <table class="service-custom-table" id="servicesTable">
                 <thead>
                     <tr>
-                        <th style="width: 75px;" class="text-center"># ID</th>
-                        <th style="width: 90px;" class="text-center">Image</th>
-                        <th style="width: 22%;">Service Title</th>
-                        <th style="width: 28%;">Description</th>
-                        <th>Key Highlights</th>
-                        <th style="width: 90px;" class="text-center">Order</th>
-                        <th style="width: 100px;" class="text-center">Status</th>
-                        <th style="width: 120px;" class="text-end">Actions</th>
+                        <th style="min-width: 250px;">SERVICE</th>
+                        <th style="min-width: 280px;">DESCRIPTION</th>
+                        <th style="min-width: 170px;">DISPLAY ORDER</th>
+                        <th style="min-width: 180px;">CREATED DATE</th>
+                        <th style="width: 140px;" class="text-end">ACTION</th>
                     </tr>
                 </thead>
                 <tbody id="servicesTableBody">
@@ -289,58 +378,55 @@
 
             <!-- Loading State -->
             <div id="tableLoadingState" class="dash-table-state-box">
-                <div class="dash-state-icon-circle icon-loading">
+                <div class="dash-state-icon-circle icon-loading mb-3">
                     <div class="spinner-border text-primary" style="width: 2rem; height: 2rem;" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-                <h3 class="dash-state-title">Fetching Services</h3>
-                <p class="dash-state-desc">Connecting to secure API server and loading service records...</p>
+                <h5 class="fw-bold text-dark mb-1">Fetching Services</h5>
+                <p class="text-muted small mb-0">Connecting to secure API server and loading service records...</p>
             </div>
 
             <!-- Error State -->
             <div id="tableErrorState" class="dash-table-state-box d-none">
-                <div class="dash-state-icon-circle icon-error">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
+                <div class="dash-state-icon-circle icon-error mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
                 </div>
-                <h3 class="dash-state-title">Unable to Load Services</h3>
-                <p class="dash-state-desc" id="errorMessageText">
+                <h5 class="fw-bold text-dark mb-1">Unable to Load Services</h5>
+                <p class="text-muted small mb-3" id="errorMessageText">
                     Failed to fetch data from the server. Please verify your connection or API status.
                 </p>
-                <button type="button" class="btn btn-primary btn-sm px-4 py-2 rounded-3 mt-2" id="btnRetryServices">
+                <button type="button" class="btn btn-primary btn-sm px-4 py-2 rounded-3" id="btnRetryServices">
                     <i class="bi bi-arrow-repeat me-1"></i> Try Again
                 </button>
             </div>
 
             <!-- Empty State -->
             <div id="tableEmptyState" class="dash-table-state-box d-none">
-                <div class="dash-state-icon-circle icon-empty">
-                    <i class="bi bi-gear-wide-connected"></i>
+                <div class="dash-state-icon-circle icon-empty mb-3">
+                    <i class="bi bi-gear-wide-connected text-muted fs-3"></i>
                 </div>
-                <h3 class="dash-state-title">No Services Found</h3>
-                <p class="dash-state-desc">There are currently no services recorded in the database.</p>
+                <h5 class="fw-bold text-dark mb-1">No Services Found</h5>
+                <p class="text-muted small mb-0">There are currently no services recorded in the database.</p>
             </div>
 
             <!-- No Search Results State -->
             <div id="tableNoResultsState" class="dash-table-state-box d-none">
-                <div class="dash-state-icon-circle icon-empty">
-                    <i class="bi bi-search"></i>
+                <div class="dash-state-icon-circle icon-empty mb-3">
+                    <i class="bi bi-search text-muted fs-3"></i>
                 </div>
-                <h3 class="dash-state-title">No Matching Records</h3>
-                <p class="dash-state-desc">No services match your search or filter criteria.</p>
-                <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-3 mt-2" id="btnResetFilters">
-                    <i class="bi bi-x-circle me-1"></i> Reset Filters
-                </button>
+                <h5 class="fw-bold text-dark mb-1">No Matching Records</h5>
+                <p class="text-muted small mb-2">No services match your search query.</p>
             </div>
         </div>
 
-        <!-- Card Footer Toolbar with Pagination -->
-        <div class="dash-card-footer">
+        <!-- Card Footer with Pagination Controls -->
+        <div class="service-card-footer">
             <div class="d-flex align-items-center gap-2">
-                <span id="tableCountSummary" class="text-muted small">Loading count...</span>
+                <span id="tableCountSummary" class="text-muted fw-semibold small">Loading count...</span>
             </div>
             <nav id="servicesPaginationNav" aria-label="Services pagination" class="d-none">
-                <ul class="pagination pagination-sm mb-0" id="servicesPaginationUl" style="gap: 4px;">
+                <ul class="pagination pagination-custom pagination-sm mb-0" id="servicesPaginationUl">
                     <!-- Populated dynamically via dashboard-services.js -->
                 </ul>
             </nav>
@@ -354,20 +440,14 @@
 <div class="modal fade" id="serviceDetailModal" tabindex="-1" aria-labelledby="modalServiceTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
-            <!-- Modal Header -->
             <div class="modal-header border-bottom px-4 py-3 bg-light d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <span class="dash-id-badge" id="modalServiceId">#0</span>
                     <h5 class="modal-title fw-bold text-dark m-0" id="modalServiceTitle">Service Details</h5>
-                    <span class="dash-status-badge status-active" id="modalServiceStatus">
-                        <span class="status-dot"></span>
-                        <span id="modalServiceStatusText">Active</span>
-                    </span>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <!-- Modal Body -->
             <div class="modal-body p-4">
                 <!-- Service Banner Image Card -->
                 <div class="mb-4 text-center rounded-3 overflow-hidden bg-light border p-2" id="modalImageWrapper">
@@ -384,8 +464,8 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="p-3 rounded-3 bg-light border">
-                            <span class="text-muted small d-block text-uppercase fw-semibold mb-1">Highlight Count</span>
-                            <span class="fw-bold text-primary fs-6" id="modalHighlightsCount">0</span>
+                            <span class="text-muted small d-block text-uppercase fw-semibold mb-1">Created Date</span>
+                            <span class="fw-bold text-dark fs-6" id="modalCreatedOn">—</span>
                         </div>
                     </div>
                 </div>
@@ -400,34 +480,8 @@
                         —
                     </div>
                 </div>
-
-                <!-- Key Highlights List -->
-                <div class="mb-4">
-                    <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
-                        <i class="bi bi-stars text-primary"></i>
-                        <span>Highlights &amp; Feature Points</span>
-                    </h6>
-                    <div class="d-flex flex-column gap-2" id="modalHighlightsList">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
-
-                <!-- System Audit Metadata -->
-                <div class="p-3 rounded-3 bg-light border">
-                    <div class="row g-2 text-muted small">
-                        <div class="col-sm-6">
-                            <span><i class="bi bi-calendar-plus me-1"></i> Created On:</span>
-                            <strong class="text-dark ms-1" id="modalCreatedOn">—</strong>
-                        </div>
-                        <div class="col-sm-6">
-                            <span><i class="bi bi-clock-history me-1"></i> Updated On:</span>
-                            <strong class="text-dark ms-1" id="modalUpdatedOn">—</strong>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Modal Footer -->
             <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary btn-sm px-3 rounded-3" data-bs-dismiss="modal">
                     Close
