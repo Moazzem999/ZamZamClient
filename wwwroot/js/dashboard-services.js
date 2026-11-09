@@ -61,6 +61,13 @@ $(function () {
         createModalInstance = new bootstrap.Modal($createModalEl[0]);
     }
 
+    const $deleteModalEl = $('#deleteConfirmModal');
+    let deleteModalInstance = null;
+    if ($deleteModalEl.length && typeof bootstrap !== 'undefined') {
+        deleteModalInstance = new bootstrap.Modal($deleteModalEl[0]);
+    }
+    let pendingDeleteServiceId = null;
+
     // Create Modal Form Elements
     const $btnOpenCreate = $('#btnOpenCreateServiceModal');
     const $createForm = $('#createServiceForm');
@@ -359,12 +366,9 @@ $(function () {
 
                     <!-- 2. DESCRIPTION COLUMN -->
                     <td>
-                        <div class="d-flex align-items-center gap-2 text-secondary">
-                            <i class="bi bi-geo-alt text-muted" style="font-size: 0.95rem; flex-shrink: 0;"></i>
-                            <span class="text-truncate" style="max-width: 320px;" title="${description}">
-                                ${description}
-                            </span>
-                        </div>
+                        <span class="text-secondary text-truncate d-inline-block" style="max-width: 360px;" title="${description}">
+                            ${description}
+                        </span>
                     </td>
 
                     <!-- 3. DISPLAY ORDER COLUMN (Text only like 1, 2, 3) -->
@@ -905,10 +909,82 @@ $(function () {
         openServiceDetails(serviceId);
     });
 
+    // Delete button click opens confirmation modal
     $(document).on('click', '.btn-delete-service', function (e) {
         e.stopPropagation();
         const serviceId = $(this).data('id');
-        showToast(`Delete Service #${serviceId} requested`, 'bi bi-trash3 text-danger');
+        const service = allFetchedServices.find(s => s.id == serviceId);
+        if (!service) return;
+
+        pendingDeleteServiceId = serviceId;
+        $('#deleteTargetId').text(`#${service.id}`);
+        $('#deleteTargetName').text(service.title || `Service #${service.id}`);
+        $('#deleteTargetDesc').text(service.description || 'No description provided');
+
+        const fullImageUrl = resolveImageUrl(service.imagePath);
+        $('#deleteTargetThumb').attr('src', fullImageUrl || '/images/logo-icon.png');
+
+        if (deleteModalInstance) {
+            deleteModalInstance.show();
+        }
+    });
+
+    // Confirm Delete action (Calls DELETE /api/Services/{id})
+    $('#btnConfirmDelete').on('click', function () {
+        if (!pendingDeleteServiceId) return;
+
+        const deleteUrl = `${apiBaseUrl}/api/Services/${pendingDeleteServiceId}`;
+        const $btn = $(this);
+        const $btnText = $('#btnConfirmDeleteText');
+
+        $btn.prop('disabled', true);
+        $btnText.text('Deleting...');
+
+        const token = getAuthToken();
+        const headers = { 'Accept': '*/*' };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        console.log(`[Services] Sending DELETE request to: ${deleteUrl}`);
+
+        $.ajax({
+            url: deleteUrl,
+            type: 'DELETE',
+            headers: headers,
+            success: function (res) {
+                console.log('[Services] Delete response:', res);
+                if (res && res.succeeded !== false) {
+                    showToast(res.message || 'Service successfully deleted.', 'bi bi-check-circle-fill text-success');
+                    if (deleteModalInstance) {
+                        deleteModalInstance.hide();
+                    }
+                    pendingDeleteServiceId = null;
+                    // Reload table from API
+                    loadServices();
+                } else {
+                    const msg = res?.message || 'Failed to delete service.';
+                    showToast(msg, 'bi bi-exclamation-triangle-fill text-danger');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('[Services] Delete error:', status, error, xhr);
+                let msg = 'Failed to delete service. Please verify your connection or permissions.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    try {
+                        const parsed = JSON.parse(xhr.responseText);
+                        if (parsed.message) msg = parsed.message;
+                    } catch (e) { }
+                }
+                showToast(msg, 'bi bi-exclamation-triangle-fill text-danger');
+            },
+            complete: function () {
+                $btn.prop('disabled', false);
+                $btnText.text('Delete Service');
+            }
+        });
     });
 
     // Thumbnail Click
