@@ -265,6 +265,17 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
+    /* Create Modal Highlight Row */
+    .highlight-input-row {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.5rem 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
     /* Card Footer & Pagination */
     .service-card-footer {
         padding: 1.1rem 1.5rem;
@@ -328,6 +339,24 @@
         <span class="separator"><i class="bi bi-chevron-right"></i></span>
         <span class="current">Services</span>
     </nav>
+
+    <!-- Page Heading Area with Create Service Button -->
+    <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="dashboard-title">Services Directory</h1>
+            <p class="dashboard-subtitle">Manage company trims manufacturing solutions, descriptions, and feature highlights.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm fw-semibold" id="btnOpenCreateServiceModal" title="Create New Service">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add Service</span>
+            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm fw-semibold" id="btnRefreshServices" title="Reload from API">
+                <i class="bi bi-arrow-clockwise refresh-icon"></i>
+                <span>Refresh</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Top Search & Controls Card matching attached design -->
     <div class="service-filter-card">
@@ -445,6 +474,150 @@
 
 </div>
 
+<!-- Create Service & Highlights Modal -->
+<div class="modal fade" id="createServiceModal" tabindex="-1" aria-labelledby="createServiceModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header border-bottom px-4 py-3 bg-light d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary text-white p-2 rounded-3 fs-6">
+                        <i class="bi bi-plus-lg"></i>
+                    </span>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark m-0" id="createServiceModalTitle">Add New Service</h5>
+                        <small class="text-muted">Create service with banner image and highlight points</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="createServiceForm" novalidate enctype="multipart/form-data">
+                <div class="modal-body p-4">
+                    <!-- Alert Message Box -->
+                    <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="createServiceAlert" role="alert"></div>
+
+                    <!-- 1. Basic Info Row -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label for="createServiceTitle" class="form-label small fw-bold text-dark mb-1">
+                                Service Title <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control rounded-3" 
+                                   id="createServiceTitle" 
+                                   name="Title" 
+                                   maxlength="50" 
+                                   placeholder="e.g. Offset &amp; Digital Printing" 
+                                   required />
+                            <small class="text-muted" style="font-size: 0.72rem;">Maximum 50 characters</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="createServiceDisplayOrder" class="form-label small fw-bold text-dark mb-1">
+                                Display Order <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" 
+                                   class="form-control rounded-3" 
+                                   id="createServiceDisplayOrder" 
+                                   name="DisplayOrder" 
+                                   min="1" 
+                                   value="1" 
+                                   required />
+                            <small class="text-muted" style="font-size: 0.72rem;">Sequence order (1, 2, 3...)</small>
+                        </div>
+                    </div>
+
+                    <!-- 2. Description -->
+                    <div class="mb-3">
+                        <label for="createServiceDescription" class="form-label small fw-bold text-dark mb-1">
+                            Service Description <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control rounded-3" 
+                                  id="createServiceDescription" 
+                                  name="Description" 
+                                  rows="3" 
+                                  maxlength="500" 
+                                  placeholder="Enter detailed description of the service..." 
+                                  required></textarea>
+                        <small class="text-muted" style="font-size: 0.72rem;">Maximum 500 characters</small>
+                    </div>
+
+                    <!-- 3. Image Upload Dropzone -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-dark d-flex justify-content-between align-items-center mb-1">
+                            <span>Service Image <span class="text-danger">*</span></span>
+                            <span class="text-muted fw-normal" style="font-size: 0.75rem;">JPG, JPEG, PNG (Max 300 KB)</span>
+                        </label>
+
+                        <div class="image-dropzone position-relative" id="createServiceDropzone">
+                            <input type="file" 
+                                   id="createServiceImageInput" 
+                                   name="Image" 
+                                   accept=".jpg,.jpeg,.png,image/jpeg,image/png" 
+                                   class="image-dropzone-input" 
+                                   required />
+
+                            <!-- Prompt State -->
+                            <div class="dropzone-prompt text-center py-4" id="serviceDropzonePrompt">
+                                <div class="dropzone-icon mb-2">
+                                    <i class="bi bi-cloud-arrow-up text-primary fs-2"></i>
+                                </div>
+                                <div class="fw-semibold text-dark small mb-1">Click to upload or drag &amp; drop service banner</div>
+                                <div class="text-muted mb-2" style="font-size: 0.75rem;">Accepted: JPG, JPEG, PNG &bull; Max 300 KB</div>
+                                <span class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold">
+                                    <i class="bi bi-image me-1"></i> Browse File
+                                </span>
+                            </div>
+
+                            <!-- Preview State -->
+                            <div class="dropzone-preview d-none text-center p-3" id="serviceDropzonePreview">
+                                <img src="" alt="Selected Preview" class="img-fluid rounded-3 mb-2" id="createServicePreviewImg" style="max-height: 160px; object-fit: contain;" />
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <span class="badge bg-light text-dark border small" id="createServiceFileName">image.png</span>
+                                    <button type="button" class="btn btn-sm btn-outline-danger px-2 py-1 rounded-2" id="btnRemoveServiceImage">
+                                        <i class="bi bi-trash3 me-1"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Highlights Section -->
+                    <div class="p-3 bg-light rounded-3 border">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div>
+                                <h6 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-stars text-primary"></i>
+                                    <span>Key Highlights</span>
+                                </h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">Add feature points for this service (Max 60 chars each)</small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-3 px-2 py-1" id="btnAddHighlightRow">
+                                <i class="bi bi-plus-lg me-1"></i> Add Highlight
+                            </button>
+                        </div>
+
+                        <!-- Dynamic Highlights Rows Container -->
+                        <div class="d-flex flex-column gap-2 mt-2" id="createHighlightsContainer">
+                            <!-- Populated with dynamic rows -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-3 rounded-3" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 py-2 rounded-3 shadow-sm d-inline-flex align-items-center gap-2 fw-semibold" id="btnSubmitCreateService">
+                        <i class="bi bi-check-lg"></i>
+                        <span id="btnSubmitCreateText">Create Service</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Service Full Details Modal with Highlights (Requirement #1) -->
 <div class="modal fade" id="serviceDetailModal" tabindex="-1" aria-labelledby="modalServiceTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
@@ -500,7 +673,6 @@
                         <!-- Populated dynamically via dashboard-services.js -->
                     </div>
                 </div>
-
             </div>
 
             <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-end">

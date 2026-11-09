@@ -1,8 +1,10 @@
 /**
  * ZamZam Trims (BD) Limited - Services Management (dashboard-services.js)
  * ------------------------------------------------------------------------
- * Handles fetching, searching, pagination, and detail viewing for company services.
- * API Endpoint: {ApiBaseUrl}/api/Services/GetAll
+ * Handles fetching, searching, pagination, detail viewing, and creating services with highlights.
+ * API Endpoints:
+ *   GET  {ApiBaseUrl}/api/Services/GetAll
+ *   POST {ApiBaseUrl}/api/Services
  */
 
 $(function () {
@@ -18,6 +20,7 @@ $(function () {
     }
 
     const GET_SERVICES_URL = `${apiBaseUrl}/api/Services/GetAll`;
+    const POST_SERVICE_URL = `${apiBaseUrl}/api/Services`;
 
     // Table & State containers
     const $table = $('#servicesTable');
@@ -38,6 +41,7 @@ $(function () {
     const $btnSearchSubmit = $('#btnSearchSubmit');
     const $btnResetFilters = $('#btnResetFilters');
     const $btnRetry = $('#btnRetryServices');
+    const $btnRefreshServices = $('#btnRefreshServices');
 
     // Modals
     const $detailModalEl = $('#serviceDetailModal');
@@ -52,6 +56,33 @@ $(function () {
         imageModalInstance = new bootstrap.Modal($imageModalEl[0]);
     }
 
+    const $createModalEl = $('#createServiceModal');
+    let createModalInstance = null;
+    if ($createModalEl.length && typeof bootstrap !== 'undefined') {
+        createModalInstance = new bootstrap.Modal($createModalEl[0]);
+    }
+
+    // Create Modal Form Elements
+    const $btnOpenCreate = $('#btnOpenCreateServiceModal');
+    const $createForm = $('#createServiceForm');
+    const $createAlert = $('#createServiceAlert');
+    const $createTitle = $('#createServiceTitle');
+    const $createDisplayOrder = $('#createServiceDisplayOrder');
+    const $createDescription = $('#createServiceDescription');
+    const $createImageInput = $('#createServiceImageInput');
+    const $createDropzone = $('#createServiceDropzone');
+    const $dropzonePrompt = $('#serviceDropzonePrompt');
+    const $dropzonePreview = $('#serviceDropzonePreview');
+    const $createPreviewImg = $('#createServicePreviewImg');
+    const $createFileName = $('#createServiceFileName');
+    const $btnRemoveImage = $('#btnRemoveServiceImage');
+    const $highlightsContainer = $('#createHighlightsContainer');
+    const $btnAddHighlight = $('#btnAddHighlightRow');
+    const $btnSubmitCreate = $('#btnSubmitCreateService');
+    const $btnSubmitCreateText = $('#btnSubmitCreateText');
+
+    let selectedCreateImageFile = null;
+
     // Toast
     const $toast = $('#dashToast');
     const $toastMessage = $('#dashToastMessage');
@@ -63,6 +94,7 @@ $(function () {
     let currentSearchTerm = '';
     let allFetchedServices = [];
     let isFetching = false;
+    let isSubmitting = false;
     let searchDebounceTimer = null;
     let currentTotalCount = 0;
     let currentTotalPages = 1;
@@ -188,6 +220,8 @@ $(function () {
 
         showState('loading');
         $tableBody.empty();
+        $btnRefreshServices.prop('disabled', true);
+        $btnRefreshServices.find('.refresh-icon').addClass('spin-animation');
 
         const token = getAuthToken();
         const headers = { 'Accept': 'application/json' };
@@ -283,6 +317,8 @@ $(function () {
             },
             complete: function () {
                 isFetching = false;
+                $btnRefreshServices.prop('disabled', false);
+                $btnRefreshServices.find('.refresh-icon').removeClass('spin-animation');
             }
         });
     }
@@ -341,7 +377,7 @@ $(function () {
                         <span class="fw-bold text-dark fs-6">${displayOrderText}</span>
                     </td>
 
-                    <!-- 4. ACTION COLUMN (3 Buttons matching image: Blue Eye, Yellow Pencil, Red Trash) -->
+                    <!-- 4. ACTION COLUMN (3 Buttons: Blue Eye, Yellow Pencil, Red Trash) -->
                     <td class="text-end align-middle">
                         <div class="service-actions-group">
                             <!-- 1. Blue View Button -->
@@ -444,7 +480,7 @@ $(function () {
         `);
     }
 
-    // 7. View Service Details Modal with Highlights (Requirement #1)
+    // 7. View Service Details Modal with Highlights
     function openServiceDetails(serviceId) {
         const service = allFetchedServices.find(s => s.id == serviceId);
         if (!service) return;
@@ -464,7 +500,7 @@ $(function () {
             $('#modalImageWrapper').hide();
         }
 
-        // Highlights List in Modal (Requirement #1)
+        // Highlights List in Modal
         const $highlightsList = $('#modalHighlightsList');
         $highlightsList.empty();
 
@@ -515,7 +551,255 @@ $(function () {
         }
     }
 
-    // 9. Event Listeners (Requirement #5: Search box, search and reset button trigger the API endpoint)
+    // 9. Highlights Management in Create Service Modal
+    function addHighlightRow(text = '', order = null) {
+        const count = $highlightsContainer.find('.highlight-input-row').length;
+        const currentOrder = order !== null ? order : (count + 1);
+
+        const rowHtml = `
+            <div class="highlight-input-row">
+                <span class="text-muted small fw-semibold text-nowrap" style="font-size: 0.75rem;">#${count + 1}</span>
+                <input type="text" 
+                       class="form-control form-control-sm highlight-text-input" 
+                       placeholder="e.g. High resolution color printing" 
+                       maxlength="60" 
+                       value="${escapeHtml(text)}" 
+                       required />
+                <div class="d-flex align-items-center gap-1" style="width: 110px;">
+                    <span class="text-muted small" style="font-size: 0.75rem;">Order:</span>
+                    <input type="number" 
+                           class="form-control form-control-sm highlight-order-input px-2" 
+                           min="1" 
+                           value="${currentOrder}" 
+                           style="width: 55px;" />
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm btn-remove-highlight p-1 px-2 rounded-2" title="Remove highlight">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </div>
+        `;
+
+        $highlightsContainer.append(rowHtml);
+    }
+
+    function resetCreateForm() {
+        $createForm[0].reset();
+        $createAlert.addClass('d-none').text('');
+        selectedCreateImageFile = null;
+        $createImageInput.val('');
+        $createPreviewImg.attr('src', '');
+        $dropzonePreview.addClass('d-none');
+        $dropzonePrompt.removeClass('d-none');
+        $createDropzone.removeClass('has-preview');
+
+        // Reset highlights with 2 starter rows
+        $highlightsContainer.empty();
+        addHighlightRow('', 1);
+        addHighlightRow('', 2);
+    }
+
+    // 10. Image Dropzone & File Handling
+    $createImageInput.on('change', function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const maxFileSize = 300 * 1024; // 300 KB as required by backend
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
+        if (!allowedTypes.includes(file.type.toLowerCase()) && !file.name.match(/\.(jpg|jpeg|png)$/i)) {
+            $createAlert.removeClass('d-none').text('Invalid file type. Allowed formats: .jpg, .jpeg, .png');
+            $createImageInput.val('');
+            selectedCreateImageFile = null;
+            return;
+        }
+
+        if (file.size > maxFileSize) {
+            $createAlert.removeClass('d-none').text(`Image file size (${(file.size / 1024).toFixed(1)} KB) exceeds the maximum allowed limit of 300 KB.`);
+            $createImageInput.val('');
+            selectedCreateImageFile = null;
+            return;
+        }
+
+        $createAlert.addClass('d-none').text('');
+        selectedCreateImageFile = file;
+        $createFileName.text(`${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+            $createPreviewImg.attr('src', evt.target.result);
+            $dropzonePrompt.addClass('d-none');
+            $dropzonePreview.removeClass('d-none');
+            $createDropzone.addClass('has-preview');
+        };
+        reader.readAsDataURL(file);
+    });
+
+    $btnRemoveImage.on('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        selectedCreateImageFile = null;
+        $createImageInput.val('');
+        $createPreviewImg.attr('src', '');
+        $dropzonePreview.addClass('d-none');
+        $dropzonePrompt.removeClass('d-none');
+        $createDropzone.removeClass('has-preview');
+    });
+
+    // Add Highlight Row button
+    $btnAddHighlight.on('click', function () {
+        const count = $highlightsContainer.find('.highlight-input-row').length;
+        addHighlightRow('', count + 1);
+    });
+
+    // Remove Highlight Row button
+    $(document).on('click', '.btn-remove-highlight', function () {
+        $(this).closest('.highlight-input-row').remove();
+    });
+
+    // Open Create Modal
+    $btnOpenCreate.on('click', function () {
+        resetCreateForm();
+        if (createModalInstance) {
+            createModalInstance.show();
+        }
+    });
+
+    // 11. Submit Create Service Form (Calls POST /api/Services)
+    $createForm.on('submit', function (e) {
+        e.preventDefault();
+        if (isSubmitting) return;
+
+        $createAlert.addClass('d-none').text('');
+
+        const title = $createTitle.val().trim();
+        const displayOrder = parseInt($createDisplayOrder.val(), 10);
+        const description = $createDescription.val().trim();
+
+        if (!title) {
+            $createAlert.removeClass('d-none').text('Please enter a service title (max 50 chars).');
+            $createTitle.focus();
+            return;
+        }
+
+        if (title.length > 50) {
+            $createAlert.removeClass('d-none').text('Service title cannot exceed 50 characters.');
+            $createTitle.focus();
+            return;
+        }
+
+        if (isNaN(displayOrder) || displayOrder <= 0) {
+            $createAlert.removeClass('d-none').text('Please provide a valid display order greater than 0.');
+            $createDisplayOrder.focus();
+            return;
+        }
+
+        if (!description) {
+            $createAlert.removeClass('d-none').text('Please enter a service description (max 500 chars).');
+            $createDescription.focus();
+            return;
+        }
+
+        if (description.length > 500) {
+            $createAlert.removeClass('d-none').text('Service description cannot exceed 500 characters.');
+            $createDescription.focus();
+            return;
+        }
+
+        if (!selectedCreateImageFile) {
+            $createAlert.removeClass('d-none').text('Please select an image file for this service (Max 300 KB, .jpg/.png).');
+            return;
+        }
+
+        // Build FormData matching backend DTO
+        const formData = new FormData();
+        formData.append('Id', '0');
+        formData.append('Title', title);
+        formData.append('Description', description);
+        formData.append('DisplayOrder', displayOrder);
+        formData.append('Image', selectedCreateImageFile);
+
+        // Process Highlights
+        const highlightsList = [];
+        $highlightsContainer.find('.highlight-input-row').each(function (idx) {
+            const hText = $(this).find('.highlight-text-input').val().trim();
+            const hOrder = parseInt($(this).find('.highlight-order-input').val(), 10) || (idx + 1);
+
+            if (hText) {
+                const hObj = {
+                    id: 0,
+                    highlightText: hText,
+                    displayOrder: hOrder
+                };
+                highlightsList.push(hObj);
+                formData.append('Highlights', JSON.stringify(hObj));
+            }
+        });
+
+        formData.append('HighlightsJson', JSON.stringify(highlightsList));
+
+        // Submit to API
+        isSubmitting = true;
+        $btnSubmitCreate.prop('disabled', true);
+        $btnSubmitCreateText.text('Creating Service...');
+
+        const token = getAuthToken();
+        const headers = { 'Accept': '*/*' };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        console.log(`[Services] Submitting Create Service to ${POST_SERVICE_URL}`, {
+            Title: title,
+            DisplayOrder: displayOrder,
+            Description: description,
+            Highlights: highlightsList
+        });
+
+        $.ajax({
+            url: POST_SERVICE_URL,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: headers,
+            success: function (res) {
+                console.log('[Services] Create Response:', res);
+                if (res && res.succeeded !== false) {
+                    showToast(res.message || 'Service successfully created.', 'bi bi-check-circle-fill text-success');
+                    if (createModalInstance) {
+                        createModalInstance.hide();
+                    }
+                    resetCreateForm();
+                    // Reload table from API
+                    currentPageNumber = 1;
+                    loadServices();
+                } else {
+                    const errorMsg = res?.message || 'Failed to create service.';
+                    $createAlert.removeClass('d-none').text(errorMsg);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('[Services] Create Error:', status, error, xhr);
+                let msg = 'Failed to create service. Please verify your connection or input data.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    try {
+                        const parsed = JSON.parse(xhr.responseText);
+                        if (parsed.message) msg = parsed.message;
+                    } catch (e) { }
+                }
+                $createAlert.removeClass('d-none').text(msg);
+            },
+            complete: function () {
+                isSubmitting = false;
+                $btnSubmitCreate.prop('disabled', false);
+                $btnSubmitCreateText.text('Create Service');
+            }
+        });
+    });
+
+    // 12. Search & Filter Event Listeners
 
     // A. Search box typing (debounced API trigger)
     $searchInput.on('input', function () {
@@ -530,7 +814,7 @@ $(function () {
         searchDebounceTimer = setTimeout(function () {
             currentSearchTerm = val.trim();
             currentPageNumber = 1;
-            loadServices(); // Triggers API endpoint
+            loadServices();
         }, 400);
     });
 
@@ -541,7 +825,7 @@ $(function () {
             clearTimeout(searchDebounceTimer);
             currentSearchTerm = $(this).val().trim();
             currentPageNumber = 1;
-            loadServices(); // Triggers API endpoint
+            loadServices();
         }
     });
 
@@ -551,7 +835,7 @@ $(function () {
         currentSearchTerm = '';
         $searchClearBtn.hide();
         currentPageNumber = 1;
-        loadServices(); // Triggers API endpoint
+        loadServices();
         $searchInput.focus();
     });
 
@@ -560,7 +844,7 @@ $(function () {
         clearTimeout(searchDebounceTimer);
         currentSearchTerm = $searchInput.val().trim();
         currentPageNumber = 1;
-        loadServices(); // Triggers API endpoint
+        loadServices();
     });
 
     // C. Reset button triggers API endpoint
@@ -570,8 +854,14 @@ $(function () {
         currentSearchTerm = '';
         $searchClearBtn.hide();
         currentPageNumber = 1;
-        loadServices(); // Triggers API endpoint
+        loadServices();
         showToast('Filters reset. Reloading services...', 'bi bi-arrow-clockwise text-primary');
+    });
+
+    // Refresh button
+    $btnRefreshServices.on('click', function () {
+        loadServices();
+        showToast('Refreshing services...', 'bi bi-arrow-clockwise text-primary');
     });
 
     // Retry button on error state
@@ -583,7 +873,7 @@ $(function () {
     $pageSizeFilter.on('change', function () {
         currentPageSize = parseInt($(this).val(), 10) || 10;
         currentPageNumber = 1;
-        loadServices(); // Triggers API endpoint
+        loadServices();
     });
 
     // D. Pagination triggers API endpoint
@@ -591,7 +881,7 @@ $(function () {
         const page = parseInt($(this).data('page'), 10);
         if (page && page !== currentPageNumber) {
             currentPageNumber = page;
-            loadServices(); // Triggers API endpoint
+            loadServices();
             $('html, body').animate({ scrollTop: $table.offset().top - 120 }, 200);
         }
     });
@@ -599,7 +889,7 @@ $(function () {
     $(document).on('click', '#btnPagePrev', function () {
         if (currentPageNumber > 1) {
             currentPageNumber--;
-            loadServices(); // Triggers API endpoint
+            loadServices();
             $('html, body').animate({ scrollTop: $table.offset().top - 120 }, 200);
         }
     });
@@ -607,7 +897,7 @@ $(function () {
     $(document).on('click', '#btnPageNext', function () {
         if (currentPageNumber < currentTotalPages) {
             currentPageNumber++;
-            loadServices(); // Triggers API endpoint
+            loadServices();
             $('html, body').animate({ scrollTop: $table.offset().top - 120 }, 200);
         }
     });
