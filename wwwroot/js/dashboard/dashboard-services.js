@@ -1016,25 +1016,10 @@ $(function () {
         formData.append('Description', description);
         formData.append('DisplayOrder', displayOrder);
 
-        // Image handling: if user selected replacement, append it. Otherwise, fetch existing image as blob
+        // Image handling: only append Image if user selected a new replacement file.
+        // If omitted, the server preserves the existing image untouched.
         if (selectedEditImageFile) {
             formData.append('Image', selectedEditImageFile);
-        } else {
-            const origPath = $editOriginalImagePath.val();
-            if (origPath) {
-                try {
-                    const fullUrl = resolveImageUrl(origPath);
-                    const res = await fetch(fullUrl);
-                    if (res.ok) {
-                        const blob = await res.blob();
-                        const filename = origPath.split('/').pop() || `service_${id}.png`;
-                        const file = new File([blob], filename, { type: blob.type || 'image/png' });
-                        formData.append('Image', file);
-                    }
-                } catch (err) {
-                    console.warn('[Services Edit] Could not fetch existing image blob:', err);
-                }
-            }
         }
 
         // Process highlights
