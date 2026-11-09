@@ -1,8 +1,188 @@
 @model List<ZamZamClient.Models.ServiceItem>
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{
     ViewData["Title"] = "Our Services & Technical Solutions";
     var selected = ViewBag.SelectedService as ZamZamClient.Models.ServiceItem;
+    var apiBaseUrl = Configuration["ApiBaseUrl"] ?? "https://localhost:7148";
 }
+
+<style>
+    /* Dynamic Services Card matching attached design */
+    .dynamic-service-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 1.5rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dynamic-service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(79, 70, 229, 0.08);
+        border-color: #c7d2fe;
+    }
+
+    .dynamic-service-img-wrapper {
+        position: relative;
+        width: 100%;
+        height: 185px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+        background-color: #f1f5f9;
+    }
+
+    .dynamic-service-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.35s ease;
+        display: block;
+    }
+
+    .dynamic-service-card:hover .dynamic-service-img {
+        transform: scale(1.04);
+    }
+
+    .dynamic-service-order-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(15, 23, 42, 0.88);
+        color: #ffffff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 6px;
+        letter-spacing: 0.05em;
+        backdrop-filter: blur(4px);
+        z-index: 2;
+        font-family: monospace, sans-serif;
+    }
+
+    .dynamic-service-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.65rem;
+        line-height: 1.35;
+    }
+
+    .dynamic-service-desc {
+        font-size: 0.85rem;
+        line-height: 1.55;
+        color: #64748b;
+        margin-bottom: 1.25rem;
+    }
+
+    .dynamic-service-highlights-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #4f46e5;
+        margin-bottom: 0.65rem;
+    }
+
+    .dynamic-service-highlights-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1.25rem 0;
+    }
+
+    .dynamic-service-highlight-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.45rem;
+        font-size: 0.82rem;
+        color: #64748b;
+        line-height: 1.45;
+        margin-bottom: 0.45rem;
+    }
+
+    .dynamic-service-highlight-item .bi-check-lg {
+        color: #4f46e5;
+        font-size: 0.95rem;
+        font-weight: 800;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .dynamic-service-footer {
+        margin-top: auto;
+        padding-top: 1.15rem;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .btn-service-quote {
+        background-color: #0b132b;
+        color: #ffffff !important;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        padding: 0.5rem 1.15rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-service-quote:hover {
+        background-color: #1e293b;
+        color: #ffffff !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(11, 19, 43, 0.15);
+    }
+
+    .btn-service-inquire {
+        background-color: #ffffff;
+        color: #475569 !important;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-weight: 500;
+        font-size: 0.82rem;
+        padding: 0.5rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-service-inquire:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        color: #0f172a !important;
+        transform: translateY(-1px);
+    }
+
+    /* Skeleton Loading Placeholder */
+    .skeleton-placeholder {
+        background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+        background-size: 200% 100%;
+        animation: skeleton-loading 1.5s infinite;
+        border-radius: 8px;
+    }
+
+    @@keyframes skeleton-loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+</style>
 
 <!-- Page Header -->
 <section class="page-header-banner">
@@ -15,7 +195,7 @@
     </div>
 </section>
 
-<!-- Services Grid -->
+<!-- Services Grid Section -->
 <section class="section-padding bg-light">
     <div class="container">
         @if (selected != null)
@@ -47,44 +227,69 @@
             </div>
         }
 
-        <div class="row g-4">
-            @foreach (var s in Model)
+        <!-- Dynamic Services Grid (Populated directly on server and synchronized with API) -->
+        <div class="row g-4" id="servicesGridContainer" data-api-base-url="@apiBaseUrl">
+            @if (Model != null && Model.Any())
             {
-                <div class="col-lg-4 col-md-6 reveal" id="@s.Slug">
-                    <div class="service-card card-sheen h-100">
-                        <div class="position-relative overflow-hidden rounded-3 mb-3">
-                            <img src="@s.ImageUrl" alt="@s.Title" class="service-card-img mb-0" onerror="this.src='/images/services/ManufacturingService.jpg';" />
-                            <div class="position-absolute top-0 start-0 m-2">
-                                <span class="badge bg-dark bg-opacity-75 text-white">#@(s.Id.ToString("D2"))</span>
+                var cardIndex = 1;
+                foreach (var s in Model)
+                {
+                    var orderBadgeText = $"#{cardIndex:D2}";
+                    <div class="col-lg-4 col-md-6 dynamic-service-col" id="@s.Slug">
+                        <div class="dynamic-service-card">
+                            <!-- Top Image with Display Order Badge -->
+                            <div class="dynamic-service-img-wrapper">
+                                <span class="dynamic-service-order-badge">@orderBadgeText</span>
+                                <img src="@s.ImageUrl" 
+                                     alt="@s.Title" 
+                                     class="dynamic-service-img" 
+                                     loading="lazy" 
+                                     onerror="this.onerror=null; this.src='/images/services/ManufacturingService.jpg';" />
+                            </div>
+
+                            <!-- Title -->
+                            <h3 class="dynamic-service-title">@s.Title</h3>
+
+                            <!-- Description -->
+                            <p class="dynamic-service-desc">@s.FullDescription</p>
+
+                            <!-- Highlights Section -->
+                            @if (s.Highlights != null && s.Highlights.Any())
+                            {
+                                <div class="mb-4">
+                                    <div class="dynamic-service-highlights-label">HIGHLIGHTS:</div>
+                                    <ul class="dynamic-service-highlights-list">
+                                        @foreach (var h in s.Highlights)
+                                        {
+                                            <li class="dynamic-service-highlight-item">
+                                                <i class="bi bi-check-lg"></i>
+                                                <span>@h</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+
+                            <!-- Footer Actions Matching Image -->
+                            <div class="dynamic-service-footer">
+                                <button type="button" 
+                                        class="btn-service-quote" 
+                                        onclick="openQuoteModal('@s.Title.Replace("'", "\\'")', '@s.Title.Replace("'", "\\'")')" 
+                                        title="Request quote for @s.Title">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <span>Request Quote</span>
+                                </button>
+                                <a href="tel:+8801874633431" 
+                                   class="btn-service-inquire" 
+                                   title="Call directly to inquire">
+                                    <i class="bi bi-telephone"></i>
+                                    <span>Inquire</span>
+                                </a>
                             </div>
                         </div>
-
-                        <h3 class="service-title">@s.Title</h3>
-                        <p class="service-desc">@s.FullDescription</p>
-
-                        <div class="mb-4">
-                            <h6 class="small fw-bold text-uppercase text-indigo mb-2">Highlights:</h6>
-                            <ul class="list-unstyled mb-0">
-                                @foreach (var hl in s.Highlights)
-                                {
-                                    <li class="d-flex align-items-start gap-2 small text-secondary mb-1">
-                                        <i class="bi bi-check-lg text-indigo"></i>
-                                        <span>@hl</span>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-
-                        <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
-                            <button type="button" class="btn btn-modern-primary btn-sm" onclick="openQuoteModal('@s.Title', '@s.Title')">
-                                <i class="bi bi-calculator"></i> Request Quote
-                            </button>
-                            <a href="tel:+8801874633431" class="btn btn-outline-secondary btn-sm" title="Call directly">
-                                <i class="bi bi-telephone"></i> Inquire
-                            </a>
-                        </div>
                     </div>
-                </div>
+                    cardIndex++;
+                }
             }
         </div>
     </div>
@@ -110,5 +315,5 @@
 </section>
 
 @section Scripts {
-    <script src="~/js/services.js" asp-append-version="true"></script>
+    <script src="~/js/services.js?v=@DateTime.UtcNow.Ticks"></script>
 }
