@@ -305,7 +305,7 @@ $(function () {
                         } else {
                             showState('empty');
                         }
-                        $tableCountSummary.text('Showing 0 of 0 services');
+                        $tableCountSummary.text('Showing 0 to 0 of 0 entries');
                         renderPaginationControls();
                     } else {
                         showState('normal');
@@ -321,7 +321,7 @@ $(function () {
 
                     if (response.length === 0) {
                         showState('empty');
-                        $tableCountSummary.text('Showing 0 of 0 services');
+                        $tableCountSummary.text('Showing 0 to 0 of 0 entries');
                     } else {
                         showState('normal');
                         renderServicesTable(response);
@@ -434,11 +434,11 @@ $(function () {
 
         // Summary text in footer
         if (currentTotalCount === 0) {
-            $tableCountSummary.text('Showing 0 of 0 services');
+            $tableCountSummary.text('Showing 0 to 0 of 0 entries');
         } else {
             const fromCount = (currentPageNumber - 1) * currentPageSize + 1;
             const toCount = Math.min(currentPageNumber * currentPageSize, currentTotalCount);
-            $tableCountSummary.text(`Showing ${fromCount} to ${toCount} of ${currentTotalCount} services`);
+            $tableCountSummary.text(`Showing ${fromCount} to ${toCount} of ${currentTotalCount} entries`);
         }
     }
 
@@ -453,12 +453,12 @@ $(function () {
 
         $paginationNav.removeClass('d-none');
 
-        // Prev Button
+        // Prev Button (< icon only)
         const prevDisabled = !hasPreviousPage && currentPageNumber <= 1;
         $paginationUl.append(`
             <li class="page-item ${prevDisabled ? 'disabled' : ''}">
                 <button type="button" class="page-link" id="btnPagePrev" ${prevDisabled ? 'disabled' : ''} aria-label="Previous">
-                    <i class="bi bi-chevron-left me-1"></i>Prev
+                    <i class="bi bi-chevron-left"></i>
                 </button>
             </li>
         `);
@@ -477,7 +477,7 @@ $(function () {
                 <li class="page-item"><button type="button" class="page-link page-num-btn" data-page="1">1</button></li>
             `);
             if (startPage > 2) {
-                $paginationUl.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
+                $paginationUl.append(`<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`);
             }
         }
 
@@ -492,19 +492,19 @@ $(function () {
 
         if (endPage < currentTotalPages) {
             if (endPage < currentTotalPages - 1) {
-                $paginationUl.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
+                $paginationUl.append(`<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`);
             }
             $paginationUl.append(`
                 <li class="page-item"><button type="button" class="page-link page-num-btn" data-page="${currentTotalPages}">${currentTotalPages}</button></li>
             `);
         }
 
-        // Next Button
+        // Next Button (> icon only)
         const nextDisabled = !hasNextPage && currentPageNumber >= currentTotalPages;
         $paginationUl.append(`
             <li class="page-item ${nextDisabled ? 'disabled' : ''}">
                 <button type="button" class="page-link" id="btnPageNext" ${nextDisabled ? 'disabled' : ''} aria-label="Next">
-                    Next<i class="bi bi-chevron-right ms-1"></i>
+                    <i class="bi bi-chevron-right"></i>
                 </button>
             </li>
         `);

@@ -653,22 +653,18 @@ $(function () {
         $historyPaginationUl.empty();
 
         if (currentHistoryTotalCount === 0) {
-            $historyCountSummary.text('Showing 0 to 0 of 0 logs');
+            $historyCountSummary.text('Showing 0 to 0 of 0 entries');
             return;
         }
 
         const startItem = (currentHistoryPage - 1) * currentHistoryPageSize + 1;
         const endItem = Math.min(currentHistoryPage * currentHistoryPageSize, currentHistoryTotalCount);
-        $historyCountSummary.text(`Showing ${startItem} to ${endItem} of ${currentHistoryTotalCount} logs`);
-
-        if (currentHistoryTotalPages <= 1) {
-            return;
-        }
+        $historyCountSummary.text(`Showing ${startItem} to ${endItem} of ${currentHistoryTotalCount} entries`);
 
         // Previous button
         const $prevLi = $(`
             <li class="page-item ${currentHistoryPage <= 1 ? 'disabled' : ''}">
-                <button type="button" class="page-link" aria-label="Previous">
+                <button type="button" class="page-link" ${currentHistoryPage <= 1 ? 'disabled' : ''} aria-label="Previous">
                     <i class="bi bi-chevron-left"></i>
                 </button>
             </li>
@@ -720,7 +716,7 @@ $(function () {
         // Next button
         const $nextLi = $(`
             <li class="page-item ${currentHistoryPage >= currentHistoryTotalPages ? 'disabled' : ''}">
-                <button type="button" class="page-link" aria-label="Next">
+                <button type="button" class="page-link" ${currentHistoryPage >= currentHistoryTotalPages ? 'disabled' : ''} aria-label="Next">
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </li>

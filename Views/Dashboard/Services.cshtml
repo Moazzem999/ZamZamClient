@@ -302,9 +302,9 @@
         flex: 1 1 auto;
     }
 
-    /* Card Footer & Pagination */
+    /* Card Footer & Pagination matching image design */
     .service-card-footer {
-        padding: 1.1rem 1.5rem;
+        padding: 1rem 1.5rem;
         background-color: #ffffff;
         border-top: 1px solid #f1f5f9;
         display: flex;
@@ -314,37 +314,74 @@
         gap: 0.75rem;
     }
 
+    .service-card-footer .table-count-text {
+        font-size: 0.86rem;
+        color: #64748b;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+    }
+
+    .pagination-custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .pagination-custom .page-item {
+        margin: 0;
+    }
+
     .pagination-custom .page-link {
-        color: #475569;
-        border: 1px solid #e2e8f0;
-        padding: 0.45rem 0.85rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        border-radius: 8px;
-        margin: 0 2px;
-        transition: all 0.2s ease;
-        background-color: #ffffff;
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: #556271;
+        background-color: #eaedf1;
+        border: none !important;
+        border-radius: 6px !important;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
         cursor: pointer;
     }
 
     .pagination-custom .page-link:hover {
-        background-color: #eff6ff;
-        color: var(--dash-primary-blue);
-        border-color: #bfdbfe;
+        background-color: #dfe3e8;
+        color: #1e293b;
+    }
+
+    .pagination-custom .page-link:focus {
+        box-shadow: none;
+        outline: none;
     }
 
     .pagination-custom .page-item.active .page-link {
-        background-color: var(--dash-primary-blue) !important;
-        border-color: var(--dash-primary-blue) !important;
+        background-color: #1e60ff !important;
+        border-color: #1e60ff !important;
         color: #ffffff !important;
-        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        font-weight: 600;
+        box-shadow: none;
+        cursor: default;
     }
 
     .pagination-custom .page-item.disabled .page-link {
-        color: #cbd5e1;
-        background-color: #f8fafc;
-        border-color: #f1f5f9;
+        background-color: #eaedf1 !important;
+        color: #9aa5b1 !important;
         cursor: not-allowed;
+        opacity: 0.8;
+    }
+
+    .pagination-custom .page-link i {
+        font-size: 0.82rem;
+        line-height: 1;
     }
 
     /* State box */
@@ -482,11 +519,11 @@
 
         <!-- Card Footer with Prominent Pagination Controls -->
         <div class="service-card-footer">
-            <div class="d-flex align-items-center gap-2">
-                <span id="tableCountSummary" class="text-muted fw-semibold small">Loading count...</span>
+            <div class="d-flex align-items-center">
+                <span id="tableCountSummary" class="table-count-text">Showing 0 to 0 of 0 entries</span>
             </div>
             <nav id="servicesPaginationNav" aria-label="Services pagination">
-                <ul class="pagination pagination-custom pagination-sm mb-0" id="servicesPaginationUl">
+                <ul class="pagination pagination-custom mb-0" id="servicesPaginationUl">
                     <!-- Populated dynamically via dashboard-services.js -->
                 </ul>
             </nav>

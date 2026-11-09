@@ -298,38 +298,77 @@
         color: #ef4444;
     }
 
-    /* Pagination */
+    /* Pagination matching modern entries design */
     .history-pagination-wrap {
         padding: 1rem 1.5rem;
-        border-top: 1px solid #edf2f7;
-        background: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+        background: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 1rem;
+        gap: 0.75rem;
         flex-wrap: wrap;
     }
+    .history-pagination-wrap .table-count-text {
+        font-size: 0.86rem;
+        color: #64748b;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+    }
+    .pagination-custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .pagination-custom .page-item {
+        margin: 0;
+    }
     .pagination-custom .page-link {
-        color: #475569;
-        border: 1px solid #e2e8f0;
-        padding: 0.4rem 0.75rem;
-        font-size: 0.82rem;
-        font-weight: 600;
-        border-radius: 6px;
-        margin: 0 2px;
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: #556271;
+        background-color: #eaedf1;
+        border: none !important;
+        border-radius: 6px !important;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
+        cursor: pointer;
     }
     .pagination-custom .page-link:hover {
-        background-color: #eff6ff;
-        color: var(--dash-primary-blue);
+        background-color: #dfe3e8;
+        color: #1e293b;
+    }
+    .pagination-custom .page-link:focus {
+        box-shadow: none;
+        outline: none;
     }
     .pagination-custom .page-item.active .page-link {
-        background-color: var(--dash-primary-blue);
-        border-color: var(--dash-primary-blue);
-        color: #ffffff;
+        background-color: #1e60ff !important;
+        border-color: #1e60ff !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        box-shadow: none;
+        cursor: default;
     }
     .pagination-custom .page-item.disabled .page-link {
-        color: #cbd5e1;
-        background-color: #f8fafc;
+        background-color: #eaedf1 !important;
+        color: #9aa5b1 !important;
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+    .pagination-custom .page-link i {
+        font-size: 0.82rem;
+        line-height: 1;
     }
     .spin-animation {
         animation: spin 0.8s linear infinite;
@@ -695,11 +734,11 @@
 
         <!-- Pagination Controls -->
         <div class="history-pagination-wrap" id="historyPaginationWrap">
-            <div class="small text-muted" id="historyCountSummary">
-                Showing 0 to 0 of 0 logs
+            <div>
+                <span class="table-count-text" id="historyCountSummary">Showing 0 to 0 of 0 entries</span>
             </div>
             <nav aria-label="Location history pagination">
-                <ul class="pagination pagination-sm pagination-custom mb-0" id="historyPaginationUl">
+                <ul class="pagination pagination-custom mb-0" id="historyPaginationUl">
                     <!-- Dynamic Pagination Links -->
                 </ul>
             </nav>
