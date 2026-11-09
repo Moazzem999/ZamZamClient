@@ -308,6 +308,8 @@
         justify-content: space-between;
         gap: 0.75rem;
         flex-wrap: wrap;
+        position: relative;
+        z-index: 10;
     }
     .history-pagination-wrap .table-count-text {
         font-size: 0.86rem;
@@ -316,24 +318,49 @@
         letter-spacing: -0.01em;
     }
     .pagination-custom {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        margin: 0;
-        padding: 0;
-        list-style: none;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+        position: relative;
+        z-index: 11;
+        user-select: none;
+    }
+    .pagination-custom,
+    .pagination-custom .page-item,
+    .pagination-custom .page-link,
+    .pagination-custom button {
+        cursor: pointer !important;
     }
     .pagination-custom .page-item {
-        margin: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
+        border-radius: 6px !important;
+        position: relative;
+        cursor: pointer !important;
+        box-sizing: border-box !important;
     }
     .pagination-custom .page-link {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
+        max-width: 34px !important;
+        max-height: 34px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         font-size: 0.88rem;
         font-weight: 500;
         color: #556271;
@@ -342,33 +369,55 @@
         border-radius: 6px !important;
         text-decoration: none;
         transition: all 0.15s ease-in-out;
-        cursor: pointer;
+        cursor: pointer !important;
+        box-sizing: border-box !important;
+        outline: none !important;
+        -webkit-tap-highlight-color: transparent;
     }
+    .pagination-custom .page-link * {
+        pointer-events: none;
+    }
+    .pagination-custom .page-item:not(.active):not(.disabled):hover .page-link,
     .pagination-custom .page-link:hover {
         background-color: #dfe3e8;
         color: #1e293b;
+        cursor: pointer !important;
     }
-    .pagination-custom .page-link:focus {
-        box-shadow: none;
-        outline: none;
+    .pagination-custom .page-link:focus,
+    .pagination-custom .page-link:active {
+        box-shadow: none !important;
+        outline: none !important;
     }
     .pagination-custom .page-item.active .page-link {
         background-color: #1e60ff !important;
         border-color: #1e60ff !important;
         color: #ffffff !important;
         font-weight: 600;
-        box-shadow: none;
-        cursor: default;
+        box-shadow: 0 1px 3px rgba(30, 96, 255, 0.35);
+        cursor: pointer !important;
     }
-    .pagination-custom .page-item.disabled .page-link {
+    .pagination-custom .page-item.active .page-link:hover {
+        background-color: #1a56e6 !important;
+        cursor: pointer !important;
+    }
+    .pagination-custom .page-item.disabled,
+    .pagination-custom .page-item.disabled .page-link,
+    .pagination-custom .page-item.disabled button {
         background-color: #eaedf1 !important;
         color: #9aa5b1 !important;
-        cursor: not-allowed;
-        opacity: 0.8;
+        cursor: not-allowed !important;
+        opacity: 0.75;
     }
     .pagination-custom .page-link i {
         font-size: 0.82rem;
         line-height: 1;
+        pointer-events: none;
+    }
+    .dash-toast-container {
+        pointer-events: none !important;
+    }
+    .dash-toast.show {
+        pointer-events: auto !important;
     }
     .spin-animation {
         animation: spin 0.8s linear infinite;

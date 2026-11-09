@@ -137,33 +137,139 @@
         overflow-y: auto;
     }
 
-    /* Pagination controls */
+    /* Card Footer & Pagination matching modern entries design */
+    .dash-card-footer {
+        padding: 1rem 1.5rem;
+        background-color: #ffffff;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    .dash-card-footer .table-count-text {
+        font-size: 0.86rem;
+        color: #64748b;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+    }
+
+    .pagination-custom {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+        position: relative;
+        z-index: 11;
+        user-select: none;
+    }
+
+    .pagination-custom,
+    .pagination-custom .page-item,
+    .pagination-custom .page-link,
+    .pagination-custom button {
+        cursor: pointer !important;
+    }
+
+    .pagination-custom .page-item {
+        margin: 0 !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
+        border-radius: 6px !important;
+        position: relative;
+        cursor: pointer !important;
+        box-sizing: border-box !important;
+    }
+
     .pagination-custom .page-link {
-        color: #475569;
-        border: 1px solid #e2e8f0;
-        padding: 0.45rem 0.85rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        border-radius: 8px;
-        margin: 0 2px;
-        transition: all 0.2s ease;
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
+        max-width: 34px !important;
+        max-height: 34px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: #556271;
+        background-color: #eaedf1;
+        border: none !important;
+        border-radius: 6px !important;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
+        cursor: pointer !important;
+        box-sizing: border-box !important;
+        outline: none !important;
+        -webkit-tap-highlight-color: transparent;
     }
+
+    .pagination-custom .page-link * {
+        pointer-events: none;
+    }
+
+    .pagination-custom .page-item:not(.active):not(.disabled):hover .page-link,
     .pagination-custom .page-link:hover {
-        background-color: #eff6ff;
-        color: var(--dash-primary-blue);
-        border-color: #bfdbfe;
+        background-color: #dfe3e8;
+        color: #1e293b;
+        cursor: pointer !important;
     }
+
+    .pagination-custom .page-link:focus,
+    .pagination-custom .page-link:active {
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
     .pagination-custom .page-item.active .page-link {
-        background-color: var(--dash-primary-blue);
-        border-color: var(--dash-primary-blue);
-        color: #ffffff;
-        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        background-color: #1e60ff !important;
+        border-color: #1e60ff !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        box-shadow: 0 1px 3px rgba(30, 96, 255, 0.35);
+        cursor: pointer !important;
     }
-    .pagination-custom .page-item.disabled .page-link {
-        color: #cbd5e1;
-        background-color: #f8fafc;
-        border-color: #f1f5f9;
-        cursor: not-allowed;
+
+    .pagination-custom .page-item.active .page-link:hover {
+        background-color: #1a56e6 !important;
+        cursor: pointer !important;
+    }
+
+    .pagination-custom .page-item.disabled,
+    .pagination-custom .page-item.disabled .page-link,
+    .pagination-custom .page-item.disabled button {
+        background-color: #eaedf1 !important;
+        color: #9aa5b1 !important;
+        cursor: not-allowed !important;
+        opacity: 0.75;
+    }
+
+    .pagination-custom .page-link i {
+        font-size: 0.82rem;
+        line-height: 1;
+        pointer-events: none;
+    }
+
+    .dash-toast-container {
+        pointer-events: none !important;
+    }
+    .dash-toast.show {
+        pointer-events: auto !important;
     }
 </style>
 
@@ -340,11 +446,11 @@
 
         <!-- Card Footer Toolbar with Pagination -->
         <div class="dash-card-footer">
-            <div class="d-flex align-items-center gap-2">
-                <span id="quotationsTableCountSummary" class="fw-semibold text-muted">Loading count...</span>
+            <div class="d-flex align-items-center">
+                <span id="quotationsTableCountSummary" class="table-count-text">Showing 0 to 0 of 0 entries</span>
             </div>
-            <nav id="quotationsPaginationNav" aria-label="Quotations navigation" class="d-none">
-                <ul class="pagination pagination-custom pagination-sm mb-0" id="quotationsPaginationUl">
+            <nav id="quotationsPaginationNav" aria-label="Quotations navigation">
+                <ul class="pagination pagination-custom mb-0" id="quotationsPaginationUl">
                     <!-- Populated dynamically via quotations.js -->
                 </ul>
             </nav>

@@ -649,6 +649,16 @@ $(function () {
         });
     }
 
+    function smoothScrollToHistoryTable() {
+        const $card = $('.tracking-card, #historyTable');
+        if ($card.length && $card.offset()) {
+            const topPos = $card.offset().top - 80;
+            if (Math.abs($(window).scrollTop() - topPos) > 150) {
+                $('html, body').stop(true, true).animate({ scrollTop: Math.max(0, topPos) }, 250);
+            }
+        }
+    }
+
     function renderHistoryPagination() {
         $historyPaginationUl.empty();
 
@@ -661,29 +671,24 @@ $(function () {
         const endItem = Math.min(currentHistoryPage * currentHistoryPageSize, currentHistoryTotalCount);
         $historyCountSummary.text(`Showing ${startItem} to ${endItem} of ${currentHistoryTotalCount} entries`);
 
-        // Previous button
-        const $prevLi = $(`
-            <li class="page-item ${currentHistoryPage <= 1 ? 'disabled' : ''}">
+        // Previous button (< icon only)
+        const prevDisabled = currentHistoryPage <= 1 ? 'disabled' : '';
+        $historyPaginationUl.append(`
+            <li class="page-item ${prevDisabled}" data-action="prev" title="Previous page">
                 <button type="button" class="page-link" ${currentHistoryPage <= 1 ? 'disabled' : ''} aria-label="Previous">
                     <i class="bi bi-chevron-left"></i>
                 </button>
             </li>
         `);
-        if (currentHistoryPage > 1) {
-            $prevLi.find('button').on('click', function () {
-                fetchLocationHistory(currentHistoryPage - 1);
-            });
-        }
-        $historyPaginationUl.append($prevLi);
 
         // Page numbers
         let startPage = Math.max(1, currentHistoryPage - 2);
         let endPage = Math.min(currentHistoryTotalPages, currentHistoryPage + 2);
 
         if (startPage > 1) {
-            const $firstLi = $(`<li class="page-item"><button type="button" class="page-link">1</button></li>`);
-            $firstLi.find('button').on('click', function () { fetchLocationHistory(1); });
-            $historyPaginationUl.append($firstLi);
+            $historyPaginationUl.append(`
+                <li class="page-item" data-page="1" title="Page 1"><button type="button" class="page-link" data-page="1">1</button></li>
+            `);
             if (startPage > 2) {
                 $historyPaginationUl.append(`<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`);
             }
@@ -691,43 +696,60 @@ $(function () {
 
         for (let p = startPage; p <= endPage; p++) {
             const isActive = p === currentHistoryPage;
-            const $pageLi = $(`
-                <li class="page-item ${isActive ? 'active' : ''}">
-                    <button type="button" class="page-link">${p}</button>
+            $historyPaginationUl.append(`
+                <li class="page-item ${isActive ? 'active' : ''}" data-page="${p}" title="Page ${p}">
+                    <button type="button" class="page-link" data-page="${p}">${p}</button>
                 </li>
             `);
-            if (!isActive) {
-                $pageLi.find('button').on('click', (function (pageNum) {
-                    return function () { fetchLocationHistory(pageNum); };
-                })(p));
-            }
-            $historyPaginationUl.append($pageLi);
         }
 
         if (endPage < currentHistoryTotalPages) {
             if (endPage < currentHistoryTotalPages - 1) {
                 $historyPaginationUl.append(`<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`);
             }
-            const $lastLi = $(`<li class="page-item"><button type="button" class="page-link">${currentHistoryTotalPages}</button></li>`);
-            $lastLi.find('button').on('click', function () { fetchLocationHistory(currentHistoryTotalPages); });
-            $historyPaginationUl.append($lastLi);
+            $historyPaginationUl.append(`
+                <li class="page-item" data-page="${currentHistoryTotalPages}" title="Page ${currentTotalPages}"><button type="button" class="page-link" data-page="${currentHistoryTotalPages}">${currentHistoryTotalPages}</button></li>
+            `);
         }
 
-        // Next button
-        const $nextLi = $(`
-            <li class="page-item ${currentHistoryPage >= currentHistoryTotalPages ? 'disabled' : ''}">
+        // Next button (> icon only)
+        const nextDisabled = currentHistoryPage >= currentHistoryTotalPages ? 'disabled' : '';
+        $historyPaginationUl.append(`
+            <li class="page-item ${nextDisabled}" data-action="next" title="Next page">
                 <button type="button" class="page-link" ${currentHistoryPage >= currentHistoryTotalPages ? 'disabled' : ''} aria-label="Next">
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </li>
         `);
-        if (currentHistoryPage < currentHistoryTotalPages) {
-            $nextLi.find('button').on('click', function () {
-                fetchLocationHistory(currentHistoryPage + 1);
-            });
-        }
-        $historyPaginationUl.append($nextLi);
     }
+
+    // Pagination clicks (delegated smoothly from all borders)
+    $historyPaginationUl.off('click').on('click', '.page-item:not(.disabled)', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const $item = $(this);
+        const action = $item.data('action');
+        const page = $item.data('page') || $item.find('[data-page]').data('page');
+
+        if (action === 'prev') {
+            if (currentHistoryPage > 1) {
+                fetchLocationHistory(currentHistoryPage - 1);
+                smoothScrollToHistoryTable();
+            }
+        } else if (action === 'next') {
+            if (currentHistoryPage < currentHistoryTotalPages) {
+                fetchLocationHistory(currentHistoryPage + 1);
+                smoothScrollToHistoryTable();
+            }
+        } else if (page != null) {
+            const requestedPage = parseInt(page, 10);
+            if (requestedPage >= 1 && requestedPage <= currentHistoryTotalPages) {
+                fetchLocationHistory(requestedPage);
+                smoothScrollToHistoryTable();
+            }
+        }
+    });
 
     // 7. Event Listeners
     // Search input (Debounced)

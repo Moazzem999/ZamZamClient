@@ -605,7 +605,7 @@ $(function () {
             } else {
                 showState('empty');
             }
-            $tableCountSummary.text('Showing 0 of 0 employees');
+            $tableCountSummary.text('Showing 0 to 0 of 0 entries');
             return;
         }
 
@@ -689,12 +689,12 @@ $(function () {
         // Update count summary
         const fromCount = (currentPageNumber - 1) * currentPageSize + 1;
         const toCount = Math.min(currentPageNumber * currentPageSize, currentTotalCount);
-        $tableCountSummary.text(`Showing ${fromCount} to ${toCount} of ${currentTotalCount} employee${currentTotalCount === 1 ? '' : 's'}`);
+        $tableCountSummary.text(`Showing ${fromCount} to ${toCount} of ${currentTotalCount} entries`);
     }
 
     // 7. Render Pagination Controls
     function renderPaginationControls() {
-        if (currentTotalPages <= 1 && currentTotalCount <= currentPageSize) {
+        if (currentTotalCount === 0) {
             $paginationNav.addClass('d-none');
             return;
         }
@@ -702,12 +702,12 @@ $(function () {
         $paginationNav.removeClass('d-none');
         let paginationHtml = '';
 
-        // Previous Button
+        // Previous Button (< icon only)
+        const prevDisabled = !hasPreviousPage && currentPageNumber <= 1 ? 'disabled' : '';
         paginationHtml += `
-            <li class="page-item ${!hasPreviousPage && currentPageNumber <= 1 ? 'disabled' : ''}">
-                <button type="button" class="page-link" data-page="${currentPageNumber - 1}" aria-label="Previous">
+            <li class="page-item ${prevDisabled}" data-action="prev" title="Previous page">
+                <button type="button" class="page-link" data-page="${currentPageNumber - 1}" ${prevDisabled ? 'disabled' : ''} aria-label="Previous">
                     <i class="bi bi-chevron-left"></i>
-                    <span class="d-none d-sm-inline ms-1">Prev</span>
                 </button>
             </li>
         `;
@@ -723,18 +723,19 @@ $(function () {
 
         if (startPage > 1) {
             paginationHtml += `
-                <li class="page-item">
+                <li class="page-item" data-page="1" title="Page 1">
                     <button type="button" class="page-link" data-page="1">1</button>
                 </li>
             `;
             if (startPage > 2) {
-                paginationHtml += `<li class="page-item disabled"><span class="page-link border-0">…</span></li>`;
+                paginationHtml += `<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`;
             }
         }
 
         for (let i = startPage; i <= endPage; i++) {
+            const isActive = i === currentPageNumber;
             paginationHtml += `
-                <li class="page-item ${i === currentPageNumber ? 'active' : ''}">
+                <li class="page-item ${isActive ? 'active' : ''}" data-page="${i}" title="Page ${i}">
                     <button type="button" class="page-link" data-page="${i}">${i}</button>
                 </li>
             `;
@@ -742,20 +743,20 @@ $(function () {
 
         if (endPage < currentTotalPages) {
             if (endPage < currentTotalPages - 1) {
-                paginationHtml += `<li class="page-item disabled"><span class="page-link border-0">…</span></li>`;
+                paginationHtml += `<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`;
             }
             paginationHtml += `
-                <li class="page-item">
+                <li class="page-item" data-page="${currentTotalPages}" title="Page ${currentTotalPages}">
                     <button type="button" class="page-link" data-page="${currentTotalPages}">${currentTotalPages}</button>
                 </li>
             `;
         }
 
-        // Next Button
+        // Next Button (> icon only)
+        const nextDisabled = !hasNextPage && currentPageNumber >= currentTotalPages ? 'disabled' : '';
         paginationHtml += `
-            <li class="page-item ${!hasNextPage && currentPageNumber >= currentTotalPages ? 'disabled' : ''}">
-                <button type="button" class="page-link" data-page="${currentPageNumber + 1}" aria-label="Next">
-                    <span class="d-none d-sm-inline me-1">Next</span>
+            <li class="page-item ${nextDisabled}" data-action="next" title="Next page">
+                <button type="button" class="page-link" data-page="${currentPageNumber + 1}" ${nextDisabled ? 'disabled' : ''} aria-label="Next">
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </li>
@@ -989,16 +990,42 @@ $(function () {
         fetchEmployees(currentPageNumber);
     });
 
-    // Pagination button clicks (event delegation)
-    $paginationUl.on('click', '.page-link', function (e) {
+    function smoothScrollToEmployees() {
+        const $card = $('.dash-card');
+        const target = $card.length ? $card : $container;
+        if (target.length && target.offset()) {
+            const topPos = target.offset().top - 80;
+            if (Math.abs($(window).scrollTop() - topPos) > 150) {
+                $('html, body').stop(true, true).animate({ scrollTop: Math.max(0, topPos) }, 250);
+            }
+        }
+    }
+
+    // Pagination button clicks (event delegation on page-item and page-link)
+    $paginationUl.off('click').on('click', '.page-item:not(.disabled)', function (e) {
         e.preventDefault();
-        const requestedPage = parseInt($(this).data('page'), 10);
-        if (requestedPage && requestedPage !== currentPageNumber && requestedPage >= 1 && requestedPage <= currentTotalPages) {
-            fetchEmployees(requestedPage);
-            // Smooth scroll to top of table
-            $('html, body').animate({
-                scrollTop: $container.offset().top - 80
-            }, 200);
+        e.stopPropagation();
+
+        const $item = $(this);
+        const action = $item.data('action');
+        const page = $item.data('page') || $item.find('[data-page]').data('page');
+
+        if (action === 'prev') {
+            if (currentPageNumber > 1) {
+                fetchEmployees(currentPageNumber - 1);
+                smoothScrollToEmployees();
+            }
+        } else if (action === 'next') {
+            if (currentPageNumber < currentTotalPages) {
+                fetchEmployees(currentPageNumber + 1);
+                smoothScrollToEmployees();
+            }
+        } else if (page != null) {
+            const requestedPage = parseInt(page, 10);
+            if (requestedPage >= 1 && requestedPage <= currentTotalPages) {
+                fetchEmployees(requestedPage);
+                smoothScrollToEmployees();
+            }
         }
     });
 
@@ -1302,19 +1329,6 @@ $(function () {
     // Retry button on error
     $btnRetry.on('click', function () {
         fetchEmployees(currentPageNumber);
-    });
-
-    // Pagination button clicks (event delegation)
-    $paginationUl.on('click', '.page-link', function (e) {
-        e.preventDefault();
-        const requestedPage = parseInt($(this).data('page'), 10);
-        if (requestedPage && requestedPage !== currentPageNumber && requestedPage >= 1 && requestedPage <= currentTotalPages) {
-            fetchEmployees(requestedPage);
-            // Smooth scroll to top of table
-            $('html, body').animate({
-                scrollTop: $container.offset().top - 80
-            }, 200);
-        }
     });
 
     // Open detail modal clicks (delegation)

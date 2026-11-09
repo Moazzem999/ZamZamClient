@@ -370,7 +370,7 @@ $(function () {
             } else {
                 showState('empty');
             }
-            $tableCountSummary.text('Showing 0 of 0 requests');
+            $tableCountSummary.text('Showing 0 to 0 of 0 entries');
             return;
         }
 
@@ -471,12 +471,12 @@ $(function () {
         // Update count summary
         const startRecord = (currentPageNumber - 1) * currentPageSize + 1;
         const endRecord = Math.min(currentPageNumber * currentPageSize, currentTotalCount);
-        $tableCountSummary.text(`Showing ${startRecord}–${endRecord} of ${currentTotalCount.toLocaleString()} requests`);
+        $tableCountSummary.text(`Showing ${startRecord} to ${endRecord} of ${currentTotalCount.toLocaleString()} entries`);
     }
 
     // 8. Render Pagination Controls
     function renderPaginationControls() {
-        if (currentTotalPages <= 1) {
+        if (currentTotalCount === 0) {
             $paginationNav.addClass('d-none');
             return;
         }
@@ -484,11 +484,11 @@ $(function () {
         $paginationNav.removeClass('d-none');
         $paginationUl.empty();
 
-        // Previous Button
+        // Previous Button (< icon only)
         const prevDisabled = !hasPreviousPage && currentPageNumber <= 1 ? 'disabled' : '';
         $paginationUl.append(`
-            <li class="page-item ${prevDisabled}">
-                <button type="button" class="page-link" data-page="${currentPageNumber - 1}" aria-label="Previous">
+            <li class="page-item ${prevDisabled}" data-action="prev" title="Previous page">
+                <button type="button" class="page-link" data-page="${currentPageNumber - 1}" ${prevDisabled ? 'disabled' : ''} aria-label="Previous">
                     <i class="bi bi-chevron-left"></i>
                 </button>
             </li>
@@ -505,19 +505,19 @@ $(function () {
 
         if (startPage > 1) {
             $paginationUl.append(`
-                <li class="page-item">
+                <li class="page-item" data-page="1" title="Page 1">
                     <button type="button" class="page-link" data-page="1">1</button>
                 </li>
             `);
             if (startPage > 2) {
-                $paginationUl.append(`<li class="page-item disabled"><span class="page-link">…</span></li>`);
+                $paginationUl.append(`<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`);
             }
         }
 
         for (let p = startPage; p <= endPage; p++) {
             const activeClass = p === currentPageNumber ? 'active' : '';
             $paginationUl.append(`
-                <li class="page-item ${activeClass}">
+                <li class="page-item ${activeClass}" data-page="${p}" title="Page ${p}">
                     <button type="button" class="page-link" data-page="${p}">${p}</button>
                 </li>
             `);
@@ -525,20 +525,20 @@ $(function () {
 
         if (endPage < currentTotalPages) {
             if (endPage < currentTotalPages - 1) {
-                $paginationUl.append(`<li class="page-item disabled"><span class="page-link">…</span></li>`);
+                $paginationUl.append(`<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`);
             }
             $paginationUl.append(`
-                <li class="page-item">
+                <li class="page-item" data-page="${currentTotalPages}" title="Page ${currentTotalPages}">
                     <button type="button" class="page-link" data-page="${currentTotalPages}">${currentTotalPages}</button>
                 </li>
             `);
         }
 
-        // Next Button
+        // Next Button (> icon only)
         const nextDisabled = !hasNextPage && currentPageNumber >= currentTotalPages ? 'disabled' : '';
         $paginationUl.append(`
-            <li class="page-item ${nextDisabled}">
-                <button type="button" class="page-link" data-page="${currentPageNumber + 1}" aria-label="Next">
+            <li class="page-item ${nextDisabled}" data-action="next" title="Next page">
+                <button type="button" class="page-link" data-page="${currentPageNumber + 1}" ${nextDisabled ? 'disabled' : ''} aria-label="Next">
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </li>
@@ -675,14 +675,45 @@ $(function () {
         loadQuotations();
     });
 
-    // Pagination clicks (delegated)
-    $paginationUl.on('click', '.page-link', function (e) {
+    function smoothScrollToQuotations() {
+        const $card = $('.dash-card');
+        const target = $card.length ? $card : $table;
+        if (target.length && target.offset()) {
+            const topPos = target.offset().top - 80;
+            if (Math.abs($(window).scrollTop() - topPos) > 150) {
+                $('html, body').stop(true, true).animate({ scrollTop: Math.max(0, topPos) }, 250);
+            }
+        }
+    }
+
+    // Pagination clicks (delegated smoothly from all borders)
+    $paginationUl.off('click').on('click', '.page-item:not(.disabled)', function (e) {
         e.preventDefault();
-        const targetPage = parseInt($(this).data('page'), 10);
-        if (targetPage && targetPage >= 1 && targetPage <= currentTotalPages && targetPage !== currentPageNumber) {
-            currentPageNumber = targetPage;
-            loadQuotations();
-            $('html, body').animate({ scrollTop: $table.offset().top - 120 }, 200);
+        e.stopPropagation();
+
+        const $item = $(this);
+        const action = $item.data('action');
+        const page = $item.data('page') || $item.find('[data-page]').data('page');
+
+        if (action === 'prev') {
+            if (currentPageNumber > 1) {
+                currentPageNumber--;
+                loadQuotations();
+                smoothScrollToQuotations();
+            }
+        } else if (action === 'next') {
+            if (currentPageNumber < currentTotalPages) {
+                currentPageNumber++;
+                loadQuotations();
+                smoothScrollToQuotations();
+            }
+        } else if (page != null) {
+            const targetPage = parseInt(page, 10);
+            if (targetPage >= 1 && targetPage <= currentTotalPages) {
+                currentPageNumber = targetPage;
+                loadQuotations();
+                smoothScrollToQuotations();
+            }
         }
     });
 
