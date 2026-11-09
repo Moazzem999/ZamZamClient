@@ -21,6 +21,7 @@ $(function () {
 
     const GET_SERVICES_URL = `${apiBaseUrl}/api/Services/GetAll`;
     const POST_SERVICE_URL = `${apiBaseUrl}/api/Services`;
+    const PUT_SERVICE_URL = `${apiBaseUrl}/api/Services`;
 
     // Table & State containers
     const $table = $('#servicesTable');
@@ -88,6 +89,36 @@ $(function () {
     const $btnSubmitCreateText = $('#btnSubmitCreateText');
 
     let selectedCreateImageFile = null;
+
+    // Edit Modal Elements
+    const $editModalEl = $('#editServiceModal');
+    let editModalInstance = null;
+    if ($editModalEl.length && typeof bootstrap !== 'undefined') {
+        editModalInstance = new bootstrap.Modal($editModalEl[0]);
+    }
+    const $editForm = $('#editServiceForm');
+    const $editAlert = $('#editServiceAlert');
+    const $editId = $('#editServiceId');
+    const $editBadgeId = $('#editServiceBadgeId');
+    const $editTitle = $('#editServiceTitle');
+    const $editDisplayOrder = $('#editServiceDisplayOrder');
+    const $editDescription = $('#editServiceDescription');
+    const $editOriginalImagePath = $('#editServiceOriginalImagePath');
+    const $editCurrentImgCard = $('#editCurrentImgCard');
+    const $editCurrentThumb = $('#editServiceCurrentThumb');
+    const $editCurrentPath = $('#editServiceCurrentPath');
+    const $editDropzone = $('#editServiceDropzone');
+    const $editImageInput = $('#editServiceImageInput');
+    const $editDropzonePrompt = $('#editDropzonePrompt');
+    const $editDropzonePreview = $('#editDropzonePreview');
+    const $editPreviewImg = $('#editServicePreviewImg');
+    const $editFileName = $('#editServiceFileName');
+    const $btnCancelEditReplacement = $('#btnCancelEditImageReplacement');
+    const $editHighlightsContainer = $('#editHighlightsContainer');
+    const $btnAddEditHighlight = $('#btnAddEditHighlightRow');
+    const $btnSubmitEdit = $('#btnSubmitEditService');
+    const $btnSubmitEditText = $('#btnSubmitEditText');
+    let selectedEditImageFile = null;
 
     // Toast
     const $toast = $('#dashToast');
@@ -798,6 +829,296 @@ $(function () {
         });
     });
 
+    // 11B. Edit Service & Highlights Management (Calls PUT /api/Services)
+    function addEditHighlightRow(h) {
+        const hId = (h && h.id != null) ? h.id : 0;
+        const textVal = (h && h.highlightText) ? escapeHtml(h.highlightText) : '';
+        const count = $editHighlightsContainer.find('.highlight-input-row').length;
+        const orderVal = (h && h.displayOrder != null) ? h.displayOrder : (count + 1);
+
+        const rowHtml = `
+            <div class="highlight-input-row">
+                <input type="hidden" class="highlight-id-input" value="${hId}" />
+                <span class="text-muted small fw-semibold text-nowrap" style="font-size: 0.75rem;">#${count + 1}</span>
+                <input type="text" 
+                       class="form-control form-control-sm highlight-text-input" 
+                       placeholder="e.g. 24/7 Precision Quality Check" 
+                       maxlength="60" 
+                       value="${textVal}" 
+                       required />
+                <div class="d-flex align-items-center gap-1" style="width: 110px;">
+                    <span class="text-muted small" style="font-size: 0.75rem;">Order:</span>
+                    <input type="number" 
+                           class="form-control form-control-sm highlight-order-input px-2" 
+                           min="1" 
+                           value="${orderVal}" 
+                           style="width: 55px;" />
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm btn-remove-highlight p-1 px-2 rounded-2" title="Remove highlight">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </div>
+        `;
+
+        $editHighlightsContainer.append(rowHtml);
+    }
+
+    function openEditService(serviceId) {
+        const service = allFetchedServices.find(s => s.id == serviceId);
+        if (!service) {
+            showToast('Service record not found', 'bi bi-exclamation-triangle-fill text-warning');
+            return;
+        }
+
+        $editAlert.addClass('d-none').text('');
+        $editForm[0].reset();
+        selectedEditImageFile = null;
+        $editImageInput.val('');
+        $editPreviewImg.attr('src', '');
+        $editDropzonePreview.addClass('d-none');
+        $editDropzonePrompt.removeClass('d-none');
+        $editDropzone.removeClass('has-preview');
+        $editHighlightsContainer.empty();
+
+        $editId.val(service.id);
+        $editBadgeId.text(`#${service.id}`);
+        $editTitle.val(service.title || '');
+        $editDisplayOrder.val(service.displayOrder != null ? service.displayOrder : 1);
+        $editDescription.val(service.description || '');
+
+        const origPath = service.imagePath || '';
+        $editOriginalImagePath.val(origPath);
+        const fullImgUrl = resolveImageUrl(origPath);
+
+        if (origPath && fullImgUrl) {
+            $editCurrentThumb.attr('src', fullImgUrl);
+            $editCurrentPath.text(origPath);
+            $editCurrentImgCard.removeClass('d-none');
+        } else {
+            $editCurrentThumb.attr('src', '/images/logo-icon.png');
+            $editCurrentPath.text('No image currently assigned');
+            $editCurrentImgCard.addClass('d-none');
+        }
+
+        const highlights = Array.isArray(service.highlights) ? service.highlights : [];
+        if (highlights.length > 0) {
+            const sorted = [...highlights].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+            sorted.forEach(h => addEditHighlightRow(h));
+        } else {
+            addEditHighlightRow(null);
+        }
+
+        if (editModalInstance) {
+            editModalInstance.show();
+        }
+    }
+
+    $editImageInput.on('change', function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const maxFileSize = 300 * 1024;
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
+        if (!allowedTypes.includes(file.type.toLowerCase()) && !file.name.match(/\.(jpg|jpeg|png)$/i)) {
+            $editAlert.removeClass('d-none').text('Invalid file type. Allowed formats: .jpg, .jpeg, .png');
+            $editImageInput.val('');
+            selectedEditImageFile = null;
+            return;
+        }
+
+        if (file.size > maxFileSize) {
+            $editAlert.removeClass('d-none').text(`Image file size (${(file.size / 1024).toFixed(1)} KB) exceeds the maximum allowed limit of 300 KB.`);
+            $editImageInput.val('');
+            selectedEditImageFile = null;
+            return;
+        }
+
+        $editAlert.addClass('d-none').text('');
+        selectedEditImageFile = file;
+        $editFileName.text(`${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+            $editPreviewImg.attr('src', evt.target.result);
+            $editDropzonePrompt.addClass('d-none');
+            $editDropzonePreview.removeClass('d-none');
+            $editDropzone.addClass('has-preview');
+        };
+        reader.readAsDataURL(file);
+    });
+
+    $btnCancelEditReplacement.on('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        selectedEditImageFile = null;
+        $editImageInput.val('');
+        $editPreviewImg.attr('src', '');
+        $editDropzonePreview.addClass('d-none');
+        $editDropzonePrompt.removeClass('d-none');
+        $editDropzone.removeClass('has-preview');
+    });
+
+    $btnAddEditHighlight.on('click', function () {
+        const count = $editHighlightsContainer.find('.highlight-input-row').length;
+        addEditHighlightRow({ id: 0, highlightText: '', displayOrder: count + 1 });
+    });
+
+    $editForm.on('submit', async function (e) {
+        e.preventDefault();
+        if (isSubmitting) return;
+
+        $editAlert.addClass('d-none').text('');
+
+        const id = parseInt($editId.val(), 10);
+        const title = $editTitle.val().trim();
+        const displayOrder = parseInt($editDisplayOrder.val(), 10);
+        const description = $editDescription.val().trim();
+
+        if (!id || id <= 0) {
+            $editAlert.removeClass('d-none').text('Invalid service ID.');
+            return;
+        }
+
+        if (!title) {
+            $editAlert.removeClass('d-none').text('Please enter a service title (max 50 chars).');
+            $editTitle.focus();
+            return;
+        }
+
+        if (title.length > 50) {
+            $editAlert.removeClass('d-none').text('Service title cannot exceed 50 characters.');
+            $editTitle.focus();
+            return;
+        }
+
+        if (isNaN(displayOrder) || displayOrder <= 0) {
+            $editAlert.removeClass('d-none').text('Please provide a valid display order greater than 0.');
+            $editDisplayOrder.focus();
+            return;
+        }
+
+        if (!description) {
+            $editAlert.removeClass('d-none').text('Please enter a service description (max 500 chars).');
+            $editDescription.focus();
+            return;
+        }
+
+        if (description.length > 500) {
+            $editAlert.removeClass('d-none').text('Service description cannot exceed 500 characters.');
+            $editDescription.focus();
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('Id', id);
+        formData.append('Title', title);
+        formData.append('Description', description);
+        formData.append('DisplayOrder', displayOrder);
+
+        // Image handling: if user selected replacement, append it. Otherwise, fetch existing image as blob
+        if (selectedEditImageFile) {
+            formData.append('Image', selectedEditImageFile);
+        } else {
+            const origPath = $editOriginalImagePath.val();
+            if (origPath) {
+                try {
+                    const fullUrl = resolveImageUrl(origPath);
+                    const res = await fetch(fullUrl);
+                    if (res.ok) {
+                        const blob = await res.blob();
+                        const filename = origPath.split('/').pop() || `service_${id}.png`;
+                        const file = new File([blob], filename, { type: blob.type || 'image/png' });
+                        formData.append('Image', file);
+                    }
+                } catch (err) {
+                    console.warn('[Services Edit] Could not fetch existing image blob:', err);
+                }
+            }
+        }
+
+        // Process highlights
+        const highlightsList = [];
+        $editHighlightsContainer.find('.highlight-input-row').each(function (idx) {
+            const hId = parseInt($(this).find('.highlight-id-input').val(), 10) || 0;
+            const hText = $(this).find('.highlight-text-input').val().trim();
+            const hOrder = parseInt($(this).find('.highlight-order-input').val(), 10) || (idx + 1);
+
+            if (hText) {
+                const hObj = {
+                    id: hId,
+                    highlightText: hText,
+                    displayOrder: hOrder
+                };
+                highlightsList.push(hObj);
+                formData.append('Highlights', JSON.stringify(hObj));
+            }
+        });
+
+        formData.append('HighlightsJson', JSON.stringify(highlightsList));
+
+        // Submit to API
+        isSubmitting = true;
+        $btnSubmitEdit.prop('disabled', true);
+        $btnSubmitEditText.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span> Updating...');
+
+        const token = getAuthToken();
+        const headers = { 'Accept': '*/*' };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        console.log(`[Services] Submitting Edit Service to ${PUT_SERVICE_URL}`, {
+            Id: id,
+            Title: title,
+            DisplayOrder: displayOrder,
+            Description: description,
+            Highlights: highlightsList
+        });
+
+        $.ajax({
+            url: PUT_SERVICE_URL,
+            type: 'PUT',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: headers,
+            timeout: 25000,
+            success: function (res) {
+                console.log('[Services] Edit Response:', res);
+                if (res && res.succeeded !== false) {
+                    showToast(res.message || 'Service successfully updated.', 'bi bi-check-circle-fill text-success');
+                    if (editModalInstance) {
+                        editModalInstance.hide();
+                    }
+                    // Refresh table without resetting current page
+                    loadServices();
+                } else {
+                    const errorMsg = res?.message || 'Failed to update service.';
+                    $editAlert.removeClass('d-none').text(errorMsg);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('[Services] Edit Error:', status, error, xhr);
+                let msg = 'Failed to update service. Please verify your connection or input data.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    try {
+                        const parsed = JSON.parse(xhr.responseText);
+                        if (parsed.message) msg = parsed.message;
+                    } catch (e) { }
+                }
+                $editAlert.removeClass('d-none').text(msg);
+            },
+            complete: function () {
+                isSubmitting = false;
+                $btnSubmitEdit.prop('disabled', false);
+                $btnSubmitEditText.text('Update Service');
+            }
+        });
+    });
+
     // 12. Search & Filter Event Listeners
 
     // A. Search box typing (debounced API trigger)
@@ -905,8 +1226,7 @@ $(function () {
     $(document).on('click', '.btn-edit-service', function (e) {
         e.stopPropagation();
         const serviceId = $(this).data('id');
-        showToast(`Edit Service #${serviceId} selected`, 'bi bi-pencil-square text-warning');
-        openServiceDetails(serviceId);
+        openEditService(serviceId);
     });
 
     // Delete button click opens confirmation modal
