@@ -455,17 +455,13 @@ $(function () {
         $('#modalServiceTitle').text(service.title || 'Untitled Service');
         $('#modalDisplayOrder').text(service.displayOrder != null ? service.displayOrder : '—');
         $('#modalServiceDescription').text(service.description || 'No description provided.');
-        $('#modalCreatedOn').text(formatDateTime(service.createdOn));
-        $('#modalUpdatedOn').text(formatDateTime(service.updatedOn));
 
         const fullImageUrl = resolveImageUrl(service.imagePath);
         if (fullImageUrl) {
             $('#modalServiceImage').attr('src', fullImageUrl).show();
             $('#modalImageWrapper').show();
-            $('#modalBtnPreviewImage').show();
         } else {
             $('#modalImageWrapper').hide();
-            $('#modalBtnPreviewImage').hide();
         }
 
         // Highlights List in Modal (Requirement #1)
@@ -642,13 +638,6 @@ $(function () {
         const url = $(this).data('url');
         const title = $(this).data('title');
         openLightbox(url, title);
-    });
-
-    $('#modalBtnPreviewImage').on('click', function () {
-        if (currentModalService) {
-            const url = resolveImageUrl(currentModalService.imagePath);
-            openLightbox(url, currentModalService.title);
-        }
     });
 
     // Initial Load from API
