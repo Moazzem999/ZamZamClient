@@ -276,6 +276,28 @@
         gap: 0.5rem;
     }
 
+    /* Create Modal Scrollable Layout */
+    #createServiceModal .modal-dialog {
+        max-height: calc(100vh - 3.5rem);
+    }
+    #createServiceModal .modal-content {
+        max-height: calc(100vh - 3.5rem);
+        display: flex;
+        flex-direction: column;
+    }
+    #createServiceModal form {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+    }
+    #createServiceModal .modal-body {
+        overflow-y: auto !important;
+        max-height: calc(100vh - 200px);
+        flex: 1 1 auto;
+    }
+
     /* Card Footer & Pagination */
     .service-card-footer {
         padding: 1.1rem 1.5rem;
@@ -350,10 +372,6 @@
             <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm fw-semibold" id="btnOpenCreateServiceModal" title="Create New Service">
                 <i class="bi bi-plus-lg"></i>
                 <span>Add Service</span>
-            </button>
-            <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm fw-semibold" id="btnRefreshServices" title="Reload from API">
-                <i class="bi bi-arrow-clockwise refresh-icon"></i>
-                <span>Refresh</span>
             </button>
         </div>
     </div>
@@ -491,8 +509,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form id="createServiceForm" novalidate enctype="multipart/form-data">
-                <div class="modal-body p-4">
+            <form id="createServiceForm" novalidate enctype="multipart/form-data" class="d-flex flex-column flex-grow-1 overflow-hidden">
+                <div class="modal-body p-4" style="overflow-y: auto; max-height: calc(100vh - 200px);">
                     <!-- Alert Message Box -->
                     <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="createServiceAlert" role="alert"></div>
 

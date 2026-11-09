@@ -41,7 +41,6 @@ $(function () {
     const $btnSearchSubmit = $('#btnSearchSubmit');
     const $btnResetFilters = $('#btnResetFilters');
     const $btnRetry = $('#btnRetryServices');
-    const $btnRefreshServices = $('#btnRefreshServices');
 
     // Modals
     const $detailModalEl = $('#serviceDetailModal');
@@ -220,8 +219,6 @@ $(function () {
 
         showState('loading');
         $tableBody.empty();
-        $btnRefreshServices.prop('disabled', true);
-        $btnRefreshServices.find('.refresh-icon').addClass('spin-animation');
 
         const token = getAuthToken();
         const headers = { 'Accept': 'application/json' };
@@ -317,8 +314,6 @@ $(function () {
             },
             complete: function () {
                 isFetching = false;
-                $btnRefreshServices.prop('disabled', false);
-                $btnRefreshServices.find('.refresh-icon').removeClass('spin-animation');
             }
         });
     }
@@ -856,12 +851,6 @@ $(function () {
         currentPageNumber = 1;
         loadServices();
         showToast('Filters reset. Reloading services...', 'bi bi-arrow-clockwise text-primary');
-    });
-
-    // Refresh button
-    $btnRefreshServices.on('click', function () {
-        loadServices();
-        showToast('Refreshing services...', 'bi bi-arrow-clockwise text-primary');
     });
 
     // Retry button on error state
