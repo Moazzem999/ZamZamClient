@@ -1188,6 +1188,7 @@ body.dashboard-body.sidebar-open {
     bottom: 24px;
     right: 24px;
     z-index: 1090;
+    pointer-events: none !important;
 }
 
 .dash-toast {
@@ -1209,7 +1210,7 @@ body.dashboard-body.sidebar-open {
 .dash-toast.show {
     opacity: 1;
     transform: translateY(0);
-    pointer-events: auto;
+    pointer-events: auto !important;
 }
 
 .dash-toast-icon {
