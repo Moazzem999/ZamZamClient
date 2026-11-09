@@ -116,13 +116,13 @@
                 if (sortedHighlights.length > 0) {
                     highlightsHtml = `
                         <div class="mb-4">
-                            <div class="dynamic-service-highlights-label">HIGHLIGHTS:</div>
-                            <ul class="dynamic-service-highlights-list">
+                            <h6 class="small fw-bold text-uppercase text-indigo mb-2">HIGHLIGHTS:</h6>
+                            <ul class="list-unstyled mb-0">
                                 ${sortedHighlights.map(h => {
                                     const text = typeof h === 'string' ? h : (h.highlightText || '');
                                     return `
-                                        <li class="dynamic-service-highlight-item">
-                                            <i class="bi bi-check-lg"></i>
+                                        <li class="d-flex align-items-start gap-2 small text-secondary mb-1">
+                                            <i class="bi bi-check-lg text-indigo"></i>
                                             <span>${escapeHtml(text)}</span>
                                         </li>
                                     `;
@@ -135,41 +135,42 @@
                 const rawTitleEscaped = (service.title || '').replace(/'/g, "\\'");
 
                 const cardHtml = `
-                    <div class="col-lg-4 col-md-6 dynamic-service-col" id="${slug}">
-                        <div class="dynamic-service-card">
+                    <div class="col-lg-4 col-md-6" id="${slug}">
+                        <div class="service-card card-sheen h-100">
                             <!-- Top Image with Display Order Badge -->
-                            <div class="dynamic-service-img-wrapper">
-                                <span class="dynamic-service-order-badge">${orderBadgeText}</span>
+                            <div class="position-relative overflow-hidden rounded-3 mb-3">
                                 <img src="${imgUrl}" 
                                      alt="${title}" 
-                                     class="dynamic-service-img" 
+                                     class="service-card-img mb-0" 
+                                     style="height: 180px; width: 100%; object-fit: cover;" 
                                      loading="lazy" 
                                      onerror="this.onerror=null; this.src='/images/services/ManufacturingService.jpg';" />
+                                <div class="position-absolute top-0 start-0 m-2">
+                                    <span class="badge bg-dark bg-opacity-75 text-white fw-bold px-2 py-1">${orderBadgeText}</span>
+                                </div>
                             </div>
 
                             <!-- Title -->
-                            <h3 class="dynamic-service-title">${title}</h3>
+                            <h3 class="service-title">${title}</h3>
 
                             <!-- Description -->
-                            <p class="dynamic-service-desc">${description}</p>
+                            <p class="service-desc">${description}</p>
 
                             <!-- Highlights Section -->
                             ${highlightsHtml}
 
-                            <!-- Footer Actions Matching Image -->
-                            <div class="dynamic-service-footer">
+                            <!-- Footer Actions Matching Previous Buttons -->
+                            <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
                                 <button type="button" 
-                                        class="btn-service-quote" 
+                                        class="btn btn-modern-primary btn-sm" 
                                         onclick="openQuoteModal('${rawTitleEscaped}', '${rawTitleEscaped}')" 
                                         title="Request quote for ${title}">
-                                    <i class="bi bi-file-earmark-text"></i>
-                                    <span>Request Quote</span>
+                                    <i class="bi bi-file-earmark-text me-1"></i> Request Quote
                                 </button>
                                 <a href="tel:+8801874633431" 
-                                   class="btn-service-inquire" 
+                                   class="btn btn-outline-secondary btn-sm" 
                                    title="Call directly to inquire">
-                                    <i class="bi bi-telephone"></i>
-                                    <span>Inquire</span>
+                                    <i class="bi bi-telephone me-1"></i> Inquire
                                 </a>
                             </div>
                         </div>
@@ -191,7 +192,7 @@
             }
         }
 
-        // 1. Immediately render fallback cards so page is NEVER blank
+        // 1. Immediately render fallback cards if skeleton is present
         if ($grid.find('.service-skeleton-item').length > 0 || $grid.children().length === 0) {
             renderCards(DEFAULT_SERVICES);
         }
