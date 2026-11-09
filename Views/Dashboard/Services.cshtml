@@ -1,0 +1,469 @@
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Services - Manage Site";
+    var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
+}
+
+<style>
+    /* Services Page Custom Enhancements */
+    .service-thumb-container {
+        width: 64px;
+        height: 48px;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .service-thumb-container:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+    .service-thumb-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .service-thumb-fallback {
+        font-size: 1.25rem;
+        color: #94a3b8;
+    }
+    .highlight-pill-tag {
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        max-width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .highlight-more-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.2rem 0.45rem;
+        border-radius: 6px;
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        cursor: pointer;
+    }
+    .service-order-pill {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        background-color: #f8fafc;
+        color: #334155;
+        border: 1px solid #e2e8f0;
+        display: inline-block;
+    }
+    .service-title-text {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 0.92rem;
+        margin-bottom: 2px;
+    }
+    .service-desc-preview {
+        font-size: 0.82rem;
+        color: #64748b;
+        max-width: 320px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .service-stat-card {
+        background: #ffffff;
+        border: 1px solid #edf2f7;
+        border-radius: 14px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        flex: 1 1 200px;
+    }
+    .service-stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    .service-stat-icon.primary {
+        background-color: #eff6ff;
+        color: #2563eb;
+    }
+    .service-stat-icon.success {
+        background-color: #ecfdf5;
+        color: #059669;
+    }
+    .service-stat-icon.purple {
+        background-color: #f5f3ff;
+        color: #7c3aed;
+    }
+    .service-stat-value {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.1;
+        margin: 0;
+    }
+    .service-stat-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin: 0;
+    }
+    .highlight-card-item {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        transition: all 0.2s ease;
+    }
+    .highlight-card-item:hover {
+        background-color: #ffffff;
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+</style>
+
+<!-- Page Root Container -->
+<div class="services-page-wrapper" id="servicesPageContainer" data-api-base-url="@apiBaseUrl">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="dash-breadcrumb">
+        <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span>Manage Site</span>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span class="current">Services</span>
+    </nav>
+
+    <!-- Page Heading Area -->
+    <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="dashboard-title">Services Management</h1>
+            <p class="dashboard-subtitle">Manage, view, and organize company trims manufacturing and specialized services.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- Refresh Button -->
+            <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm" id="btnRefreshServices" title="Reload services from API">
+                <i class="bi bi-arrow-clockwise refresh-icon"></i>
+                <span class="fw-semibold">Refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-4">
+            <div class="service-stat-card">
+                <div class="service-stat-icon primary">
+                    <i class="bi bi-gear-wide-connected"></i>
+                </div>
+                <div>
+                    <h3 class="service-stat-value" id="statTotalServices">0</h3>
+                    <p class="service-stat-label">Total Services</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="service-stat-card">
+                <div class="service-stat-icon success">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div>
+                    <h3 class="service-stat-value" id="statActiveServices">0</h3>
+                    <p class="service-stat-label">Active Services</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="service-stat-card">
+                <div class="service-stat-icon purple">
+                    <i class="bi bi-stars"></i>
+                </div>
+                <div>
+                    <h3 class="service-stat-value" id="statTotalHighlights">0</h3>
+                    <p class="service-stat-label">Total Highlights</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Table Card -->
+    <div class="dash-table-card">
+
+        <!-- Card Header Toolbar -->
+        <div class="dash-card-header">
+            <div class="dash-card-header-left">
+                <div class="dash-header-icon">
+                    <i class="bi bi-layers-fill"></i>
+                </div>
+                <div>
+                    <h2 class="dash-card-title">All Services Directory</h2>
+                    <p class="dash-card-subtitle">Complete registry of manufacturing solutions and client offerings</p>
+                </div>
+            </div>
+
+            <!-- Toolbar Controls -->
+            <div class="dash-toolbar-controls">
+                <!-- Status Filter -->
+                <div class="dash-filter-item">
+                    <select class="form-select form-select-sm" id="filterServiceStatus" style="min-width: 130px; height: 38px; border-radius: 8px;">
+                        <option value="all">All Statuses</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+
+                <!-- Live Search Box -->
+                <div class="dash-search-group" style="min-width: 280px;">
+                    <i class="bi bi-search dash-search-icon"></i>
+                    <input type="text" 
+                           id="searchServicesInput" 
+                           class="dash-search-input" 
+                           placeholder="Search by title, description, highlight..." 
+                           autocomplete="off" />
+                    <button type="button" class="dash-search-clear" id="searchClearBtn" title="Clear search" style="display: none;">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+
+                <!-- Page Size Selector -->
+                <div class="dash-filter-item">
+                    <select class="form-select form-select-sm" id="filterPageSize" style="width: 85px; height: 38px; border-radius: 8px;" title="Rows per page">
+                        <option value="10">10 / pg</option>
+                        <option value="25">25 / pg</option>
+                        <option value="50">50 / pg</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Responsive Container -->
+        <div class="table-responsive">
+            <table class="dash-custom-table" id="servicesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 75px;" class="text-center"># ID</th>
+                        <th style="width: 90px;" class="text-center">Image</th>
+                        <th style="width: 22%;">Service Title</th>
+                        <th style="width: 28%;">Description</th>
+                        <th>Key Highlights</th>
+                        <th style="width: 90px;" class="text-center">Order</th>
+                        <th style="width: 100px;" class="text-center">Status</th>
+                        <th style="width: 120px;" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="servicesTableBody">
+                    <!-- Populated dynamically via dashboard-services.js -->
+                </tbody>
+            </table>
+
+            <!-- Loading State -->
+            <div id="tableLoadingState" class="dash-table-state-box">
+                <div class="dash-state-icon-circle icon-loading">
+                    <div class="spinner-border text-primary" style="width: 2rem; height: 2rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <h3 class="dash-state-title">Fetching Services</h3>
+                <p class="dash-state-desc">Connecting to secure API server and loading service records...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="tableErrorState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-error">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h3 class="dash-state-title">Unable to Load Services</h3>
+                <p class="dash-state-desc" id="errorMessageText">
+                    Failed to fetch data from the server. Please verify your connection or API status.
+                </p>
+                <button type="button" class="btn btn-primary btn-sm px-4 py-2 rounded-3 mt-2" id="btnRetryServices">
+                    <i class="bi bi-arrow-repeat me-1"></i> Try Again
+                </button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="tableEmptyState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-empty">
+                    <i class="bi bi-gear-wide-connected"></i>
+                </div>
+                <h3 class="dash-state-title">No Services Found</h3>
+                <p class="dash-state-desc">There are currently no services recorded in the database.</p>
+            </div>
+
+            <!-- No Search Results State -->
+            <div id="tableNoResultsState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-empty">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h3 class="dash-state-title">No Matching Records</h3>
+                <p class="dash-state-desc">No services match your search or filter criteria.</p>
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-3 mt-2" id="btnResetFilters">
+                    <i class="bi bi-x-circle me-1"></i> Reset Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Card Footer Toolbar with Pagination -->
+        <div class="dash-card-footer">
+            <div class="d-flex align-items-center gap-2">
+                <span id="tableCountSummary" class="text-muted small">Loading count...</span>
+            </div>
+            <nav id="servicesPaginationNav" aria-label="Services pagination" class="d-none">
+                <ul class="pagination pagination-sm mb-0" id="servicesPaginationUl" style="gap: 4px;">
+                    <!-- Populated dynamically via dashboard-services.js -->
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Service Full Details Modal -->
+<div class="modal fade" id="serviceDetailModal" tabindex="-1" aria-labelledby="modalServiceTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <!-- Modal Header -->
+            <div class="modal-header border-bottom px-4 py-3 bg-light d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="dash-id-badge" id="modalServiceId">#0</span>
+                    <h5 class="modal-title fw-bold text-dark m-0" id="modalServiceTitle">Service Details</h5>
+                    <span class="dash-status-badge status-active" id="modalServiceStatus">
+                        <span class="status-dot"></span>
+                        <span id="modalServiceStatusText">Active</span>
+                    </span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-4">
+                <!-- Service Banner Image Card -->
+                <div class="mb-4 text-center rounded-3 overflow-hidden bg-light border p-2" id="modalImageWrapper">
+                    <img id="modalServiceImage" src="" alt="Service Banner" class="img-fluid rounded-3" style="max-height: 240px; width: 100%; object-fit: cover;" onerror="this.src='/images/logo-icon.png'" />
+                </div>
+
+                <!-- Info Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <span class="text-muted small d-block text-uppercase fw-semibold mb-1">Display Order</span>
+                            <span class="fw-bold text-dark fs-6" id="modalDisplayOrder">1</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <span class="text-muted small d-block text-uppercase fw-semibold mb-1">Highlight Count</span>
+                            <span class="fw-bold text-primary fs-6" id="modalHighlightsCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description Card -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
+                        <i class="bi bi-text-paragraph text-primary"></i>
+                        <span>Service Description</span>
+                    </h6>
+                    <div class="p-3 rounded-3 bg-light border text-secondary" id="modalServiceDescription" style="white-space: pre-wrap; line-height: 1.6;">
+                        —
+                    </div>
+                </div>
+
+                <!-- Key Highlights List -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
+                        <i class="bi bi-stars text-primary"></i>
+                        <span>Highlights &amp; Feature Points</span>
+                    </h6>
+                    <div class="d-flex flex-column gap-2" id="modalHighlightsList">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- System Audit Metadata -->
+                <div class="p-3 rounded-3 bg-light border">
+                    <div class="row g-2 text-muted small">
+                        <div class="col-sm-6">
+                            <span><i class="bi bi-calendar-plus me-1"></i> Created On:</span>
+                            <strong class="text-dark ms-1" id="modalCreatedOn">—</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span><i class="bi bi-clock-history me-1"></i> Updated On:</span>
+                            <strong class="text-dark ms-1" id="modalUpdatedOn">—</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-light border-top px-4 py-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3 rounded-3" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary btn-sm px-3 rounded-3 d-inline-flex align-items-center gap-2" id="modalBtnPreviewImage">
+                    <i class="bi bi-eye"></i>
+                    <span>View Full Image</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Lightbox Modal -->
+<div class="modal fade" id="serviceImageModal" tabindex="-1" aria-labelledby="imageModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 bg-transparent">
+            <div class="modal-header border-0 pb-0 justify-content-end">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-2">
+                <img id="lightboxImage" src="" alt="Full preview" class="img-fluid rounded-3 shadow-lg" style="max-height: 80vh; object-fit: contain;" onerror="this.src='/images/logo-icon.png'" />
+                <p class="text-white mt-2 small fw-semibold" id="lightboxTitle"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Toast Notification -->
+<div class="dash-toast-container">
+    <div class="dash-toast" id="dashToast" role="alert" aria-live="assertive" aria-atomic="true">
+        <i class="bi bi-check-circle-fill dash-toast-icon"></i>
+        <span id="dashToastMessage">Action completed successfully.</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/dashboard-services.js" asp-append-version="true"></script>
+}
