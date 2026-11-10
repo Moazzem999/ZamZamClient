@@ -59,7 +59,8 @@
                                           string.Equals(currentAction, "AboutUs", StringComparison.OrdinalIgnoreCase) ||
                                           string.Equals(currentAction, "Quotations", StringComparison.OrdinalIgnoreCase) ||
                                           string.Equals(currentAction, "Services", StringComparison.OrdinalIgnoreCase) ||
-                                          string.Equals(currentAction, "MachineryCategory", StringComparison.OrdinalIgnoreCase));
+                                          string.Equals(currentAction, "MachineryCategory", StringComparison.OrdinalIgnoreCase) ||
+                                          string.Equals(currentAction, "Machineries", StringComparison.OrdinalIgnoreCase));
                 var isEmployeeActive = string.Equals(currentController, "Employee", StringComparison.OrdinalIgnoreCase);
             }
 
@@ -112,6 +113,12 @@
                             <a asp-controller="Dashboard" asp-action="MachineryCategory" class="submenu-link">
                                 <i class="bi bi-tags submenu-icon"></i>
                                 <span>Machinery Category</span>
+                            </a>
+                        </li>
+                        <li class="submenu-item @(isManageSiteActive && string.Equals(currentAction, "Machineries", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="Machineries" class="submenu-link">
+                                <i class="bi bi-cpu submenu-icon"></i>
+                                <span>Machineries</span>
                             </a>
                         </li>
                     </ul>
