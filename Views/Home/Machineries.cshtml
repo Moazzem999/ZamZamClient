@@ -1,8 +1,69 @@
-@model List<ZamZamClient.Models.Machinery>
+@model List<ZamZamClient.Models.Machinery>?
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{
     ViewData["Title"] = "Our Machineries - World-Class Production Infrastructure";
-    var currentCat = ViewBag.CurrentCategory as string ?? "all";
+    var apiBaseUrl = Configuration["ApiBaseUrl"] ?? ViewBag.ApiBaseUrl ?? "https://localhost:7148";
 }
+
+<style>
+    .machinery-item-col {
+        opacity: 1 !important;
+        transform: none !important;
+        visibility: visible !important;
+        transition: transform 0.25s ease;
+    }
+    .machinery-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        border: 1px solid #e0e7ff;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.04);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .machinery-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 32px -4px rgba(79, 70, 229, 0.12);
+        border-color: #c7d2fe;
+    }
+    .machinery-img-wrapper {
+        position: relative;
+        width: 100%;
+        height: 220px;
+        background-color: #f1f5f9;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+    .machinery-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease;
+    }
+    .machinery-card:hover .machinery-img {
+        transform: scale(1.06);
+    }
+    .machinery-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        color: #ffffff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 50px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        z-index: 2;
+    }
+</style>
 
 <!-- Page Header -->
 <section class="page-header-banner">
@@ -15,53 +76,24 @@
     </div>
 </section>
 
-<section class="section-padding bg-light">
+<section class="section-padding bg-light" id="machineriesSection" data-api-base-url="@apiBaseUrl">
     <div class="container">
-        <!-- Category Filter Pills -->
-        <div class="catalog-filter-bar mb-5">
-            <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "all" ? "active" : "")" data-filter="all">
+        <!-- Category Filter Pills (Populated dynamically from API) -->
+        <div class="catalog-filter-bar mb-5" id="machineryFilterBar">
+            <button type="button" class="filter-btn machinery-filter-btn active" data-category-id="0">
                 All Machineries
-            </button>
-            <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "offset" ? "active" : "")" data-filter="offset">
-                Offset Printing & Finishing
-            </button>
-            <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "label" ? "active" : "")" data-filter="label">
-                Label Weaving & Printing
-            </button>
-            <button type="button" class="filter-btn machinery-filter-btn @(currentCat == "others" ? "active" : "")" data-filter="others">
-                Embossing & Specialized
             </button>
         </div>
 
-        <!-- Machineries Grid -->
+        <!-- Machineries Grid (Populated dynamically from API) -->
         <div class="row g-4" id="machineryGrid">
-            @foreach (var m in Model)
-            {
-                <div class="col-lg-4 col-md-6 machinery-item-col reveal" data-category="@m.FilterCategory">
-                    <div class="machinery-card card-sheen">
-                        <div class="machinery-img-wrapper">
-                            <span class="machinery-badge">@m.Category</span>
-                            <img src="@m.ImageUrl" alt="@m.Title" class="machinery-img" onerror="this.src='/images/machineries/gto.jpg';" />
-                        </div>
-                        <div class="machinery-body">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h3 class="machinery-title mb-0">@m.Title</h3>
-                                <span class="badge bg-light text-dark border">#@(m.Id.ToString("D2"))</span>
-                            </div>
-                            <p class="machinery-desc">@m.KeyCapabilities</p>
-                            
-                            <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
-                                <span class="small text-indigo fw-bold">
-                                    <i class="bi bi-check-circle-fill"></i> Precision Unit
-                                </span>
-                                <button type="button" class="btn btn-sm btn-modern-primary" onclick="openQuoteModal('@m.Title', '@m.Category')">
-                                    Inquire Capacity
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Loading placeholder initially -->
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary mb-3" style="width: 2.5rem; height: 2.5rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
-            }
+                <h6 class="fw-semibold text-secondary">Loading machinery lineup...</h6>
+            </div>
         </div>
     </div>
 </section>
