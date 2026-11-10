@@ -41,9 +41,7 @@ $(function () {
     const $searchInput = $('#searchCategoryInput');
     const $searchClearBtn = $('#searchClearBtn');
     const $pageSizeFilter = $('#filterPageSize');
-    const $btnSearchSubmit = $('#btnSearchSubmit');
     const $btnResetFilters = $('#btnResetFilters');
-    const $btnRefresh = $('#btnRefreshCategoryList');
     const $btnRetry = $('#btnRetryCategories');
 
     // Modals
@@ -104,6 +102,7 @@ $(function () {
     let currentPageNumber = 1;
     let currentPageSize = 10;
     let currentSearchTerm = '';
+    let searchDebounceTimer = null;
     let allFetchedCategories = [];
     let currentTotalCount = 0;
     let currentTotalPages = 1;
@@ -306,17 +305,6 @@ $(function () {
         items.forEach(function (cat) {
             const safeName = escapeHtml(cat.name || 'Unnamed Category');
             const displayOrder = cat.displayOrder != null ? cat.displayOrder : 0;
-            const createdOnFormatted = formatDateTime(cat.createdOn);
-
-            // Status Badge (1 = Active)
-            let statusBadge = '';
-            if (cat.status === 1) {
-                statusBadge = '<span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill"><i class="bi bi-check-circle-fill me-1"></i>Active</span>';
-            } else if (cat.status === 2) {
-                statusBadge = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-pill"><i class="bi bi-trash-fill me-1"></i>Deleted</span>';
-            } else {
-                statusBadge = `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1 rounded-pill">Status #${cat.status ?? 0}</span>`;
-            }
 
             const rowHtml = `
                 <tr data-id="${cat.id}">
@@ -333,18 +321,8 @@ $(function () {
                             </div>
                         </div>
                     </td>
-                    <td class="text-center">
-                        <span class="badge bg-light text-dark border px-2.5 py-1 fw-semibold">
-                            <i class="bi bi-sort-numeric-down text-primary me-1"></i>${displayOrder}
-                        </span>
-                    </td>
-                    <td class="text-center">
-                        ${statusBadge}
-                    </td>
-                    <td>
-                        <span class="text-muted small">
-                            <i class="bi bi-calendar3 me-1 text-secondary"></i>${createdOnFormatted}
-                        </span>
+                    <td class="text-center fw-medium text-dark">
+                        ${displayOrder}
                     </td>
                     <td class="text-end">
                         <div class="category-actions-group">
@@ -476,30 +454,36 @@ $(function () {
     });
 
     // 7. Search & Filter Handlers
-    function executeSearch() {
-        currentSearchTerm = $searchInput.val().trim();
-        currentPageNumber = 1;
-        loadCategories();
-    }
-
-    $btnSearchSubmit.on('click', function () {
-        executeSearch();
-    });
-
-    $searchInput.on('keyup', function (e) {
-        if (e.key === 'Enter') {
-            executeSearch();
-        }
-        if ($(this).val().length > 0) {
+    $searchInput.on('input', function () {
+        const val = $(this).val().trim();
+        if (val.length > 0) {
             $searchClearBtn.show();
         } else {
             $searchClearBtn.hide();
+        }
+
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(function () {
+            currentSearchTerm = val;
+            currentPageNumber = 1;
+            loadCategories();
+        }, 350);
+    });
+
+    $searchInput.on('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+            currentSearchTerm = $(this).val().trim();
+            currentPageNumber = 1;
+            loadCategories();
         }
     });
 
     $searchClearBtn.on('click', function () {
         $searchInput.val('');
         $(this).hide();
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
         if (currentSearchTerm !== '') {
             currentSearchTerm = '';
             currentPageNumber = 1;
@@ -511,6 +495,7 @@ $(function () {
         $searchInput.val('');
         $searchClearBtn.hide();
         $pageSizeFilter.val('10');
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
         currentSearchTerm = '';
         currentPageSize = 10;
         currentPageNumber = 1;
@@ -520,10 +505,6 @@ $(function () {
     $pageSizeFilter.on('change', function () {
         currentPageSize = parseInt($(this).val()) || 10;
         currentPageNumber = 1;
-        loadCategories();
-    });
-
-    $btnRefresh.on('click', function () {
         loadCategories();
     });
 
@@ -618,14 +599,6 @@ $(function () {
         $('#viewCategoryBadgeId').text(`#${cat.id}`);
         $('#viewCategoryName').text(cat.name || '—');
         $('#viewCategoryDisplayOrder').text(cat.displayOrder != null ? cat.displayOrder : 0);
-        
-        let statusText = 'Active';
-        if (cat.status === 2) statusText = 'Deleted';
-        else if (cat.status !== 1) statusText = `Status #${cat.status}`;
-        $('#viewCategoryStatus').text(statusText);
-
-        $('#viewCategoryCreatedOn').text(formatDateTime(cat.createdOn));
-        $('#viewCategoryUpdatedOn').text(formatDateTime(cat.updatedOn));
 
         if (viewModalInstance) {
             viewModalInstance.show();
