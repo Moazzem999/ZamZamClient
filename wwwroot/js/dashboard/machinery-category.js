@@ -40,6 +40,7 @@ $(function () {
     // Controls
     const $searchInput = $('#searchCategoryInput');
     const $searchClearBtn = $('#searchClearBtn');
+    const $btnSearchSubmit = $('#btnSearchSubmit');
     const $pageSizeFilter = $('#filterPageSize');
     const $btnResetFilters = $('#btnResetFilters');
     const $btnRetry = $('#btnRetryCategories');
@@ -454,6 +455,17 @@ $(function () {
     });
 
     // 7. Search & Filter Handlers
+    function executeSearch() {
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+        currentSearchTerm = $searchInput.val().trim();
+        currentPageNumber = 1;
+        loadCategories();
+    }
+
+    $btnSearchSubmit.on('click', function () {
+        executeSearch();
+    });
+
     $searchInput.on('input', function () {
         const val = $(this).val().trim();
         if (val.length > 0) {
@@ -473,10 +485,7 @@ $(function () {
     $searchInput.on('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
-            currentSearchTerm = $(this).val().trim();
-            currentPageNumber = 1;
-            loadCategories();
+            executeSearch();
         }
     });
 
@@ -568,7 +577,8 @@ $(function () {
                 if (createModalInstance) {
                     createModalInstance.hide();
                 }
-                showToast('Machinery category created successfully.', true);
+                const successMsg = (res && res.message) ? res.message : 'Machinery category created successfully.';
+                showToast(successMsg, true);
                 loadCategories();
             },
             error: function (xhr) {
@@ -681,7 +691,8 @@ $(function () {
                 if (editModalInstance) {
                     editModalInstance.hide();
                 }
-                showToast('Machinery category updated successfully.', true);
+                const successMsg = (res && res.message) ? res.message : 'Machinery category updated successfully.';
+                showToast(successMsg, true);
                 loadCategories();
             },
             error: function (xhr) {
@@ -737,13 +748,28 @@ $(function () {
                 if (deleteModalInstance) {
                     deleteModalInstance.hide();
                 }
-                showToast('Machinery category deleted successfully.', true);
+
+                // If API returned failure flag in payload
+                if (res && res.succeeded === false) {
+                    const errorMsg = res.message || 'Failed to delete machinery category.';
+                    showToast(errorMsg, false);
+                    return;
+                }
+
+                // Message directly from API response
+                const successMsg = (res && res.message) ? res.message : 'Machinery category deleted successfully.';
+                showToast(successMsg, true);
                 loadCategories();
             },
             error: function (xhr) {
                 let errorMsg = 'Failed to delete machinery category.';
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    try {
+                        const parsed = JSON.parse(xhr.responseText);
+                        if (parsed.message) errorMsg = parsed.message;
+                    } catch (e) {}
                 }
                 showToast(errorMsg, false);
             },
