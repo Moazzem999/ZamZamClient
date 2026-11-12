@@ -457,6 +457,7 @@
                 }
 
                 const currentId = hiddenIdInput.value;
+                activeIndex = -1;
                 dropdownEl.innerHTML = categories.map(cat => {
                     const isCurrent = currentId && String(currentId) === String(cat.id);
                     return `
@@ -471,28 +472,83 @@
                 showCategoryDropdown(dropdownEl);
             }
 
+            let activeIndex = -1;
+
+            function getDropdownItems() {
+                return Array.from(dropdownEl.querySelectorAll(".category-autocomplete-item"));
+            }
+
+            function highlightItem(items, newIndex) {
+                items.forEach(el => el.classList.remove("keyboard-active"));
+                if (newIndex >= 0 && newIndex < items.length) {
+                    activeIndex = newIndex;
+                    const target = items[activeIndex];
+                    target.classList.add("keyboard-active");
+                    target.scrollIntoView({ block: "nearest" });
+                } else {
+                    activeIndex = -1;
+                }
+            }
+
+            function selectItem(itemEl) {
+                if (!itemEl) return;
+                hiddenIdInput.value = itemEl.getAttribute("data-cat-id") || "";
+                searchInput.value = itemEl.getAttribute("data-cat-name") || "";
+                activeIndex = -1;
+                hideCategoryDropdown(dropdownEl);
+            }
+
             searchInput.addEventListener("focus", function () {
                 fetchCategories(searchInput.value);
             });
 
             searchInput.addEventListener("input", function () {
                 hiddenIdInput.value = "";
+                activeIndex = -1;
                 clearTimeout(catDebounce);
                 catDebounce = setTimeout(() => {
                     fetchCategories(searchInput.value);
                 }, 250);
             });
 
+            searchInput.addEventListener("keydown", function (e) {
+                const isVisible = dropdownEl.style.display === "block" && !dropdownEl.classList.contains("d-none");
+                const items = getDropdownItems();
+
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    if (!isVisible) {
+                        fetchCategories(searchInput.value);
+                        return;
+                    }
+                    if (!items.length) return;
+                    const next = activeIndex < items.length - 1 ? activeIndex + 1 : 0;
+                    highlightItem(items, next);
+                } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    if (!isVisible || !items.length) return;
+                    const prev = activeIndex > 0 ? activeIndex - 1 : items.length - 1;
+                    highlightItem(items, prev);
+                } else if (e.key === "Enter") {
+                    if (isVisible && activeIndex >= 0 && items[activeIndex]) {
+                        e.preventDefault();
+                        selectItem(items[activeIndex]);
+                    }
+                } else if (e.key === "Escape") {
+                    activeIndex = -1;
+                    hideCategoryDropdown(dropdownEl);
+                }
+            });
+
             dropdownEl.addEventListener("click", function (e) {
                 const itemEl = e.target.closest(".category-autocomplete-item");
                 if (!itemEl) return;
-                hiddenIdInput.value = itemEl.getAttribute("data-cat-id") || "";
-                searchInput.value = itemEl.getAttribute("data-cat-name") || "";
-                hideCategoryDropdown(dropdownEl);
+                selectItem(itemEl);
             });
 
             document.addEventListener("click", function (e) {
                 if (!searchInput.contains(e.target) && !dropdownEl.contains(e.target)) {
+                    activeIndex = -1;
                     hideCategoryDropdown(dropdownEl);
                 }
             });

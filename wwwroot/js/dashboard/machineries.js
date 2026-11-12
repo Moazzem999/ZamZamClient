@@ -604,12 +604,43 @@ $(function () {
                         `;
                     });
 
+                    activeIndex = -1;
                     $dropdown.html(html).show();
                 },
                 error: function () {
+                    activeIndex = -1;
                     $dropdown.html('<div class="category-autocomplete-empty text-danger">Failed to load categories</div>').show();
                 }
             });
+        }
+
+        let activeIndex = -1;
+
+        function getDropdownItems() {
+            return $dropdown.find('.category-autocomplete-item');
+        }
+
+        function highlightItem($items, newIndex) {
+            $items.removeClass('keyboard-active');
+            if (newIndex >= 0 && newIndex < $items.length) {
+                activeIndex = newIndex;
+                const el = $items.eq(activeIndex).addClass('keyboard-active')[0];
+                if (el && el.scrollIntoView) {
+                    el.scrollIntoView({ block: 'nearest' });
+                }
+            } else {
+                activeIndex = -1;
+            }
+        }
+
+        function selectItem($item) {
+            if (!$item || !$item.length) return;
+            const id = $item.data('id');
+            const name = $item.data('name');
+            $hiddenId.val(id);
+            $input.val(name);
+            activeIndex = -1;
+            $dropdown.hide();
         }
 
         $input.on('focus', function () {
@@ -620,23 +651,50 @@ $(function () {
         $input.on('input', function () {
             const val = $(this).val().trim();
             $hiddenId.val(''); // Clear ID until user picks an option
+            activeIndex = -1;
             if (categorySearchTimer) clearTimeout(categorySearchTimer);
             categorySearchTimer = setTimeout(function () {
                 searchCategories(val);
             }, 300);
         });
 
+        $input.on('keydown', function (e) {
+            const isVisible = $dropdown.is(':visible');
+            const $items = getDropdownItems();
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!isVisible) {
+                    searchCategories($(this).val().trim());
+                    return;
+                }
+                if (!$items.length) return;
+                const next = activeIndex < $items.length - 1 ? activeIndex + 1 : 0;
+                highlightItem($items, next);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (!isVisible || !$items.length) return;
+                const prev = activeIndex > 0 ? activeIndex - 1 : $items.length - 1;
+                highlightItem($items, prev);
+            } else if (e.key === 'Enter') {
+                if (isVisible && activeIndex >= 0 && $items.eq(activeIndex).length) {
+                    e.preventDefault();
+                    selectItem($items.eq(activeIndex));
+                }
+            } else if (e.key === 'Escape') {
+                activeIndex = -1;
+                $dropdown.hide();
+            }
+        });
+
         $dropdown.on('click', '.category-autocomplete-item', function () {
-            const id = $(this).data('id');
-            const name = $(this).data('name');
-            $hiddenId.val(id);
-            $input.val(name);
-            $dropdown.hide();
+            selectItem($(this));
         });
 
         // Hide dropdown on outside click
         $(document).on('click', function (e) {
             if (!$(e.target).closest($input.parent().parent()).length) {
+                activeIndex = -1;
                 $dropdown.hide();
             }
         });
