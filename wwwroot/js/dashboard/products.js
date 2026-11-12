@@ -290,41 +290,64 @@
         function renderTableRows(items) {
             tbodyEl.innerHTML = items.map(item => {
                 const imgUrl = resolveImageUrl(apiBaseUrl, item.imagePath);
-                const title = escapeHtml(item.title);
-                const categoryName = escapeHtml(item.productCategoryName || "—");
-                const cardBadge = escapeHtml(item.cardBadge || "—");
-                const description = escapeHtml(item.description || "");
-                const technicalSpecs = escapeHtml(item.technicalSpecs || "");
-                const displayOrder = item.displayOrder !== undefined && item.displayOrder !== null ? escapeHtml(item.displayOrder) : "—";
+                const title = escapeHtml(item.title || "Untitled Product");
+                const categoryName = escapeHtml(item.productCategoryName || "Uncategorized");
+                const cardBadgeHtml = item.cardBadge
+                    ? `<span class="card-badge-pill ms-2">${escapeHtml(item.cardBadge)}</span>`
+                    : "";
+                const description = escapeHtml(item.description || "No description provided.");
+                const displayOrder = item.displayOrder !== undefined && item.displayOrder !== null
+                    ? escapeHtml(item.displayOrder)
+                    : 0;
 
                 const thumbHtml = imgUrl
-                    ? `<img src="${escapeHtml(imgUrl)}" alt="${title}" class="rounded border object-fit-cover" style="width:48px;height:48px;" loading="lazy" />`
-                    : `<div class="rounded border bg-light d-flex align-items-center justify-content-center text-muted" style="width:48px;height:48px;"><i class="bi bi-image"></i></div>`;
+                    ? `<img src="${escapeHtml(imgUrl)}" alt="${title}" onerror="this.onerror=null; this.src='/images/logo-icon.png';" loading="lazy" />`
+                    : `<i class="bi bi-image text-muted"></i>`;
 
                 return `
                     <tr data-id="${item.id}">
-                        <td class="ps-3">${thumbHtml}</td>
                         <td>
-                            <div class="fw-semibold text-dark">${title}</div>
-                            ${description ? `<div class="small text-muted text-truncate" style="max-width:260px;" title="${description}">${description}</div>` : ""}
-                            ${technicalSpecs ? `<div class="small text-secondary text-truncate" style="max-width:260px;" title="${technicalSpecs}"><i class="bi bi-cpu me-1"></i>${technicalSpecs}</div>` : ""}
+                            <span class="product-id-pill">#${item.id}</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="product-thumb-wrapper mx-auto btn-view-product" data-id="${item.id}" title="Click to view details">
+                                ${thumbHtml}
+                            </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border">${categoryName}</span>
+                            <div class="d-flex flex-column">
+                                <div class="d-flex align-items-center flex-wrap">
+                                    <span class="product-title-text">${title}</span>
+                                    ${cardBadgeHtml}
+                                </div>
+                                <span class="product-desc-text mt-1" title="${description}">${description}</span>
+                            </div>
                         </td>
                         <td>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">${cardBadge}</span>
+                            <span class="category-badge-pill">
+                                <i class="bi bi-tag-fill text-primary"></i>
+                                <span>${categoryName}</span>
+                            </span>
                         </td>
-                        <td class="text-center fw-medium">${displayOrder}</td>
-                        <td class="text-end pe-3">
-                            <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn-outline-secondary btn-view-product" data-id="${item.id}" title="View Details">
+                        <td class="text-center fw-medium text-dark">${displayOrder}</td>
+                        <td class="text-end">
+                            <div class="product-actions-group">
+                                <button type="button"
+                                        class="btn-action-icon btn-action-view btn-view-product"
+                                        data-id="${item.id}"
+                                        title="View Details">
                                     <i class="bi bi-eye"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-primary btn-edit-product" data-id="${item.id}" title="Edit Product">
-                                    <i class="bi bi-pencil"></i>
+                                <button type="button"
+                                        class="btn-action-icon btn-action-edit btn-edit-product"
+                                        data-id="${item.id}"
+                                        title="Edit Product">
+                                    <i class="bi bi-pencil-square"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-danger btn-delete-product" data-id="${item.id}" title="Delete Product">
+                                <button type="button"
+                                        class="btn-action-icon btn-action-delete btn-delete-product"
+                                        data-id="${item.id}"
+                                        title="Delete Product">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -336,7 +359,7 @@
             const startIdx = (state.pageNumber - 1) * state.pageSize + 1;
             const endIdx = Math.min(startIdx + items.length - 1, state.totalCount);
             if (countSummaryEl) {
-                countSummaryEl.textContent = `Showing ${startIdx}–${endIdx} of ${state.totalCount} product${state.totalCount === 1 ? "" : "s"}`;
+                countSummaryEl.textContent = `Showing ${startIdx} to ${endIdx} of ${state.totalCount} entries`;
             }
         }
 
@@ -389,6 +412,18 @@
         }
 
         // ---------- Category Search Box Autocomplete ----------
+        function showCategoryDropdown(dropdownEl) {
+            if (!dropdownEl) return;
+            dropdownEl.classList.remove("d-none");
+            dropdownEl.style.display = "block";
+        }
+
+        function hideCategoryDropdown(dropdownEl) {
+            if (!dropdownEl) return;
+            dropdownEl.classList.add("d-none");
+            dropdownEl.style.display = "none";
+        }
+
         function setupCategoryAutocomplete(searchInput, hiddenIdInput, dropdownEl) {
             if (!searchInput || !hiddenIdInput || !dropdownEl) return;
 
@@ -400,33 +435,41 @@
                     ? `${apiBaseUrl}/api/ProductCategory/GetByName/${encodeURIComponent(trimmed)}`
                     : `${apiBaseUrl}/api/ProductCategory/GetAllForDisplay`;
 
+                dropdownEl.innerHTML = `<div class="category-autocomplete-empty"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Searching categories...</div>`;
+                showCategoryDropdown(dropdownEl);
+
                 try {
                     const res = await apiFetch(endpoint);
-                    const list = Array.isArray(res && res.data) ? res.data : [];
+                    const list = Array.isArray(res && res.data)
+                        ? res.data
+                        : (res && res.data && Array.isArray(res.data.items) ? res.data.items : []);
                     renderCategoryDropdown(list);
                 } catch {
-                    dropdownEl.innerHTML = `<div class="px-3 py-2 small text-danger">Failed to load categories</div>`;
-                    dropdownEl.classList.remove("d-none");
+                    dropdownEl.innerHTML = `<div class="category-autocomplete-empty text-danger">Failed to load categories</div>`;
+                    showCategoryDropdown(dropdownEl);
                 }
             }
 
             function renderCategoryDropdown(categories) {
                 if (!categories.length) {
-                    dropdownEl.innerHTML = `<div class="px-3 py-2 small text-muted">No matching categories found</div>`;
-                    dropdownEl.classList.remove("d-none");
+                    dropdownEl.innerHTML = `<div class="category-autocomplete-empty">No matching categories found</div>`;
+                    showCategoryDropdown(dropdownEl);
                     return;
                 }
 
-                dropdownEl.innerHTML = categories.map(cat => `
-                    <button type="button"
-                            class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 cat-option-btn"
-                            data-cat-id="${cat.id}"
-                            data-cat-name="${escapeHtml(cat.name)}">
-                        <span class="fw-medium">${escapeHtml(cat.name)}</span>
-                        <span class="badge bg-light text-secondary border">#${escapeHtml(cat.displayOrder)}</span>
-                    </button>
-                `).join("");
-                dropdownEl.classList.remove("d-none");
+                const currentId = hiddenIdInput.value;
+                dropdownEl.innerHTML = categories.map(cat => {
+                    const isCurrent = currentId && String(currentId) === String(cat.id);
+                    return `
+                        <div class="category-autocomplete-item ${isCurrent ? "selected" : ""}"
+                             data-cat-id="${cat.id}"
+                             data-cat-name="${escapeHtml(cat.name)}">
+                            <span><i class="bi bi-tag me-2 text-primary"></i>${escapeHtml(cat.name)}</span>
+                            <span class="badge bg-light text-muted border">#${escapeHtml(cat.id)}</span>
+                        </div>
+                    `;
+                }).join("");
+                showCategoryDropdown(dropdownEl);
             }
 
             searchInput.addEventListener("focus", function () {
@@ -442,16 +485,16 @@
             });
 
             dropdownEl.addEventListener("click", function (e) {
-                const btn = e.target.closest(".cat-option-btn");
-                if (!btn) return;
-                hiddenIdInput.value = btn.getAttribute("data-cat-id") || "";
-                searchInput.value = btn.getAttribute("data-cat-name") || "";
-                dropdownEl.classList.add("d-none");
+                const itemEl = e.target.closest(".category-autocomplete-item");
+                if (!itemEl) return;
+                hiddenIdInput.value = itemEl.getAttribute("data-cat-id") || "";
+                searchInput.value = itemEl.getAttribute("data-cat-name") || "";
+                hideCategoryDropdown(dropdownEl);
             });
 
             document.addEventListener("click", function (e) {
                 if (!searchInput.contains(e.target) && !dropdownEl.contains(e.target)) {
-                    dropdownEl.classList.add("d-none");
+                    hideCategoryDropdown(dropdownEl);
                 }
             });
         }
@@ -557,7 +600,7 @@
             hideFormAlert(createAlertEl);
             if (createCatIdEl) createCatIdEl.value = "";
             if (createCatSearchEl) createCatSearchEl.value = "";
-            if (createCatDropdownEl) createCatDropdownEl.classList.add("d-none");
+            hideCategoryDropdown(createCatDropdownEl);
             clearCreateImage();
         }
 
@@ -725,7 +768,7 @@
             editTechnicalSpecsEl.value = item.technicalSpecs || "";
             editCatIdEl.value = item.productCategoryId || "";
             editCatSearchEl.value = item.productCategoryName || "";
-            if (editCatDropdownEl) editCatDropdownEl.classList.add("d-none");
+            hideCategoryDropdown(editCatDropdownEl);
 
             const imgUrl = resolveImageUrl(apiBaseUrl, item.imagePath);
             if (editPreviewImgEl) {
