@@ -300,9 +300,8 @@
                     ? escapeHtml(item.displayOrder)
                     : 0;
 
-                const thumbHtml = imgUrl
-                    ? `<img src="${escapeHtml(imgUrl)}" alt="${title}" onerror="this.onerror=null; this.src='/images/logo-icon.png';" loading="lazy" />`
-                    : `<i class="bi bi-image text-muted"></i>`;
+                const fullImgUrl = imgUrl || "/images/logo-icon.png";
+                const thumbHtml = `<img src="${escapeHtml(fullImgUrl)}" alt="${title}" onerror="this.onerror=null; this.src='/images/logo-icon.png';" />`;
 
                 return `
                     <tr data-id="${item.id}">
@@ -770,9 +769,13 @@
             editCatSearchEl.value = item.productCategoryName || "";
             hideCategoryDropdown(editCatDropdownEl);
 
-            const imgUrl = resolveImageUrl(apiBaseUrl, item.imagePath);
+            const imgUrl = resolveImageUrl(apiBaseUrl, item.imagePath) || "/images/logo-icon.png";
             if (editPreviewImgEl) {
-                editPreviewImgEl.src = imgUrl || "";
+                editPreviewImgEl.onerror = function () {
+                    this.onerror = null;
+                    this.src = "/images/logo-icon.png";
+                };
+                editPreviewImgEl.src = imgUrl;
             }
 
             window.bootstrap.Modal.getOrCreateInstance(editModalEl).show();
@@ -893,9 +896,13 @@
             if (viewDescriptionEl) viewDescriptionEl.textContent = item.description || "No description provided.";
             if (viewTechnicalSpecsEl) viewTechnicalSpecsEl.textContent = item.technicalSpecs || "No technical specs provided.";
 
-            const imgUrl = resolveImageUrl(apiBaseUrl, item.imagePath);
+            const imgUrl = resolveImageUrl(apiBaseUrl, item.imagePath) || "/images/logo-icon.png";
             if (viewImgEl) {
-                viewImgEl.src = imgUrl || "";
+                viewImgEl.onerror = function () {
+                    this.onerror = null;
+                    this.src = "/images/logo-icon.png";
+                };
+                viewImgEl.src = imgUrl;
                 viewImgEl.alt = item.title || "Product Image";
             }
 
