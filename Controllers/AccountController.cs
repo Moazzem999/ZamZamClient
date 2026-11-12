@@ -26,7 +26,6 @@ public class AccountController : Controller
         return View(model);
     }
 
-
     [HttpGet]
     public IActionResult Logout()
     {
