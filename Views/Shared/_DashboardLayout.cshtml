@@ -100,6 +100,12 @@
                                 <span>About Us</span>
                             </a>
                         </li>
+                        <li class="submenu-item @(isManageSiteActive && string.Equals(currentAction, "Inquiries", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+                            <a asp-controller="Dashboard" asp-action="Inquiries" class="submenu-link">
+                                <i class="bi bi-envelope-paper submenu-icon"></i>
+                                <span>Inquiries</span>
+                            </a>
+                        </li>
                         <li class="submenu-item @(isManageSiteActive && string.Equals(currentAction, "Quotations", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
                             <a asp-controller="Dashboard" asp-action="Quotations" class="submenu-link">
                                 <i class="bi bi-chat-square-quote submenu-icon"></i>
@@ -134,12 +140,6 @@
                             <a asp-controller="Dashboard" asp-action="Product" class="submenu-link">
                                 <i class="bi bi-bag-check submenu-icon"></i>
                                 <span>Product</span>
-                            </a>
-                        </li>
-                        <li class="submenu-item @(isManageSiteActive && string.Equals(currentAction, "Inquiries", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
-                            <a asp-controller="Dashboard" asp-action="Inquiries" class="submenu-link">
-                                <i class="bi bi-envelope-paper submenu-icon"></i>
-                                <span>Inquiries</span>
                             </a>
                         </li>
                     </ul>
