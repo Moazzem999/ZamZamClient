@@ -174,6 +174,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function selectAllProductsCategory() {
+        currentCategoryId = 0;
+        if (!filterBar) return;
+        filterBar.querySelectorAll('.product-filter-btn').forEach(btn => {
+            const isAll = btn.getAttribute('data-category-id') === '0';
+            btn.classList.toggle('active', isAll);
+        });
+    }
+
     // 3. Search Products via API
     function searchProducts(term) {
         const trimmed = (term || '').trim();
@@ -182,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        selectAllProductsCategory();
         showLoadingState();
         const endpoint = `${PRODUCTS_SEARCH_URL}?searchTerm=${encodeURIComponent(trimmed)}`;
 
