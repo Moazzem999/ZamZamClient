@@ -1,0 +1,703 @@
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Product Category - Manage Site";
+    var apiBaseUrl = ViewBag.ApiBaseUrl ?? "https://localhost:7148";
+}
+
+<style>
+    /* Filter & Search Card */
+    .category-filter-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.15rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        margin-bottom: 1.5rem;
+    }
+
+    .category-search-box {
+        position: relative;
+        flex: 1 1 320px;
+    }
+
+    .category-search-box .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.95rem;
+        pointer-events: none;
+    }
+
+    .category-search-box input {
+        padding-left: 2.5rem;
+        padding-right: 2rem;
+        height: 42px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.92rem;
+        color: #0f172a;
+        background-color: #ffffff;
+        transition: all 0.2s ease;
+        width: 100%;
+    }
+
+    .category-search-box input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        outline: none;
+    }
+
+    .category-search-clear {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 0;
+        display: none;
+    }
+
+    .category-search-clear:hover {
+        color: #ef4444;
+    }
+
+    .btn-search-action {
+        height: 42px;
+        padding: 0 1.25rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .btn-reset-action {
+        height: 42px;
+        padding: 0 1.15rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #475569;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: all 0.15s ease;
+    }
+
+    .btn-reset-action:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        color: #0f172a;
+    }
+
+    /* Main Table Card */
+    .category-table-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+    }
+
+    .category-custom-table {
+        width: 100%;
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .category-custom-table thead th {
+        background-color: #ffffff;
+        color: #64748b;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .category-custom-table tbody td {
+        padding: 1.05rem 1.25rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.88rem;
+        color: #334155;
+        background-color: #ffffff;
+        transition: background-color 0.15s ease;
+    }
+
+    .category-custom-table tbody tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .category-custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .category-id-pill {
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        font-weight: 700;
+        color: #64748b;
+        font-size: 0.82rem;
+        background-color: #f1f5f9;
+        padding: 0.25rem 0.55rem;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    .category-icon-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: #2563eb;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .category-name-text {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 0.92rem;
+    }
+
+    /* Action Buttons */
+    .category-actions-group {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .btn-action-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        background-color: #ffffff;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        padding: 0;
+    }
+
+    .btn-action-icon.btn-action-view {
+        border: 1.5px solid #93c5fd;
+        color: #2563eb;
+    }
+
+    .btn-action-icon.btn-action-view:hover {
+        background-color: #eff6ff;
+        border-color: #60a5fa;
+        color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    .btn-action-icon.btn-action-edit {
+        border: 1.5px solid #fde047;
+        color: #ca8a04;
+    }
+
+    .btn-action-icon.btn-action-edit:hover {
+        background-color: #fefce8;
+        border-color: #eab308;
+        color: #a16207;
+        transform: translateY(-1px);
+    }
+
+    .btn-action-icon.btn-action-delete {
+        border: 1.5px solid #fca5a5;
+        color: #ef4444;
+    }
+
+    .btn-action-icon.btn-action-delete:hover {
+        background-color: #fff1f2;
+        border-color: #f87171;
+        color: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    /* Footer & Pagination */
+    .category-card-footer {
+        padding: 1.15rem 1.5rem;
+        background-color: #ffffff;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .table-count-text {
+        font-size: 0.88rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .pagination-custom {
+        gap: 4px;
+    }
+
+    .pagination-custom .page-item .page-link {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        transition: all 0.15s ease;
+    }
+
+    .pagination-custom .page-item .page-link:hover:not([disabled]) {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #0f172a;
+    }
+
+    .pagination-custom .page-item.active .page-link {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    }
+
+    .pagination-custom .page-item.disabled .page-link {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* State box */
+    .dash-table-state-box {
+        padding: 3.5rem 1.5rem;
+        text-align: center;
+    }
+
+    /* Detail Modal Card */
+    .detail-info-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .detail-info-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .detail-value {
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+</style>
+
+<!-- Page Root Container -->
+<div class="category-page-wrapper" id="productCategoryPageContainer" data-api-base-url="@apiBaseUrl">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="dash-breadcrumb">
+        <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span>Manage Site</span>
+        <span class="separator"><i class="bi bi-chevron-right"></i></span>
+        <span class="current">Product Category</span>
+    </nav>
+
+    <!-- Page Heading Area -->
+    <div class="dashboard-heading-area d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="dashboard-title">Product Categories</h1>
+            <p class="dashboard-subtitle">Manage product categories, display sequences, and classification for trims catalog.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm fw-semibold" id="btnOpenCreateCategoryModal" title="Add New Category">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add Category</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter & Controls Card -->
+    <div class="category-filter-card">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <!-- Left: Search Box + Search Button + Reset Button -->
+            <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" style="max-width: 680px;">
+                <div class="category-search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" 
+                           id="searchCategoryInput" 
+                           placeholder="Search by category name or ID..." 
+                           autocomplete="off" />
+                    <button type="button" class="category-search-clear" id="searchClearBtn" title="Clear search">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <button type="button" class="btn btn-primary btn-search-action shadow-sm" id="btnSearchSubmit" title="Execute search via API">
+                    <i class="bi bi-search"></i>
+                    <span>Search</span>
+                </button>
+                <button type="button" class="btn-reset-action" id="btnResetFilters" title="Reset all filters via API">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+
+            <!-- Right: Rows per page Selector -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-muted small text-nowrap">Rows per page:</span>
+                <select class="form-select form-select-sm" id="filterPageSize" style="width: 80px; height: 42px; border-radius: 8px;">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Table Card -->
+    <div class="category-table-card">
+
+        <!-- Table Responsive Container -->
+        <div class="table-responsive">
+            <table class="category-custom-table" id="categoriesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 90px;"># ID</th>
+                        <th style="min-width: 280px;">CATEGORY NAME</th>
+                        <th style="width: 160px;" class="text-center">DISPLAY ORDER</th>
+                        <th style="width: 140px;" class="text-end">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody id="categoriesTableBody">
+                    <!-- Populated dynamically via product-category.js -->
+                </tbody>
+            </table>
+
+            <!-- Loading State -->
+            <div id="tableLoadingState" class="dash-table-state-box">
+                <div class="dash-state-icon-circle icon-loading mb-3">
+                    <div class="spinner-border text-primary" style="width: 2rem; height: 2rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">Fetching Product Categories</h5>
+                <p class="text-muted small mb-0">Connecting to secure API server and loading category records...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="tableErrorState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-error mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">Unable to Load Product Categories</h5>
+                <p class="text-muted small mb-3" id="errorMessageText">
+                    Failed to fetch data from the server. Please verify your connection or API status.
+                </p>
+                <button type="button" class="btn btn-primary btn-sm px-4 py-2 rounded-3" id="btnRetryCategories">
+                    <i class="bi bi-arrow-repeat me-1"></i> Try Again
+                </button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="tableEmptyState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-empty mb-3">
+                    <i class="bi bi-box-seam text-muted fs-3"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">No Product Categories Found</h5>
+                <p class="text-muted small mb-0">There are currently no product categories recorded in the database.</p>
+            </div>
+
+            <!-- No Search Results State -->
+            <div id="tableNoResultsState" class="dash-table-state-box d-none">
+                <div class="dash-state-icon-circle icon-empty mb-3">
+                    <i class="bi bi-search text-muted fs-3"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">No Matching Records</h5>
+                <p class="text-muted small mb-2">No product categories match your search query.</p>
+            </div>
+        </div>
+
+        <!-- Card Footer with Pagination Controls -->
+        <div class="category-card-footer">
+            <div class="d-flex align-items-center">
+                <span id="tableCountSummary" class="table-count-text">Showing 0 to 0 of 0 entries</span>
+            </div>
+            <nav id="categoriesPaginationNav" aria-label="Categories pagination">
+                <ul class="pagination pagination-custom mb-0" id="categoriesPaginationUl">
+                    <!-- Populated dynamically via product-category.js -->
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Create Category Modal -->
+<div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header border-bottom px-4 py-3 bg-light d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary text-white p-2 rounded-3 fs-6">
+                        <i class="bi bi-plus-lg"></i>
+                    </span>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark m-0" id="createCategoryModalTitle">Add Product Category</h5>
+                        <small class="text-muted">Create a new category for product classification</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="createCategoryForm" novalidate>
+                <div class="modal-body p-4">
+                    <!-- Alert Message Box -->
+                    <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="createCategoryAlert" role="alert"></div>
+
+                    <!-- Category Name -->
+                    <div class="mb-3">
+                        <label for="createCategoryName" class="form-label small fw-bold text-dark mb-1">
+                            Category Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                               class="form-control rounded-3" 
+                               id="createCategoryName" 
+                               name="Name" 
+                               maxlength="50" 
+                               placeholder="e.g. Labels &amp; Badges" 
+                               required />
+                        <small class="text-muted" style="font-size: 0.72rem;">Maximum 50 characters</small>
+                    </div>
+
+                    <!-- Display Order -->
+                    <div class="mb-2">
+                        <label for="createCategoryDisplayOrder" class="form-label small fw-bold text-dark mb-1">
+                            Display Order <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" 
+                               class="form-control rounded-3" 
+                               id="createCategoryDisplayOrder" 
+                               name="DisplayOrder" 
+                               min="0" 
+                               value="1" 
+                               required />
+                        <small class="text-muted" style="font-size: 0.72rem;">Sequence order for display priority (1, 2, 3...)</small>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top px-4 py-3 bg-light d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary px-3 py-2 rounded-3 fw-semibold" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold d-inline-flex align-items-center gap-2" id="btnSubmitCreateCategory">
+                        <i class="bi bi-check-lg"></i>
+                        <span id="btnSubmitCreateText">Save Category</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header border-bottom px-4 py-3 bg-light d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark p-2 rounded-3 fs-6">
+                        <i class="bi bi-pencil-square"></i>
+                    </span>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark m-0" id="editCategoryModalTitle">Edit Product Category</h5>
+                        <small class="text-muted">Update category details and sequence order</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="editCategoryForm" novalidate>
+                <div class="modal-body p-4">
+                    <!-- Alert Message Box -->
+                    <div class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" id="editCategoryAlert" role="alert"></div>
+
+                    <!-- Hidden ID -->
+                    <input type="hidden" id="editCategoryId" name="Id" />
+
+                    <!-- Category Name -->
+                    <div class="mb-3">
+                        <label for="editCategoryName" class="form-label small fw-bold text-dark mb-1">
+                            Category Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                               class="form-control rounded-3" 
+                               id="editCategoryName" 
+                               name="Name" 
+                               maxlength="50" 
+                               required />
+                        <small class="text-muted" style="font-size: 0.72rem;">Maximum 50 characters</small>
+                    </div>
+
+                    <!-- Display Order -->
+                    <div class="mb-2">
+                        <label for="editCategoryDisplayOrder" class="form-label small fw-bold text-dark mb-1">
+                            Display Order <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" 
+                               class="form-control rounded-3" 
+                               id="editCategoryDisplayOrder" 
+                               name="DisplayOrder" 
+                               min="0" 
+                               required />
+                        <small class="text-muted" style="font-size: 0.72rem;">Sequence order for display priority</small>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top px-4 py-3 bg-light d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary px-3 py-2 rounded-3 fw-semibold" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold d-inline-flex align-items-center gap-2" id="btnSubmitEditCategory">
+                        <i class="bi bi-save"></i>
+                        <span id="btnSubmitEditText">Update Category</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Category Details Modal -->
+<div class="modal fade" id="viewCategoryModal" tabindex="-1" aria-labelledby="viewCategoryModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header border-bottom px-4 py-3 bg-light d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary-subtle text-primary p-2 rounded-3 fs-6">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </span>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark m-0" id="viewCategoryModalTitle">Category Details</h5>
+                        <small class="text-muted">Product category classification</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <div class="bg-light rounded-3 p-3 mb-3 border">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="category-icon-avatar" style="width: 48px; height: 48px; font-size: 1.35rem;">
+                            <i class="bi bi-box-seam-fill"></i>
+                        </div>
+                        <div>
+                            <span class="badge bg-primary mb-1" id="viewCategoryBadgeId">#0</span>
+                            <h5 class="fw-bold text-dark mb-0" id="viewCategoryName">—</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border rounded-3 overflow-hidden">
+                    <div class="detail-info-row">
+                        <span class="detail-label">Display Order</span>
+                        <span class="detail-value" id="viewCategoryDisplayOrder">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-top px-4 py-3 bg-light d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-warning btn-sm px-3 py-2 rounded-3 fw-semibold d-inline-flex align-items-center gap-1" id="btnEditFromView">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm px-3 py-2 rounded-3 fw-semibold" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;">
+            <div class="modal-body p-4 text-center">
+                <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                     style="width: 60px; height: 60px; border-radius: 50%; background-color: #fee2e2; color: #dc2626; font-size: 1.6rem;">
+                    <i class="bi bi-trash3-fill"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1" id="deleteCategoryModalTitle">Delete Product Category</h5>
+                <p class="text-muted small mb-3">
+                    Are you sure you want to delete this product category? This will remove it from the system.
+                </p>
+
+                <div class="p-3 rounded-3 mb-3 text-start border bg-light">
+                    <div class="small text-muted mb-1">Target Category:</div>
+                    <div class="fw-bold text-dark" id="deleteCategoryTargetName">—</div>
+                    <div class="small text-muted" id="deleteCategoryTargetId">#0</div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-semibold" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger px-4 py-2 rounded-3 fw-semibold d-inline-flex align-items-center gap-2" id="btnConfirmDeleteCategory">
+                        <i class="bi bi-trash"></i>
+                        <span id="btnConfirmDeleteText">Delete Category</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Toast Notification -->
+<div class="dash-toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
+    <div class="dash-toast toast align-items-center text-bg-dark border-0 shadow-lg" id="dashToast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success fs-5 dash-toast-icon"></i>
+                <span id="dashToastMessage">Action completed successfully.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/dashboard/product-category.js" asp-append-version="true"></script>
+}
+
