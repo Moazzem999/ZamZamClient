@@ -275,7 +275,7 @@
                                 <span class="inquiry-message-preview" title="${message}">${message || "No message content."}</span>
                             </div>
                         </td>
-                        <td class="text-muted small fw-medium">
+                        <td class="text-muted small fw-medium text-nowrap">
                             ${submitted}
                         </td>
                         <td class="text-end">
