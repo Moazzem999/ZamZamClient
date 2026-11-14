@@ -8,16 +8,28 @@
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
+    // Shared Helper: Escape HTML
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Shared Base API URL configuration with mixed-content safeguard
+    const heroSectionEl = document.getElementById('factoryHeroSection') || document.querySelector('.factory-hero-section');
+    const rawApiBaseUrl = (heroSectionEl?.getAttribute('data-api-base-url') || window.apiBaseUrl || 'https://localhost:7148').trim();
+    let apiBaseUrl = rawApiBaseUrl.replace(/\/+$/, '');
+    if (window.location.protocol === 'https:' && apiBaseUrl.startsWith('http://localhost:')) {
+        apiBaseUrl = apiBaseUrl.replace(/^http:\/\//i, 'https://');
+    }
+
     // =============================================================
     // 1. Giant Factory Carousel Dynamic API Loader & Interactive Controller
     // =============================================================
     const factoryCarouselEl = document.getElementById('factoryHeroCarousel');
-    const heroSectionEl = document.getElementById('factoryHeroSection') || document.querySelector('.factory-hero-section');
 
     if (factoryCarouselEl) {
-        // Read API base URL from section container data attribute or default to https://localhost:7148
-        const configuredApiBaseUrl = (heroSectionEl?.getAttribute('data-api-base-url') || 'https://localhost:7148').trim();
-        const apiBaseUrl = configuredApiBaseUrl.replace(/\/+$/, '');
         const BRAND_IMAGES_API_URL = `${apiBaseUrl}/api/Global/GetAllBrandImages`;
 
         const hudCounterCur = document.querySelector('.factory-hud-counter .cur-slide');
@@ -32,14 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let progressAnimFrame = null;
         let slideStartTime = performance.now();
         const slideDuration = 6500;
-
-        // Escape HTML to prevent XSS
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
 
         // Construct absolute URL for images returned from the API
         function getFullImageUrl(imagePath) {
@@ -280,6 +284,47 @@ document.addEventListener('DOMContentLoaded', function () {
             const y = e.clientY - rect.top;
             heroCard.style.setProperty('--mouse-x', `${x}px`);
             heroCard.style.setProperty('--mouse-y', `${y}px`);
+        });
+    }
+
+    // =============================================================
+    // 2b. Dynamic Trusted Garments Product Categories Loader
+    // =============================================================
+    const trustedCategoriesContainer = document.getElementById('trustedGarmentsCategories');
+    if (trustedCategoriesContainer) {
+        const PRODUCT_CATEGORIES_API_URL = `${apiBaseUrl}/api/ProductCategory/GetAllForDisplay`;
+
+        fetch(PRODUCT_CATEGORIES_API_URL, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            },
+            cache: 'no-cache'
+        })
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        })
+        .then(response => {
+            let categories = [];
+            if (response && response.succeeded !== false && response.data) {
+                categories = Array.isArray(response.data) ? response.data : (Array.isArray(response.data.items) ? response.data.items : []);
+            } else if (Array.isArray(response)) {
+                categories = response;
+            }
+
+            if (categories && categories.length > 0) {
+                // Sort by displayOrder ascending
+                categories.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
+                trustedCategoriesContainer.innerHTML = categories.map(cat => {
+                    const safeName = escapeHtml(cat.name || '');
+                    return `<span class="badge bg-light text-dark border px-3 py-2">${safeName}</span>`;
+                }).join(' ');
+            }
+        })
+        .catch(err => {
+            console.warn('[Home] Failed to load trusted garments categories:', err);
         });
     }
 
