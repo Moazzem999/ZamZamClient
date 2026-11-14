@@ -411,7 +411,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
 .factory-carousel-wrapper {
     position: relative;
-    border-radius: var(--radius-xl);
+    border-radius: 0;
     overflow: hidden;
     box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.28);
     background: #090d16;
