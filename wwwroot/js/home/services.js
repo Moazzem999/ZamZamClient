@@ -17,7 +17,7 @@
             displayOrder: 1,
             highlights: [
                 { highlightText: "High-volume output capacity", displayOrder: 1 },
-                { highlightText: "Export-standard compliance & OEKO-TEX adherence", displayOrder: 2 },
+                { highlightText: "Export-standard compliance", displayOrder: 2 },
                 { highlightText: "Custom mold, dye, and weave formulations", displayOrder: 3 },
                 { highlightText: "Rigorous in-line quality assurance", displayOrder: 4 }
             ]

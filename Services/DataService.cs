@@ -118,7 +118,7 @@ public class DataService : IDataService
         return filterCat switch
         {
             "label" => $"Premium {title} crafted with high thread-density yarns, soft edges, skin-friendly texture, and certified color fastness for luxury and casual apparel.",
-            "button" => $"Engineered {title} available in diverse finishes, custom logo engraving, scratch-resistant surface, and OEKO-TEX compliant materials.",
+            "button" => $"Engineered {title} available in diverse finishes, custom logo engraving, scratch-resistant surface, and Standard compliant materials.",
             "emboss" => $"Exquisite {title} featuring sharp 3D embossing, foil accents, and high-tensile GSM board suited for premium garments and luxury branding.",
             "thread" => $"High-tenacity {title} delivering smooth seam elasticity, minimal breakage on high-speed industrial sewing machines, and superior wash durability.",
             "elastic" => $"Resilient {title} with consistent modulus, skin-comfort woven/knitted structures, and long-lasting recovery across repeated wash cycles.",
@@ -183,7 +183,7 @@ public class DataService : IDataService
                 FullDescription = "ZamZam Trims (BD) Limited runs fully equipped modern production floors designed for large-scale and precision manufacturing of apparel accessories and trims. Our cutting-edge infrastructure manufactures woven labels, care labels, twill tapes, drawstrings, buttons, elastics, and hang tags following strict international tolerances.",
                 ImageUrl = "/images/services/ManufacturingService.jpg",
                 IconClass = "bi-gear-wide-connected",
-                Highlights = new() { "High-volume output capacity", "Export-standard compliance & OEKO-TEX adherence", "Custom mold, dye, and weave formulations", "Rigorous in-line quality assurance" }
+                Highlights = new() { "High-volume output capacity", "Export-standard compliance", "Custom mold, dye, and weave formulations", "Rigorous in-line quality assurance" }
             },
             new()
             {

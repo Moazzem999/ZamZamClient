@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function () {
             description: 'Instant cost estimations, rapid lab dips, and technical spec-sheet approvals. We provide merchandisers with verified tech-pack costing within 2-4 hours to streamline buyer presentations.',
             bullets: [
                 'Direct factory cost computations with transparent pricing breakdown',
-                'Compliant OEKO-TEX Standard 100 chemical safety test certifications',
+                'Compliant Standard 100 chemical safety test certifications',
                 'Real-time order progress tracking and digital swatch catalogs'
             ],
             image1: '/images/slider/slide-2.jpg',
