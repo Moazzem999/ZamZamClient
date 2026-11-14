@@ -5,6 +5,21 @@
     var apiBaseUrl = Configuration["ApiBaseUrl"] ?? ViewBag.ApiBaseUrl ?? "https://localhost:7148";
 }
 
+<style>
+    .trusted-category-badge {
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        display: inline-block;
+    }
+    .trusted-category-badge:hover {
+        background-color: #e2e8f0 !important;
+        color: #1e293b !important;
+        border-color: #cbd5e1 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+</style>
+
 <!-- =========================================================
      GIANT FACTORY HERO CAROUSEL (Eye-Catching Showcase for Global Buyers)
      ========================================================= -->
@@ -134,11 +149,11 @@
                         Global and local fashion leaders trust us as their accessories partner. Our long-standing collaborations are built on quality, reliability, and innovation across RMG sectors.
                     </p>
                     <div class="d-flex flex-wrap gap-2 pt-2 border-top" id="trustedGarmentsCategories">
-                        <span class="badge bg-light text-dark border px-3 py-2">Woven Belts</span>
-                        <span class="badge bg-light text-dark border px-3 py-2">Twill Tape</span>
-                        <span class="badge bg-light text-dark border px-3 py-2">Drawstring</span>
-                        <span class="badge bg-light text-dark border px-3 py-2">Hang Tags</span>
-                        <span class="badge bg-light text-dark border px-3 py-2">Buttons</span>
+                        <a href="/Home/Products?category=Woven%20Belts" class="badge bg-light text-dark border px-3 py-2 text-decoration-none trusted-category-badge">Woven Belts</a>
+                        <a href="/Home/Products?category=Twill%20Tape" class="badge bg-light text-dark border px-3 py-2 text-decoration-none trusted-category-badge">Twill Tape</a>
+                        <a href="/Home/Products?category=Drawstring" class="badge bg-light text-dark border px-3 py-2 text-decoration-none trusted-category-badge">Drawstring</a>
+                        <a href="/Home/Products?category=Hang%20Tags" class="badge bg-light text-dark border px-3 py-2 text-decoration-none trusted-category-badge">Hang Tags</a>
+                        <a href="/Home/Products?category=Buttons" class="badge bg-light text-dark border px-3 py-2 text-decoration-none trusted-category-badge">Buttons</a>
                     </div>
                 </div>
             </div>

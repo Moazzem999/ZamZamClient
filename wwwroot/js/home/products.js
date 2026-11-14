@@ -150,6 +150,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // 2. Load Products by Category
     function loadProductsByCategory(categoryId = 0) {
         currentCategoryId = categoryId;
+        if (filterBar) {
+            filterBar.querySelectorAll('.product-filter-btn').forEach(btn => {
+                const btnCatId = parseInt(btn.getAttribute('data-category-id'), 10) || 0;
+                btn.classList.toggle('active', btnCatId === categoryId);
+            });
+        }
         showLoadingState();
 
         const endpoint = `${PRODUCTS_BY_CAT_URL}/${categoryId > 0 ? categoryId : 0}`;
@@ -308,6 +314,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const catId = parseInt(btn.getAttribute('data-category-id'), 10) || 0;
+            const catName = btn.getAttribute('data-category-name') || '';
+            if (catId === 0) {
+                window.history.replaceState(null, '', window.location.pathname);
+            } else {
+                window.history.replaceState(null, '', `?category=${encodeURIComponent(catName || catId)}`);
+            }
             loadProductsByCategory(catId);
         });
     }
@@ -361,11 +373,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (categoryParam && categoryParam.toLowerCase() !== 'all') {
-            const matched = categories.find(c =>
-                String(c.id) === categoryParam ||
-                (c.name || '').toLowerCase() === categoryParam.toLowerCase() ||
-                (c.name || '').toLowerCase().includes(categoryParam.toLowerCase())
-            );
+            const cleanParam = decodeURIComponent(categoryParam).trim().toLowerCase();
+            const matched = categories.find(c => {
+                if (!c) return false;
+                const cId = String(c.id);
+                const cName = (c.name || '').trim().toLowerCase();
+                return cId === categoryParam ||
+                       cName === cleanParam ||
+                       cName === categoryParam.toLowerCase() ||
+                       cName.replace(/\s+/g, '') === cleanParam.replace(/\s+/g, '') ||
+                       cName.includes(cleanParam) ||
+                       cleanParam.includes(cName);
+            });
             if (matched) {
                 currentCategoryId = matched.id;
                 renderCategoryPills(categories);

@@ -319,7 +319,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 trustedCategoriesContainer.innerHTML = categories.map(cat => {
                     const safeName = escapeHtml(cat.name || '');
-                    return `<span class="badge bg-light text-dark border px-3 py-2">${safeName}</span>`;
+                    const encodedName = encodeURIComponent(cat.name || '');
+                    return `<a href="/Home/Products?category=${encodedName}" class="badge bg-light text-dark border px-3 py-2 text-decoration-none trusted-category-badge" title="Browse ${safeName} products">${safeName}</a>`;
                 }).join(' ');
             }
         })
