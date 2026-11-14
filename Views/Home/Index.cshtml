@@ -21,6 +21,10 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
     }
+    .profile-img-link-1:hover img,
+    .profile-img-link-2:hover img {
+        transform: scale(1.05);
+    }
 </style>
 
 <!-- =========================================================
@@ -186,53 +190,65 @@
     </div>
 </section>
 
-<!-- Section 3: Business We Help To Grow -->
+<!-- Section 3: Highlighting Services & Machineries -->
 <section class="section-padding bg-light">
     <div class="container">
         <div class="row align-items-center mb-4 reveal">
-            <div class="col-lg-6">
+            <div class="col-lg-7">
                 <h2 class="section-title mb-1">
-                    Business We <span class="gradient-text-indigo">Help To Grow</span>
+                    Manufacturing Excellence: <span class="gradient-text-indigo">Services &amp; Machineries</span>
                 </h2>
                 <p class="text-secondary small mb-0">
-                    From emerging labels to established garment conglomerates, we empower businesses of all sizes with international accessories.
+                    Explore our specialized manufacturing services and world-class industrial machinery lineup engineered for international export standards.
                 </p>
             </div>
-            <div class="col-lg-6 text-lg-end mt-3 mt-lg-0">
-                <div class="catalog-filter-bar mb-0 justify-content-lg-end">
-                    <button type="button" class="filter-btn business-profile-tab active" data-tab="enterprise">Enterprise</button>
-                    <button type="button" class="filter-btn business-profile-tab" data-tab="startup">Startup</button>
-                    <button type="button" class="filter-btn business-profile-tab" data-tab="merchandiser">Merchandiser</button>
-                    <button type="button" class="filter-btn business-profile-tab" data-tab="garments">Garments</button>
-                    <button type="button" class="filter-btn business-profile-tab" data-tab="trader">Trader</button>
+            <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+                <div class="catalog-filter-bar mb-0 justify-content-lg-end d-inline-flex gap-2">
+                    <button type="button" class="filter-btn capabilities-tab active" data-tab="services">
+                        <i class="bi bi-gear-wide-connected me-1"></i> Services
+                    </button>
+                    <button type="button" class="filter-btn capabilities-tab" data-tab="machineries">
+                        <i class="bi bi-cpu me-1"></i> Machineries
+                    </button>
                 </div>
             </div>
         </div>
 
         <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white reveal delay-1">
-            <div class="row align-items-center g-4 dynamic-tab-content" id="businessProfileContent">
+            <div class="row align-items-center g-4 dynamic-tab-content" id="capabilitiesContent">
                 <div class="col-lg-5">
-                    <span class="badge bg-light text-primary border mb-2 px-3 py-2 profile-tag">Dedicated Support</span>
-                    <h3 class="fw-bold text-dark mb-3 profile-title">Enterprise Garment Manufacturers</h3>
+                    <span class="badge bg-light text-primary border mb-2 px-3 py-2 profile-tag">
+                        <i class="bi bi-gear-wide-connected me-1"></i> Specialized Manufacturing Solutions
+                    </span>
+                    <h3 class="fw-bold text-dark mb-3 profile-title">Export-Grade Manufacturing Services</h3>
                     <p class="text-secondary small mb-4 profile-desc">
-                        We provide a complete range of accessories tailored to your production needs. Our commitment is to streamline operations, reduce delays, and deliver superior-quality apparel trims so manufacturers can focus on creating world-class garments.
+                        From high-speed multi-color offset and automated screen printing to computerized ultrasonic cutting, hot-foil stamping, and custom packaging. We offer full-cycle manufacturing services tailored to global apparel brands and RMG exporters.
                     </p>
                     <ul class="list-unstyled small text-secondary mb-4 profile-bullets">
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-indigo me-2"></i> High-volume monthly output capacity exceeding 10M trims/month</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-indigo me-2"></i> Dedicated merchandising account managers & direct ERP link</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-indigo me-2"></i> Punctual delivery across industrial export clusters</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-indigo me-2"></i> High-volume offset printing, ultrasonic cutting &amp; computerized sampling</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-indigo me-2"></i> OEKO-TEX Standard 100 chemical wash-test &amp; fastness certified</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-indigo me-2"></i> Fast lab dip turnarounds with direct technical merchandiser coordination</li>
                     </ul>
-                    <button type="button" class="btn btn-modern-primary" onclick="openQuoteModal('', 'Enterprise Order')">
-                        Get Started Now
-                    </button>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <a asp-controller="Home" asp-action="Services" class="btn btn-modern-primary profile-btn-primary" id="btnCapabilitiesPrimary">
+                            <i class="bi bi-gear-wide-connected me-2"></i> <span>Explore All Services</span>
+                        </a>
+                        <a asp-controller="Home" asp-action="Machineries" class="btn btn-outline-dark profile-btn-secondary" id="btnCapabilitiesSecondary">
+                            <i class="bi bi-cpu me-2"></i> <span>View Machineries</span>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-lg-7">
                     <div class="row g-2">
                         <div class="col-6">
-                            <img src="~/images/slider/slide-1.jpg" alt="Production floor" class="img-fluid rounded-3 w-100 shadow-sm profile-img-1" style="height: 280px; object-fit: cover;" onerror="this.src='/images/machineries/gto.jpg';" />
+                            <a asp-controller="Home" asp-action="Services" class="d-block overflow-hidden rounded-3 shadow-sm profile-img-link-1" title="Explore Services">
+                                <img src="~/images/services/ManufacturingService.jpg" alt="Manufacturing Services" class="img-fluid w-100 profile-img-1" style="height: 280px; object-fit: cover; transition: transform 0.3s ease;" onerror="this.src='/images/slider/slide-1.jpg';" />
+                            </a>
                         </div>
                         <div class="col-6">
-                            <img src="~/images/slider/slide-2.jpg" alt="Garments sorting" class="img-fluid rounded-3 w-100 shadow-sm profile-img-2" style="height: 280px; object-fit: cover;" onerror="this.src='/images/machineries/autoscreen.jpg';" />
+                            <a asp-controller="Home" asp-action="Services" class="d-block overflow-hidden rounded-3 shadow-sm profile-img-link-2" title="Explore Services">
+                                <img src="~/images/services/PackagingService.jpg" alt="Packaging Services" class="img-fluid w-100 profile-img-2" style="height: 280px; object-fit: cover; transition: transform 0.3s ease;" onerror="this.src='/images/slider/slide-2.jpg';" />
+                            </a>
                         </div>
                     </div>
                 </div>

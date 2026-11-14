@@ -392,108 +392,112 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // =============================================================
-    // 5. Dynamic Buyer Profiles ("Business We Help To Grow")
+    // 5. Dynamic Capabilities Switcher (Services & Machineries)
     // =============================================================
-    const profileTabs = document.querySelectorAll('.business-profile-tab');
-    const profileContent = document.getElementById('businessProfileContent');
+    const capabilityTabs = document.querySelectorAll('.capabilities-tab, .business-profile-tab');
+    const capabilitiesContent = document.getElementById('capabilitiesContent') || document.getElementById('businessProfileContent');
 
-    const profileData = {
-        enterprise: {
-            tag: 'Dedicated Support',
-            title: 'Enterprise Garment Manufacturers',
-            description: 'We provide a complete range of accessories tailored to high-volume production needs. Our commitment is to streamline operations, reduce supply chain delays, and deliver superior-quality apparel trims so large manufacturers can focus on global export schedules.',
+    const capabilitiesData = {
+        services: {
+            tag: '<i class="bi bi-gear-wide-connected me-1"></i> Specialized Manufacturing Solutions',
+            title: 'Export-Grade Manufacturing Services',
+            description: 'From high-speed multi-color offset and automated screen printing to computerized ultrasonic cutting, hot-foil stamping, and custom packaging. We offer full-cycle manufacturing services tailored to global apparel brands and RMG exporters.',
             bullets: [
-                'High-volume monthly output capacity exceeding 10M trims/month',
-                'Dedicated merchandising account managers & direct ERP link',
-                'Punctual delivery across industrial export clusters (Gazipur, Savar, Ashulia, Chattogram)'
+                'High-volume offset printing, ultrasonic cutting & computerized sampling',
+                'OEKO-TEX Standard 100 chemical wash-test & fastness certified',
+                'Fast lab dip turnarounds with direct technical merchandiser coordination'
             ],
-            image1: '/images/slider/slide-1.jpg',
-            image2: '/images/slider/slide-2.jpg'
+            primaryBtnText: 'Explore All Services',
+            primaryBtnHref: '/Home/Services',
+            primaryBtnIcon: 'bi bi-gear-wide-connected',
+            secondaryBtnText: 'View Machineries',
+            secondaryBtnHref: '/Home/Machineries',
+            secondaryBtnIcon: 'bi bi-cpu',
+            image1: '/images/services/ManufacturingService.jpg',
+            image2: '/images/services/PackagingService.jpg',
+            img1Alt: 'Manufacturing Services',
+            img2Alt: 'Packaging Services',
+            imgHref: '/Home/Services'
         },
-        startup: {
-            tag: 'Agile & Flexible',
-            title: 'Emerging Labels & Fashion Startups',
-            description: 'Launch your apparel brand with low minimum order quantities (MOQ), bespoke fabric development, and rapid design sampling. We empower new clothing lines with world-class packaging and brand identification.',
+        machineries: {
+            tag: '<i class="bi bi-cpu me-1"></i> Industrial Machinery Infrastructure',
+            title: 'Advanced European & Japanese Machineries',
+            description: 'Our production facility is equipped with top-tier industrial machinery including Heidelberg GTO presses, automated screen printers, and hydraulic 3D embossers, delivering unmatched precision and zero-downtime reliability.',
             bullets: [
-                'Low MOQ batches with zero compromise on premium quality',
-                'Rapid swatch sampling delivered within 48 to 72 business hours',
-                'Complete creative assistance on woven labels, hang-tags & care labels'
+                'Heidelberg GTO & multi-color offset presses for micro-dot color fidelity',
+                'Hydraulic 3D embossing & automated heat-seal laminating units',
+                'High-speed electronic jacquard & needle loom weaving capacity'
             ],
-            image1: '/images/slider/slide-3.jpg',
-            image2: '/images/products/Buttons.jpg'
-        },
-        merchandiser: {
-            tag: 'Speed & Accuracy',
-            title: 'Apparel Merchandisers & Sourcing Teams',
-            description: 'Instant cost estimations, rapid lab dips, and technical spec-sheet approvals. We provide merchandisers with verified tech-pack costing within 2-4 hours to streamline buyer presentations.',
-            bullets: [
-                'Direct factory cost computations with transparent pricing breakdown',
-                'Compliant Standard 100 chemical safety test certifications',
-                'Real-time order progress tracking and digital swatch catalogs'
-            ],
-            image1: '/images/slider/slide-2.jpg',
-            image2: '/images/slider/slide-1.jpg'
-        },
-        garments: {
-            tag: 'Continuous Feed',
-            title: 'Export-Oriented RMG Factories',
-            description: 'Consistent high-speed trims supply preventing floor downtime. We manufacture precision twill tapes, drawstrings, elastic bands, zippers, and gum tapes for seamless finishing lines.',
-            bullets: [
-                'Zero-tolerance tensile strength, elasticity, and wash-test resilience',
-                'Bulk packaging engineered for rapid automated garment sewing lines',
-                'Dedicated buffer stock reserved for rapid turnaround re-orders'
-            ],
-            image1: '/images/about-s3-pic.jpg',
-            image2: '/images/machineries/screenprint.jpg'
-        },
-        trader: {
-            tag: 'Global Wholesale',
-            title: 'Wholesalers, Buying Houses & Trims Traders',
-            description: 'High-margin wholesale pricing and white-label trims distribution. Access bulk factory quantities with customized branding, export packaging, and swift port clearances.',
-            bullets: [
-                'Competitive container-load wholesale pricing and flexible credit terms',
-                'OEM & private-label packaging tailored to overseas buyers',
-                'Complete customs documentation and smooth logistics support'
-            ],
-            image1: '/images/slider/slide-1.jpg',
-            image2: '/images/slider/slide-3.jpg'
+            primaryBtnText: 'Explore All Machineries',
+            primaryBtnHref: '/Home/Machineries',
+            primaryBtnIcon: 'bi bi-cpu',
+            secondaryBtnText: 'View Services',
+            secondaryBtnHref: '/Home/Services',
+            secondaryBtnIcon: 'bi bi-gear-wide-connected',
+            image1: '/images/machineries/gto.jpg',
+            image2: '/images/machineries/autoscreen.jpg',
+            img1Alt: 'Heidelberg GTO Press',
+            img2Alt: 'Automated Screen Printing Machine',
+            imgHref: '/Home/Machineries'
         }
     };
 
-    if (profileTabs.length > 0 && profileContent) {
-        profileTabs.forEach(tab => {
+    if (capabilityTabs.length > 0 && capabilitiesContent) {
+        capabilityTabs.forEach(tab => {
             tab.addEventListener('click', function (e) {
                 e.preventDefault();
                 const key = this.getAttribute('data-tab');
-                const data = profileData[key];
+                const data = capabilitiesData[key];
                 if (!data) return;
 
-                profileTabs.forEach(t => t.classList.remove('active'));
+                capabilityTabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
 
                 // Smooth crossfade animation
-                profileContent.classList.add('fade-out');
+                capabilitiesContent.classList.add('fade-out');
 
                 setTimeout(() => {
-                    const tagEl = profileContent.querySelector('.profile-tag');
-                    const titleEl = profileContent.querySelector('.profile-title');
-                    const descEl = profileContent.querySelector('.profile-desc');
-                    const listEl = profileContent.querySelector('.profile-bullets');
-                    const img1El = profileContent.querySelector('.profile-img-1');
-                    const img2El = profileContent.querySelector('.profile-img-2');
+                    const tagEl = capabilitiesContent.querySelector('.profile-tag');
+                    const titleEl = capabilitiesContent.querySelector('.profile-title');
+                    const descEl = capabilitiesContent.querySelector('.profile-desc');
+                    const listEl = capabilitiesContent.querySelector('.profile-bullets');
+                    const btnPrimary = capabilitiesContent.querySelector('#btnCapabilitiesPrimary, .profile-btn-primary');
+                    const btnSecondary = capabilitiesContent.querySelector('#btnCapabilitiesSecondary, .profile-btn-secondary');
+                    const img1El = capabilitiesContent.querySelector('.profile-img-1');
+                    const img2El = capabilitiesContent.querySelector('.profile-img-2');
+                    const imgLink1 = capabilitiesContent.querySelector('.profile-img-link-1');
+                    const imgLink2 = capabilitiesContent.querySelector('.profile-img-link-2');
 
-                    if (tagEl) tagEl.textContent = data.tag;
+                    if (tagEl) tagEl.innerHTML = data.tag;
                     if (titleEl) titleEl.textContent = data.title;
                     if (descEl) descEl.textContent = data.description;
                     if (listEl) {
                         listEl.innerHTML = data.bullets.map(b => `<li class="mb-2"><i class="bi bi-check-circle-fill text-indigo me-2"></i> ${b}</li>`).join('');
                     }
-                    if (img1El) img1El.src = data.image1;
-                    if (img2El) img2El.src = data.image2;
 
-                    profileContent.classList.remove('fade-out');
-                    profileContent.classList.add('fade-in');
-                    setTimeout(() => profileContent.classList.remove('fade-in'), 400);
+                    if (btnPrimary) {
+                        btnPrimary.href = data.primaryBtnHref;
+                        btnPrimary.innerHTML = `<i class="${data.primaryBtnIcon} me-2"></i> <span>${data.primaryBtnText}</span>`;
+                    }
+                    if (btnSecondary) {
+                        btnSecondary.href = data.secondaryBtnHref;
+                        btnSecondary.innerHTML = `<i class="${data.secondaryBtnIcon} me-2"></i> <span>${data.secondaryBtnText}</span>`;
+                    }
+
+                    if (img1El) {
+                        img1El.src = data.image1;
+                        img1El.alt = data.img1Alt;
+                    }
+                    if (img2El) {
+                        img2El.src = data.image2;
+                        img2El.alt = data.img2Alt;
+                    }
+                    if (imgLink1) imgLink1.href = data.imgHref;
+                    if (imgLink2) imgLink2.href = data.imgHref;
+
+                    capabilitiesContent.classList.remove('fade-out');
+                    capabilitiesContent.classList.add('fade-in');
+                    setTimeout(() => capabilitiesContent.classList.remove('fade-in'), 400);
                 }, 200);
             });
         });
